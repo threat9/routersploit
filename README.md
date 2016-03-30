@@ -4,7 +4,7 @@ The RouteSploit Framework is an open-source exploitation framework dedicated to 
 
 It consists of various modules that aids penetration testing operations:
 
-- exploits - modules that takes advantage of identified vulnerabilities
+- exploits - modules that take advantage of identified vulnerabilities
 - creds - modules designed to test credentials against network services
 - scanners - modules that check if target is vulnerable to any exploit
 
