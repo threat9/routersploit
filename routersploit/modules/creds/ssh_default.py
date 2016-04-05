@@ -2,7 +2,15 @@ import threading
 import paramiko
 import socket
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -13,8 +21,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'SSH Default Creds',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -39,12 +47,12 @@ class Exploit(exploits.Exploit):
             pass
 
         ssh.close()
-        
+
         if self.defaults.startswith('file://'):
             defaults = open(self.defaults[7:], 'r')
         else:
             defaults = [self.defaults]
-        
+
         collection = LockedIterator(defaults)
         self.run_threads(self.threads, self.target_function, collection)
 
@@ -72,7 +80,7 @@ class Exploit(exploits.Exploit):
                 break
             except paramiko.ssh_exception.SSHException as err:
                 ssh.close()
-                print_error(name, err,"Username: '{}' Password: '{}'".format(user, password))
+                print_error(name, err, "Username: '{}' Password: '{}'".format(user, password))
             else:
                 running.clear()
                 print_success("{}: Authentication succeed!".format(name), user, password)

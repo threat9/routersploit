@@ -1,7 +1,5 @@
 import threading
-import itertools
 import netsnmp
-import socket
 
 from routersploit.utils import print_status, print_success, print_error, print_table, LockedIterator
 from routersploit import exploits
@@ -15,7 +13,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SNMP Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
+        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -45,7 +43,7 @@ class Exploit(exploits.Exploit):
             print_table(headers, *self.strings)
         else:
             print_error("Valid community strings not found")
-            
+
     def target_function(self, running, data):
         name = threading.current_thread().name
         address = "{}:{}".format(self.target, self.port)
@@ -57,9 +55,9 @@ class Exploit(exploits.Exploit):
                 string = data.next().strip()
 
                 bindvariable = netsnmp.Varbind(".1.3.6.1.2.1.1.1.0")
-                res = netsnmp.snmpget(bindvariable, Version = 1, DestHost = address, Community=string)
+                res = netsnmp.snmpget(bindvariable, Version=1, DestHost=address, Community=string)
 
-                if res[0] != None:
+                if res[0] is not None:
                     running.clear()
                     print_success("{}: Valid community string found!".format(name), string)
                     self.strings.append(tuple([string]))

@@ -1,7 +1,16 @@
 import threading
 import requests
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+    sanitize_url,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -12,8 +21,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'HTTP Basic Default Creds',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target address e.g. http://192.168.1.1')
@@ -35,7 +44,7 @@ class Exploit(exploits.Exploit):
             print_error("Invalid URL format: %s" % url)
             return
         except requests.exceptions.ConnectionError:
-	    print_error("Connection error: %s" % url)
+            print_error("Connection error: %s" % url)
             return
 
         if r.status_code != 401:

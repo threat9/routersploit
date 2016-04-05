@@ -224,7 +224,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if self.current_module:
             try:
                 return self.module_prompt_template.format(host=self.prompt_hostname, module=self.module_metadata['name'])
-            except (AttributeError, KeyError) as e:
+            except (AttributeError, KeyError):
                 return self.module_prompt_template.format(host=self.prompt_hostname, module="UnnamedModule")
         else:
             return self.raw_prompt_template.format(host=self.prompt_hostname)
@@ -335,7 +335,7 @@ class RoutersploitInterpreter(BaseInterpreter):
                     if type(self.module_metadata[i]) is list:
                         for item in self.module_metadata[i]:
                             print("- {}".format(item))
-                    else:    
+                    else:
                         print(self.module_metadata[i])
             print()
         elif sub_command == options:
@@ -363,7 +363,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             return sub_commands
 
     @utils.module_required
-    def command_check(self,  *args, **kwargs):
+    def command_check(self, *args, **kwargs):
         try:
             result = self.current_module.check()
         except:
