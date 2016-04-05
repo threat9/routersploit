@@ -16,10 +16,11 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'gnureadline==6.3.3',
+    'pexpect==4.0.1',
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'mock==1.3.0',
 ]
 
 setup(
