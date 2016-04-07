@@ -270,7 +270,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             module = importlib.import_module(module_path)
             self.current_module = getattr(module, 'Exploit')()
         except (ImportError, AttributeError, KeyError):
-            utils.print_error("Error during loading '{}' module".format(utils.humanize_path(module_path)))
+            utils.print_error("Error '{}'. It should be valid path to the module. Use <tab> key multiple times for completion.".format(utils.humanize_path(module_path)))
 
     @utils.stop_after(2)
     def complete_use(self, text, *args, **kwargs):
@@ -343,11 +343,11 @@ class RoutersploitInterpreter(BaseInterpreter):
             module_opts = set(self.current_module.options) - target_opts
             headers = ("Name", "Current settings", "Description")
 
-            utils.print_info('\nTarget options:\n')
+            utils.print_info('\nTarget options:')
             utils.print_table(headers, *self.get_opts(*target_opts))
 
             if module_opts:
-                utils.print_info('\nModule options:\n')
+                utils.print_info('\nModule options:')
                 utils.print_table(headers, *self.get_opts(*module_opts))
 
             utils.print_info()
