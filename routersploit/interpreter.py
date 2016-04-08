@@ -270,7 +270,9 @@ class RoutersploitInterpreter(BaseInterpreter):
             module = importlib.import_module(module_path)
             self.current_module = getattr(module, 'Exploit')()
         except (ImportError, AttributeError, KeyError):
-            utils.print_error("Error '{}'. It should be valid path to the module. Use <tab> key multiple times for completion.".format(utils.humanize_path(module_path)))
+            utils.print_error("Error during loading '{}' module. "
+                              "It should be valid path to the module. "
+                              "Use <tab> key multiple times for completion.".format(utils.humanize_path(module_path)))
 
     @utils.stop_after(2)
     def complete_use(self, text, *args, **kwargs):
@@ -329,7 +331,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if sub_command == info:
             info = ["name", "description", "targets", "authors", "references"]
 
-            for i in info:
+            for i in info:  # TODO refactor this.
                 if i in self.module_metadata.keys():
                     print("\n{}:".format(i.capitalize()))
                     if type(self.module_metadata[i]) is list:

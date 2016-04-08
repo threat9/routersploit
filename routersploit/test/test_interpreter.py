@@ -244,7 +244,7 @@ class RoutersploitInterpreterTest(unittest.TestCase):
 
     @mock.patch('importlib.import_module')
     @mock.patch('routersploit.utils.print_error')
-    def test_command_unknown_extension(self, mocked_print_error, mocked_import_module):
+    def test_command_unknown_module(self, mocked_print_error, mocked_import_module):
         """ Testing command_use()
 
         * Unknown module
@@ -256,8 +256,10 @@ class RoutersploitInterpreterTest(unittest.TestCase):
 
         self.interpreter.command_use(module_path)
 
-        mocked_import_module.assert_called_once_with('routersploit.modules.creds.foo.bar')
-        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/creds/foo/bar' module")
+        mocked_import_module.assert_called_once_with('routersploit.modules.creds.foo.bar.baz')
+        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/creds/foo/bar/baz' "
+                                                   "module. It should be valid path to the module. "
+                                                   "Use <tab> key multiple times for completion.")
         self.assertEqual(self.interpreter.current_module, None)
 
     @mock.patch('importlib.import_module')
@@ -277,17 +279,19 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.interpreter.command_use(module_path)
 
         mocked_import_module.assert_called_once_with('routersploit.modules.exploits.foo.bar')
-        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/exploits/foo/bar' module")
+        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/exploits/foo/bar' "
+                                                   "module. It should be valid path to the module. "
+                                                   "Use <tab> key multiple times for completion.")
         self.assertEqual(self.interpreter.current_module, None)
 
     @mock.patch('__builtin__.print')
     def test_command_show_info(self, mock_print):
         metadata = {
-            'target': 'target_desc',
-            'port': 'port_desc',
-            'foo': 'foo_desc',
-            'bar': 'bar_desc',
-            'baz': 'baz_desc'
+            'targets': 'target_desc',
+            'authors': 'authors_desc',
+            'references': 'references_desc',
+            'description': 'description_desc',
+            'name': 'name_desc'
         }
         description = "Elaborate description fo the module"
         self.interpreter.current_module.__doc__ = description
@@ -297,12 +301,16 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.assertEqual(
             mock_print.mock_calls,
             [
-                mock.call(description),
-                mock.call('Baz', ': ', 'baz_desc', sep=''),
-                mock.call('Foo', ': ', 'foo_desc', sep=''),
-                mock.call('Bar', ': ', 'bar_desc', sep=''),
-                mock.call('Target', ': ', 'target_desc', sep=''),
-                mock.call('Port', ': ', 'port_desc', sep=''),
+                mock.call('\nName:'),
+                mock.call('name_desc'),
+                mock.call('\nDescription:'),
+                mock.call('description_desc'),
+                mock.call('\nTargets:'),
+                mock.call('target_desc'),
+                mock.call('\nAuthors:'),
+                mock.call('authors_desc'),
+                mock.call('\nReferences:'),
+                mock.call('references_desc'),
                 mock.call()]
             )
 
@@ -317,7 +325,6 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.assertEqual(
             mock_print.mock_calls,
             [
-                mock.call(description),
                 mock.call()]
             )
 
@@ -343,17 +350,21 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.assertEqual(
             mock_print.mock_calls,
             [
-                mock.call('\nTarget options:\n'),
+                mock.call('\nTarget options:'),
+                mock.call(),
                 mock.call('   Name       Current settings     Description     '),
                 mock.call('   ----       ----------------     -----------     '),
                 mock.call('   target     127.0.0.1            target_desc     '),
                 mock.call('   port       22                   port_desc       '),
-                mock.call('\nModule options:\n'),
+                mock.call(),
+                mock.call('\nModule options:'),
+                mock.call(),
                 mock.call('   Name     Current settings     Description     '),
                 mock.call('   ----     ----------------     -----------     '),
                 mock.call('   bar      2                    bar_desc        '),
                 mock.call('   foo      1                    foo_desc        '),
                 mock.call('   baz      3                    baz_desc        '),
+                mock.call(),
                 mock.call(),
             ]
         )
@@ -374,11 +385,13 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.assertEqual(
             mock_print.mock_calls,
             [
-                mock.call('\nTarget options:\n'),
+                mock.call('\nTarget options:'),
+                mock.call(),
                 mock.call('   Name       Current settings     Description     '),
                 mock.call('   ----       ----------------     -----------     '),
                 mock.call('   target     127.0.0.1            target_desc     '),
                 mock.call('   port       22                   port_desc       '),
+                mock.call(),
                 mock.call(),
             ]
         )

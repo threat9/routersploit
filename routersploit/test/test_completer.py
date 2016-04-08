@@ -8,7 +8,7 @@ class RoutersploitCompleterTest(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):
         super(RoutersploitCompleterTest, self).__init__(methodName)
-        self.cli_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'cli.py'))
+        self.cli_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'rsf.py'))
         self.raw_prompt = "\033[4mrsf\033[0m > "
         self.module_prompt = lambda x: "\033[4mrsf\033[0m (\033[91m{}\033[0m) > ".format(x)
 
@@ -39,7 +39,7 @@ class RoutersploitCompleterTest(unittest.TestCase):
     def test_complete_use(self):
         self.rsf.send("use \t\t")
         self.assertPrompt(
-            'creds     exploits  \r\n',
+            'creds     exploits  scanners  \r\n',
             self.raw_prompt,
             'use '
         )
