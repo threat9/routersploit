@@ -1,9 +1,11 @@
 language: python
-env:
-    - TOXENV=py27
-    - TOXENV=py32
-    - TOXENV=py33
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+
 install:
-    - pip install tox
-script:
-    - tox
+  - "pip install -r requirements.txt"
+  - "pip install pexpect"
+
+script: "python -m unittest discover -t . -s routersploit/test"
