@@ -180,7 +180,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 """
 
     def load_modules(self):
-        self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if '.py' not in module]
+        self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if not module.startswith("__")]
         self.modules = []
 
         for root, dirs, files in os.walk(self.modules_directory):

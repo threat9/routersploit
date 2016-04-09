@@ -3,7 +3,10 @@ import unittest
 import os
 import inspect
 
-import mock
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 
 from routersploit.interpreter import RoutersploitInterpreter
 from routersploit.exploits import Exploit

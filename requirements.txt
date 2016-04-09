@@ -1,0 +1,4 @@
+gnureadline
+requests
+paramiko
+beautifulsoup4
