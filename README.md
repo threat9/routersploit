@@ -1,5 +1,7 @@
 # RouterSploit - Router Exploitation Framework
 
+[![Build Status](https://travis-ci.org/reverse-shell/routersploit.svg?branch=master)](https://travis-ci.org/reverse-shell/routersploit)
+
 The RouteSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
 It consists of various modules that aids penetration testing operations:
