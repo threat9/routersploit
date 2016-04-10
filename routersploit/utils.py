@@ -193,7 +193,6 @@ def sanitize_url(address):
 
     Converts address to valid HTTP url.
     """
-    url = ""
     if not address.startswith("http://") and not address.startswith("https://"):
         url = "http://" + address
     else:
@@ -201,3 +200,43 @@ def sanitize_url(address):
 
     return url
 
+
+def pprint_dict_in_order(order, dictionary):
+    """ Pretty dict print.
+
+    Pretty printing dictionary in specific order. (as in 'show info' command)
+    Keys not mentioned in *order* parameter will be printed in random order.
+
+    ex. pprint_dict_in_order(('sex', 'name'), {'name': John, 'sex': 'male', "hobby": ["rugby", "golf"]})
+
+    Sex:
+    male
+
+    Name:
+    John
+
+    Hobby:
+    - rugby
+    - golf
+
+    """
+    def prettyprint(title, body):
+        print_info("\n{}:".format(title.capitalize()))
+        if not isinstance(body, str):
+            for value_element in value:
+                print_info('- ', value_element)
+        else:
+            print_info(value)
+
+    keys = dictionary.keys()
+    for element in order:
+        try:
+            key = keys.pop(keys.index(element))
+            value = dictionary[key]
+        except (KeyError, ValueError):
+            pass
+        else:
+            prettyprint(element, value)
+
+    for rest_keys in keys:
+        prettyprint(rest_keys, dictionary[rest_keys])

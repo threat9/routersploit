@@ -329,17 +329,11 @@ class RoutersploitInterpreter(BaseInterpreter):
         info, options = 'info', 'options'
         sub_command = args[0]
         if sub_command == info:
-            info = ["name", "description", "targets", "authors", "references"]
-
-            for i in info:  # TODO refactor this.
-                if i in self.module_metadata.keys():
-                    print("\n{}:".format(i.capitalize()))
-                    if type(self.module_metadata[i]) is list:
-                        for item in self.module_metadata[i]:
-                            print("- {}".format(item))
-                    else:    
-                        print(self.module_metadata[i])
-            print()
+            utils.pprint_dict_in_order(
+                ("name", "description", "targets", "authors", "references"),
+                self.module_metadata,
+            )
+            utils.print_info()
         elif sub_command == options:
             target_opts = {'port', 'target'}
             module_opts = set(self.current_module.options) - target_opts
