@@ -186,7 +186,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         for root, dirs, files in os.walk(self.modules_directory):
             _, package, root = root.rpartition('routersploit')
             root = "".join((package, root)).replace(os.sep, '.')
-            modules = map(lambda x: '.'.join((root, x.strip('.py'))), filter(lambda x: x.endswith('.py'), files))
+            modules = map(lambda x: '.'.join((root, os.path.splitext(x)[0])), filter(lambda x: x.endswith('.py'), files))
             for module_path in modules:
                 try:
                     module = importlib.import_module(module_path)
