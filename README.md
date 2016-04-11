@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/reverse-shell/routersploit.svg?branch=master)](https://travis-ci.org/reverse-shell/routersploit)
 
-The RouteSploit Framework is an open-source exploitation framework dedicated to embedded devices.
+The RouterSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
 It consists of various modules that aids penetration testing operations:
 
@@ -15,6 +15,13 @@ It consists of various modules that aids penetration testing operations:
 	sudo apt-get install python-requests python-paramiko python-netsnmp
 	git clone https://github.com/reverse-shell/routersploit
 	./rsf.py
+
+# Update
+
+Update RouterSploit Framework often. Project is under heavy development and new modules are shipped almost everyday.
+
+    cd routersploit
+    git pull
 
 # Usage
 
