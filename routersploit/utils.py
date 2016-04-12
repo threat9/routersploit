@@ -201,13 +201,13 @@ def sanitize_url(address):
     return url
 
 
-def pprint_dict_in_order(order, dictionary):
+def pprint_dict_in_order(dictionary, order=None):
     """ Pretty dict print.
 
     Pretty printing dictionary in specific order. (as in 'show info' command)
     Keys not mentioned in *order* parameter will be printed in random order.
 
-    ex. pprint_dict_in_order(('sex', 'name'), {'name': John, 'sex': 'male', "hobby": ["rugby", "golf"]})
+    ex. pprint_dict_in_order({'name': John, 'sex': 'male', "hobby": ["rugby", "golf"]}, ('sex', 'name'))
 
     Sex:
     male
@@ -220,6 +220,8 @@ def pprint_dict_in_order(order, dictionary):
     - golf
 
     """
+    order = order or ()
+
     def prettyprint(title, body):
         print_info("\n{}:".format(title.capitalize()))
         if not isinstance(body, str):
