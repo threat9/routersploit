@@ -285,6 +285,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_run(self, *args, **kwargs):
+        utils.print_status("Running module...")
         try:
             self.current_module.run()
         except:
