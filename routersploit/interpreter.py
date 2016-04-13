@@ -177,7 +177,9 @@ class RoutersploitInterpreter(BaseInterpreter):
  Dev Team : Marcin Bury (lucyoa) & Mariusz Kupidura (fwkz)
  Codename : Wildest Dreams
  Version  : 1.0.0
-"""
+
+ Total module count: {modules_count}
+""".format(modules_count=len(self.modules))
 
     def load_modules(self):
         self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if not module.startswith("__")]
