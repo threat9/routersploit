@@ -25,7 +25,6 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.strings= []
-        print_status("Running module...")
 
         # todo: check if service is up
 

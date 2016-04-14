@@ -36,8 +36,6 @@ class Exploit(exploits.Exploit):
     credentials = []
 
     def run(self):
-        print_status("Running module...")
-
         self.credentials = []
         ftp = ftplib.FTP()
         try:

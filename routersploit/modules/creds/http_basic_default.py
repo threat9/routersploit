@@ -33,8 +33,6 @@ class Exploit(exploits.Exploit):
     credentials = []
 
     def run(self):
-        print_status("Running module...")
-
         self.credentials = []
         url = sanitize_url("{}:{}".format(self.target, self.port))
 

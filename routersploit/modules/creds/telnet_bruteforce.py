@@ -34,7 +34,6 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
-        print_status("Running module...")
 
         try:
             tn = telnetlib.Telnet(self.target, self.port)

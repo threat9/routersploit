@@ -34,7 +34,6 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
-        print_status("Running module...")
         ssh = paramiko.SSHClient()
 
         try:

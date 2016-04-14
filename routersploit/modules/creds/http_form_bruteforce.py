@@ -40,8 +40,6 @@ class Exploit(exploits.Exploit):
     invalid = {"min": 0, "max": 0}
 
     def run(self):
-        print_status("Running module...")
-
         self.credentials = []
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
