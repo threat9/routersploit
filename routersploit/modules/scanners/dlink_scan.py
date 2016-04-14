@@ -2,7 +2,7 @@ from os import listdir
 from os.path import isfile, join
 import imp
 
-from routersplot import (
+from routersploit import (
     exploits,
     print_success,
     print_error,
