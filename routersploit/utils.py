@@ -122,7 +122,8 @@ class LockedIterator(object):
         self.lock = threading.Lock()
         self.it = it.__iter__()
 
-    def __iter__(self): return self
+    def __iter__(self):
+        return self
 
     def next(self):
         self.lock.acquire()
@@ -170,7 +171,7 @@ def print_table(headers, *args, **kwargs):
         headers_line = "".join((headers_line, "{header:<{fill}}".format(header=header, fill=current_line_fill)))
         headers_separator_line = "".join((
             headers_separator_line,
-            '{:<{}}'.format(header_separator*len(header), current_line_fill)
+            '{:<{}}'.format(header_separator * len(header), current_line_fill)
         ))
 
     print()

