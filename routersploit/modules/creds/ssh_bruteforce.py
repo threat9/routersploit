@@ -3,7 +3,15 @@ import itertools
 import socket
 import paramiko
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -13,7 +21,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SSH Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
+        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -60,7 +68,7 @@ class Exploit(exploits.Exploit):
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
-            
+
     def target_function(self, running, data):
         name = threading.current_thread().name
         ssh = paramiko.SSHClient()

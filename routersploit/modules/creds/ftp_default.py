@@ -2,7 +2,15 @@ import threading
 import ftplib
 import socket
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -13,8 +21,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'FTP Default Creds',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -65,7 +73,7 @@ class Exploit(exploits.Exploit):
             try:
                 line = data.next().split(":")
                 user = line[0].strip()
-                password = line[1].strip()    
+                password = line[1].strip()
             except StopIteration:
                 break
             else:
@@ -81,7 +89,7 @@ class Exploit(exploits.Exploit):
                         if retries > 2:
                             print_error("Too much connection problems. Quiting...")
                             return
-                
+
                 try:
                     ftp.login(user, password)
 

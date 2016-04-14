@@ -1,7 +1,13 @@
-from routersploit import *
 from os import listdir
 from os.path import isfile, join
 import imp
+
+from routersplot import (
+    exploits,
+    print_success,
+    print_error,
+    print_status,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -12,20 +18,19 @@ class Exploit(exploits.Exploit):
         'name': 'D-Link Scanner',
         'description': 'Scanner module for D-Link devices',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>', # routersploit module
-         ],
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
     }
 
-    target = exploits.Option('', 'Target address e.g. http://192.168.1.1') # target address
-    port = exploits.Option(80, 'Target port') # default port
+    target = exploits.Option('', 'Target address e.g. http://192.168.1.1')  # target address
+    port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
-        exploits = []
         rootpath = 'routersploit/modules/'
         path = 'exploits/dlink/'
 
         # only py exploit files
-        modules = [f.replace(".py", "") for f in listdir(rootpath+path) if isfile(join(rootpath+path, f)) and f.endswith(".py") and f != "__init__.py"]
+        modules = [f.replace(".py", "") for f in listdir(rootpath + path) if isfile(join(rootpath + path, f)) and f.endswith(".py") and f != "__init__.py"]
 
         vulns = []
         for module_name in modules:
@@ -47,7 +52,7 @@ class Exploit(exploits.Exploit):
             else:
                 print_status("{} could not be verified".format(f))
 
-        print 
+        print
         if len(vulns):
             print_success("Device is vulnerable!")
             for v in vulns:
@@ -58,4 +63,3 @@ class Exploit(exploits.Exploit):
 
     def check(self):
         print_error("Check method is not available")
-

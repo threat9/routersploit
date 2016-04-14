@@ -3,7 +3,15 @@ import ftplib
 import socket
 import itertools
 
-from routersploit import *
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -14,8 +22,8 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'FTP Bruteforce',
         'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>' # routersploit module
-         ]
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        ]
     }
 
     target = exploits.Option('', 'Target IP address')
@@ -99,6 +107,6 @@ class Exploit(exploits.Exploit):
                 except:
                     print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password))
 
-                ftp.close() 
+                ftp.close()
 
         print_status(name, 'process is terminated.')
