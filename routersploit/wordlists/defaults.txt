@@ -6,7 +6,7 @@
 ADMINISTRATOR:ADMINISTRATOR
 ADMN:admn
 ADVMAIL:HP
-ADVMAIL:HPOFFICE DATA
+ADVMAIL:HPOFFICE
 Admin:admin
 Administrator:3ware
 Administrator:admin
@@ -16,7 +16,7 @@ Administrator:letmein
 Administrator:password
 Administrator:pilou
 Administrator:smcadmin
-Administrator:the same all over
+Administrator:admin
 Any:12345
 CSG:SESAME
 Cisco:Cisco
@@ -174,6 +174,8 @@ admin:synnet
 admin:sysAdmin
 admin:system
 admin:visual
+admin:test
+admin:test1
 admin:w2402
 admin:xad$l#12
 admin:zoomadsl
@@ -222,6 +224,7 @@ deskalt:password
 deskman:changeme
 desknorm:password
 deskres:password
+dev:dev
 device:device
 dhs3mt:dhs3mt
 dhs3pms:dhs3pms
@@ -373,6 +376,8 @@ telco:telco
 telecom:telecom
 tellabs:tellabs#1
 temp1:password
+test:test
+test:test1
 tiara:tiaranet
 tiger:tiger123
 topicalt:password

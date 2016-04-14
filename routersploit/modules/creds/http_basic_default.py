@@ -26,15 +26,16 @@ class Exploit(exploits.Exploit):
     }
 
     target = exploits.Option('', 'Target address e.g. http://192.168.1.1')
-    port = exploits.Option(80, 'Target port')
+    port = exploits.Option(80, 'Target port') 
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
+    path = exploits.Option('/', 'URL Path')
 
     credentials = []
 
     def run(self):
         self.credentials = []
-        url = sanitize_url("{}:{}".format(self.target, self.port))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
             r = requests.get(url)
@@ -66,7 +67,7 @@ class Exploit(exploits.Exploit):
 
     def target_function(self, running, data):
         name = threading.current_thread().name
-        url = sanitize_url("{}:{}".format(self.target, self.port))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         print_status(name, 'process is starting...')
 

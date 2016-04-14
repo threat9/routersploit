@@ -32,12 +32,13 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Numbers of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
+    path = exploits.Option('/', 'URL Path')
 
     credentials = []
 
     def run(self):
         self.credentials = []
-        url = sanitize_url("{}:{}".format(self.target, self.port))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
             r = requests.get(url)
@@ -75,7 +76,7 @@ class Exploit(exploits.Exploit):
 
     def target_function(self, running, data):
         name = threading.current_thread().name
-        url = sanitize_url("{}:{}".format(self.target, self.port))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         print_status(name, 'process is starting...')
 
