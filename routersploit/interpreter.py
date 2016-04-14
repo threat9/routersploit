@@ -160,6 +160,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.prompt_hostname = 'rsf'
         self.modules_directory = rsf_modules.__path__[0]
         self.modules = []
+        self.modules_with_errors = {}
         self.main_modules_dirs = []
 
         self.__parse_prompt()
@@ -184,6 +185,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     def load_modules(self):
         self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if not module.startswith("__")]
         self.modules = []
+        self.modules_with_errors = {}
 
         for root, dirs, files in os.walk(self.modules_directory):
             _, package, root = root.rpartition('routersploit')
@@ -192,8 +194,8 @@ class RoutersploitInterpreter(BaseInterpreter):
             for module_path in modules:
                 try:
                     module = importlib.import_module(module_path)
-                except ImportError:
-                    pass
+                except ImportError as error:
+                    self.modules_with_errors[module_path] = error
                 else:
                     klasses = inspect.getmembers(module, inspect.isclass)
                     exploits = filter(lambda x: issubclass(x[1], Exploit), klasses)
@@ -257,9 +259,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         :return: list of most accurate command suggestions
         """
         if self.current_module:
-            return ['run', 'back', 'set ', 'show ', 'check']
+            return ['run', 'back', 'set ', 'show ', 'check', 'debug']
         else:
-            return ['use ']
+            return ['use ', 'debug']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -374,3 +376,9 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_error("Target is not vulnerable")
             else:
                 utils.print_status("Target could not be verified")
+
+    def command_debug(self, *args, **kwargs):
+        for key, value in self.modules_with_errors.iteritems():
+            utils.print_info(key)
+            utils.print_error(value, '\n')
+
