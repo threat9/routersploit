@@ -2,7 +2,8 @@ from __future__ import print_function
 import threading
 from functools import wraps
 import sys
-
+import random
+import string
 
 print_lock = threading.Lock()
 
@@ -200,7 +201,7 @@ def sanitize_url(address):
         url = address
 
     return url
-
+ 
 
 def pprint_dict_in_order(dictionary, order=None):
     """ Pretty dict print.
@@ -243,3 +244,11 @@ def pprint_dict_in_order(dictionary, order=None):
 
     for rest_keys in keys:
         prettyprint(rest_keys, dictionary[rest_keys])
+
+
+def random_text(length, alph=string.letters+string.digits):
+    """ Random text generator. NOT crypto safe.
+    
+    Generates random text with specified length and alphabet.
+    """
+    return ''.join(random.choice(alph) for _ in range(length))
