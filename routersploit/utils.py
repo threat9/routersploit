@@ -5,6 +5,9 @@ import sys
 import random
 import string
 
+import requests
+
+
 print_lock = threading.Lock()
 
 colors = {
@@ -195,13 +198,11 @@ def sanitize_url(address):
 
     Converts address to valid HTTP url.
     """
-    if not address.startswith("http://") and not address.startswith("https://"):
-        url = "http://" + address
+    if address.startswith("http://") or address.startswith("https://"):
+        return address
     else:
-        url = address
+        return "http://{}".format(address)
 
-    return url
- 
 
 def pprint_dict_in_order(dictionary, order=None):
     """ Pretty dict print.
@@ -252,3 +253,19 @@ def random_text(length, alph=string.letters+string.digits):
     Generates random text with specified length and alphabet.
     """
     return ''.join(random.choice(alph) for _ in range(length))
+
+
+def http_request(method, url, **kwargs):
+    """ Wrapper for 'requests' silencing exceptions a little bit. """
+
+    try:
+        return getattr(requests, method.lower())(url, **kwargs)
+    except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
+        print_error("Invalid URL format: {}".format(url))
+        return
+    except requests.exceptions.ConnectionError:
+        print_error("Connection error: {}".format(url))
+        return
+    except requests.RequestException as error:
+        print_error(error)
+        return
