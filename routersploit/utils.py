@@ -2,6 +2,8 @@ from __future__ import print_function
 import threading
 from functools import wraps
 import sys
+import re
+import collections
 
 import requests
 
@@ -259,3 +261,27 @@ def http_request(method, url, **kwargs):
     except requests.RequestException as error:
         print_error(error)
         return
+
+
+def tokenize(token_specification, text):
+    Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column', 'mo'])
+
+    token_specification.extend((
+        ('NEWLINE', r'\n'),          # Line endings
+        ('SKIP', r'.'),              # Any other character
+    ))
+
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    line_num = 1
+    line_start = 0
+    for mo in re.finditer(tok_regex, text):
+        kind = mo.lastgroup
+        value = mo.group(kind)
+        if kind == 'NEWLINE':
+            line_start = mo.end()
+            line_num += 1
+        elif kind == 'SKIP':
+            pass
+        else:
+            column = mo.start() - line_start
+            yield Token(kind, value, line_num, column, mo)

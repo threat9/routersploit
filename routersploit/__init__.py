@@ -7,6 +7,7 @@ from routersploit.utils import (
     sanitize_url,
     LockedIterator,
     http_request,
+    tokenize,
 )
 
 from routersploit import exploits
