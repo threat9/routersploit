@@ -3,6 +3,8 @@ import threading
 from functools import wraps
 import sys
 
+import requests
+
 
 print_lock = threading.Lock()
 
@@ -194,12 +196,10 @@ def sanitize_url(address):
 
     Converts address to valid HTTP url.
     """
-    if not address.startswith("http://") and not address.startswith("https://"):
-        url = "http://" + address
+    if address.startswith("http://") or address.startswith("https://"):
+        return address
     else:
-        url = address
-
-    return url
+        return "http://{}".format(address)
 
 
 def pprint_dict_in_order(dictionary, order=None):
@@ -243,3 +243,19 @@ def pprint_dict_in_order(dictionary, order=None):
 
     for rest_keys in keys:
         prettyprint(rest_keys, dictionary[rest_keys])
+
+
+def http_request(method, url, **kwargs):
+    """ Wrapper for 'requests' silencing exceptions a little bit. """
+
+    try:
+        return getattr(requests, method.lower())(url, **kwargs)
+    except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
+        print_error("Invalid URL format: {}".format(url))
+        return
+    except requests.exceptions.ConnectionError:
+        print_error("Connection error: {}".format(url))
+        return
+    except requests.RequestException as error:
+        print_error(error)
+        return
