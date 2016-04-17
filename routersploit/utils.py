@@ -276,7 +276,7 @@ def tokenize(token_specification, text):
     line_start = 0
     for mo in re.finditer(tok_regex, text):
         kind = mo.lastgroup
-        value = mo.group(kind)
+        value = filter(lambda x: x is not None, mo.groups())
         if kind == 'NEWLINE':
             line_start = mo.end()
             line_num += 1
