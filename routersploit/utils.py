@@ -92,7 +92,7 @@ def __cprint(*args, **kwargs):
     Signature like Python 3 print() function
     print([object, ...][, sep=' '][, end='\n'][, file=sys.stdout])
     """
-    if not kwargs.get("verbose", True):
+    if not kwargs.pop("verbose", True):
         return
 
     with print_lock:
