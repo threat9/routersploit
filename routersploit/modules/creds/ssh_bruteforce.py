@@ -36,7 +36,6 @@ class Exploit(exploits.Exploit):
     credentials = []
 
     def run(self):
-        print self.verbosity
         self.credentials = []
         ssh = paramiko.SSHClient()
 

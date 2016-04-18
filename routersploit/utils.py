@@ -276,4 +276,4 @@ def http_request(method, url, **kwargs):
 
 
 def boolify(value):
-    return strtobool(value)
+    return bool(strtobool(value))
