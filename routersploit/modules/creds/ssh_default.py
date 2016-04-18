@@ -29,8 +29,10 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(22, 'Target port')
     threads = exploits.Option(8, 'Numbers of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
+    verb = None
 
     def run(self):
         self.credentials = []
@@ -52,6 +54,7 @@ class Exploit(exploits.Exploit):
         else:
             defaults = [self.defaults]
 
+        self.verb = self.verbosity.lower()
         collection = LockedIterator(defaults)
         self.run_threads(self.threads, self.target_function, collection)
 
@@ -67,7 +70,8 @@ class Exploit(exploits.Exploit):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        print_status(name, 'process is starting...')
+        if self.verb == 'yes':
+            print_status(name, 'process is starting...')
 
         while running.is_set():
             try:
@@ -79,10 +83,16 @@ class Exploit(exploits.Exploit):
                 break
             except paramiko.ssh_exception.SSHException as err:
                 ssh.close()
-                print_error(name, err, "Username: '{}' Password: '{}'".format(user, password))
+
+                if self.verb == 'yes':
+                    print_error(name, err, "Username: '{}' Password: '{}'".format(user, password))
             else:
                 running.clear()
-                print_success("{}: Authentication succeed!".format(name), user, password)
+
+                if self.verb == 'yes':
+                    print_success("{}: Authentication succeed!".format(name), user, password)
+
                 self.credentials.append((user, password))
 
-        print_status(name, 'process is terminated.')
+        if self.verb == 'yes':
+            print_status(name, 'process is terminated.')
