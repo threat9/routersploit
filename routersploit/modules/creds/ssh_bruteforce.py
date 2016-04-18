@@ -30,10 +30,9 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
-    verbosity = exploits.Option('yes', 'Display authentication attempts')
+    verbosity = exploits.Option(True, 'Display authentication attempts')
 
     credentials = []
-    verb = None
 
     def run(self):
         self.credentials = []
@@ -60,7 +59,6 @@ class Exploit(exploits.Exploit):
         else:
             passwords = [self.passwords]
 
-        self.verb = self.verbosity.lower()
         collection = LockedIterator(itertools.product(usernames, passwords))
         self.run_threads(self.threads, self.target_function, collection)
 
@@ -72,12 +70,12 @@ class Exploit(exploits.Exploit):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
+        module_verbosity = bool(self.verbosity)
         name = threading.current_thread().name
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        if self.verb == 'yes':
-            print_status(name, 'thread is starting...')
+        print_status(name, 'thread is starting...', verbose=module_verbosity)
 
         while running.is_set():
             try:
@@ -89,16 +87,12 @@ class Exploit(exploits.Exploit):
                 break
             except paramiko.ssh_exception.SSHException as err:
                 ssh.close()
-                
-                if self.verb == 'yes':
-                    print_error(name, err, user, password)
+                print_error(name, err, user, password, verbose=module_verbosity)
             else:
                 running.clear()
 
-                if self.verb == 'yes':
-                    print_success("{}: Authentication succeed!".format(name), user, password)
+                print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
 
                 self.credentials.append((user, password))
 
-        if self.verb == 'yes':
-            print_status(name, 'thread is terminated.')
+        print_status(name, 'thread is terminated.', verbose=module_verbosity)

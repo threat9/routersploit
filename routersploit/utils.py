@@ -92,6 +92,9 @@ def __cprint(*args, **kwargs):
     Signature like Python 3 print() function
     print([object, ...][, sep=' '][, end='\n'][, file=sys.stdout])
     """
+    if not kwargs.get("verbose", True):
+        return
+
     with print_lock:
         color = kwargs.get('color', None)
         if color:
@@ -105,16 +108,16 @@ def __cprint(*args, **kwargs):
             print(*args, **kwargs)
 
 
-def print_error(*args):
-    __cprint('\033[91m[-]\033[0m', *args)
+def print_error(*args, **kwargs):
+    __cprint('\033[91m[-]\033[0m', *args, **kwargs)
 
 
-def print_status(*args):
-    __cprint('\033[94m[*]\033[0m', *args)
+def print_status(*args, **kwargs):
+    __cprint('\033[94m[*]\033[0m', *args, **kwargs)
 
 
-def print_success(*args):
-    __cprint('\033[92m[+]\033[0m', *args)
+def print_success(*args, **kwargs):
+    __cprint('\033[92m[+]\033[0m', *args, **kwargs)
 
 
 def print_info(*args, **kwargs):
