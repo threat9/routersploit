@@ -8,6 +8,7 @@ from routersploit.utils import (
     LockedIterator,
     random_text,
     http_request,
+    boolify,
 )
 
 from routersploit import exploits

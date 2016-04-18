@@ -1,6 +1,7 @@
 from __future__ import print_function
 import threading
 from functools import wraps
+from distutils.util import strtobool
 import sys
 import random
 import string
@@ -272,3 +273,7 @@ def http_request(method, url, **kwargs):
     except requests.RequestException as error:
         print_error(error)
         return
+
+
+def boolify(value):
+    return strtobool(value)

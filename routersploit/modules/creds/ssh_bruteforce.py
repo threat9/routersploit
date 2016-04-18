@@ -11,6 +11,7 @@ from routersploit import (
     LockedIterator,
     print_success,
     print_table,
+    boolify,
 )
 
 
@@ -35,6 +36,7 @@ class Exploit(exploits.Exploit):
     credentials = []
 
     def run(self):
+        print self.verbosity
         self.credentials = []
         ssh = paramiko.SSHClient()
 
@@ -70,7 +72,7 @@ class Exploit(exploits.Exploit):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
-        module_verbosity = bool(self.verbosity)
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
