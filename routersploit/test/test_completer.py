@@ -135,7 +135,7 @@ class RoutersploitCompleterTest(unittest.TestCase):
         self.set_module()
         self.rsf.send("set \t\t")
         self.assertPrompt(
-            'passwords  port       target     threads    usernames  \r\n',
+            'passwords  port       target     threads    usernames  verbosity  \r\n',
             self.module_prompt('FTP Bruteforce'),
             'set ',
         )
