@@ -87,6 +87,23 @@ def stop_after(space_number):
     return _outer_wrapper
 
 
+class DummyFile(object):
+    """  Mocking file object. Optimalization for the "mute" decorator. """
+    def write(self, x): pass
+
+
+def mute(fn):
+    """ Suppress function from printing to sys.stdout """
+    @wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        sys.stdout = DummyFile()
+        try:
+            return fn(self, *args, **kwargs)
+        finally:
+            sys.stdout = sys.__stdout__
+    return wrapper
+
+
 def __cprint(*args, **kwargs):
     """ Color print()
 

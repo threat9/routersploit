@@ -9,6 +9,7 @@ from routersploit.utils import (
     random_text,
     http_request,
     boolify,
+    mute,
 )
 
 from routersploit import exploits
