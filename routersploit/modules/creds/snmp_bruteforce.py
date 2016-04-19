@@ -1,9 +1,16 @@
 import threading
 import netsnmp
 
-from routersploit.utils import print_status, print_success, print_error, print_table, LockedIterator
-from routersploit import exploits
-from routersploit import wordlists
+from routersploit import (
+    exploits,
+    wordlists,
+    print_status,
+    print_error,
+    LockedIterator,
+    print_success,
+    print_table,
+    boolify,
+)
 
 
 class Exploit(exploits.Exploit):
@@ -20,6 +27,7 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(161, 'Target port')
     threads = exploits.Option(8, 'Number of threads')
     snmp = exploits.Option(wordlists.snmp, 'Community string or file with community strings (file://)')
+    verbosity = exploits.Option('yes', 'Display authentication attempts')
 
     strings = []
 
@@ -44,10 +52,11 @@ class Exploit(exploits.Exploit):
             print_error("Valid community strings not found")
 
     def target_function(self, running, data):
+        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
         address = "{}:{}".format(self.target, self.port)
 
-        print_status(name, 'thread is starting...')
+        print_status(name, 'thread is starting...', verbose=module_verbosity)
 
         while running.is_set():
             try:
@@ -58,12 +67,12 @@ class Exploit(exploits.Exploit):
 
                 if res[0] is not None:
                     running.clear()
-                    print_success("{}: Valid community string found!".format(name), string)
+                    print_success("{}: Valid community string found!".format(name), string, verbose=module_verbosity)
                     self.strings.append(tuple([string]))
                 else:
-                    print_error("{}: Invalid community string.".format(name), string)
+                    print_error("{}: Invalid community string.".format(name), string, verbose=module_verbosity)
 
             except StopIteration:
                 break
 
-        print_status(name, 'thread is terminated.')
+        print_status(name, 'thread is terminated.', verbose=module_verbosity)
