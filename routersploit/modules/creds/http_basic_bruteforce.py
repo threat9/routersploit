@@ -43,7 +43,7 @@ class Exploit(exploits.Exploit):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
-            r = requests.get(url)
+            r = requests.get(url, verify=False)
         except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
             print_error("Invalid URL format: %s" % url)
             return
@@ -88,7 +88,7 @@ class Exploit(exploits.Exploit):
                 user, password = data.next()
                 user = user.encode('utf-8').strip()
                 password = password.encode('utf-8').strip()
-                r = requests.get(url, auth=(user, password))
+                r = requests.get(url, auth=(user, password), verify=False)
 
                 if r.status_code != 401:
                     running.clear()

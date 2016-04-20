@@ -44,7 +44,7 @@ class Exploit(exploits.Exploit):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
-            requests.get(url)
+            requests.get(url, verify=False)
         except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
             print_error("Invalid URL format: %s" % url)
             return
@@ -92,7 +92,7 @@ class Exploit(exploits.Exploit):
             password = "A" * i
 
             postdata = self.data.replace("{{USER}}", user).replace("{{PASS}}", password)
-            r = requests.post(url, headers=headers, data=postdata)
+            r = requests.post(url, headers=headers, data=postdata, verify=False)
             l = len(r.text)
 
             if i == 0:
@@ -105,7 +105,7 @@ class Exploit(exploits.Exploit):
 
     def detect_form(self):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
-        r = requests.get(url)
+        r = requests.get(url, verify=False)
         soup = BeautifulSoup(r.text, "lxml")
 
         form = soup.find("form")
@@ -143,7 +143,7 @@ class Exploit(exploits.Exploit):
                 password = line[1].strip()
 
                 postdata = self.data.replace("{{USER}}", user).replace("{{PASS}}", password)
-                r = requests.post(url, headers=headers, data=postdata)
+                r = requests.post(url, headers=headers, data=postdata, verify=False)
                 l = len(r.text)
 
                 if l < self.invalid["min"] or l > self.invalid["max"]:
