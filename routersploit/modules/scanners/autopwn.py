@@ -57,7 +57,8 @@ class Exploit(exploits.Exploit):
                 print_status("{} could not be verified".format(f))
 
         if vulnerabilities:
-            print_success("\nDevice is vulnerable!")
+            print
+            print_success("Device is vulnerable!")
             for v in vulnerabilities:
                 print_info(" - {}".format(v))
         else:
