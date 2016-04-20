@@ -293,7 +293,17 @@ def http_request(method, url, **kwargs):
 
 
 def boolify(value):
-    if isinstance(value, bool):
-        return value
-    elif isinstance(value, basestring):
-        return bool(strtobool(value))
+    """ Function that will translate common strings into bool values
+
+    True -> "True", "t", "yes", "y", "on", "1"
+    False -> any other string
+
+    Objects other than string will be transformed using built-in bool() function.
+    """
+    if isinstance(value, basestring):
+        try:
+            return bool(strtobool(value))
+        except ValueError:
+            return False
+    else:
+        return bool(value)
