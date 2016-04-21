@@ -120,7 +120,7 @@ def __cprint(*args, **kwargs):
             sep = kwargs.get('sep', ' ')
             end = kwargs.get('end', '\n')
             print('\033[{}m'.format(colors[color]), end='', file=file_, sep=sep)
-            print(*args, end='', file=file_, sep=sep)
+            print(*args, end='', file=file_, sep=sep)  # TODO printing text that starts from newline
             print('\033[0m', sep=sep, end=end, file=file_)
         else:
             print(*args, **kwargs)
@@ -276,11 +276,11 @@ def random_text(length, alph=string.letters+string.digits):
     return ''.join(random.choice(alph) for _ in range(length))
 
 
-def http_request(method, url, **kwargs):
+def http_request(method, url, verify=False, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
     try:
-        return getattr(requests, method.lower())(url, **kwargs)
+        return getattr(requests, method.lower())(url, verify, **kwargs)
     except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
         print_error("Invalid URL format: {}".format(url))
         return
