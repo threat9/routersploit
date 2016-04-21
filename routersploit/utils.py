@@ -276,11 +276,11 @@ def random_text(length, alph=string.letters+string.digits):
     return ''.join(random.choice(alph) for _ in range(length))
 
 
-def http_request(method, url, **kwargs):
+def http_request(method, url, verify=False, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
     try:
-        return getattr(requests, method.lower())(url, **kwargs)
+        return getattr(requests, method.lower())(url, verify=verify, **kwargs)
     except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
         print_error("Invalid URL format: {}".format(url))
         return
