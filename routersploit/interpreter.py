@@ -87,7 +87,8 @@ class BaseInterpreter(object):
             except RoutersploitException as err:
                 utils.print_error(err)
             except KeyboardInterrupt:
-                utils.print_status("\nroutersploit stopped")
+                print()
+                utils.print_status("routersploit stopped")
                 break
 
     def complete(self, text, state):
