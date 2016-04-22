@@ -197,14 +197,14 @@ class RoutersploitInterpreterTest(unittest.TestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'debug']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'show ', 'check', 'debug', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'debug']
+            ['use ', 'debug', 'exit']
         )
 
     @mock.patch('importlib.import_module')
@@ -566,6 +566,10 @@ class RoutersploitInterpreterTest(unittest.TestCase):
                 mock.call("foo baz error", '\n'),
             ]
         )
+
+    def test_command_exit(self):
+        with self.assertRaises(KeyboardInterrupt):
+            self.interpreter.command_exit()
 
 if __name__ == '__main__':
     unittest.main()

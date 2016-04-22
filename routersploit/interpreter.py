@@ -87,8 +87,7 @@ class BaseInterpreter(object):
             except RoutersploitException as err:
                 utils.print_error(err)
             except KeyboardInterrupt:
-                print()
-                utils.print_status("routersploit stopped")
+                utils.print_status("\nroutersploit stopped")
                 break
 
     def complete(self, text, state):
@@ -259,9 +258,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         :return: list of most accurate command suggestions
         """
         if self.current_module:
-            return ['run', 'back', 'set ', 'show ', 'check', 'debug']
+            return ['run', 'back', 'set ', 'show ', 'check', 'debug', 'exit']
         else:
-            return ['use ', 'debug']
+            return ['use ', 'debug', 'exit']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -382,3 +381,5 @@ class RoutersploitInterpreter(BaseInterpreter):
             utils.print_info(key)
             utils.print_error(value, '\n')
 
+    def command_exit(self, *args, **kwargs):
+        raise KeyboardInterrupt
