@@ -4,6 +4,8 @@
 
 The RouterSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
+[![asciicast](https://asciinema.org/a/8u75xcjuacnbpwz9feaixde9e.png)](https://asciinema.org/a/8u75xcjuacnbpwz9feaixde9e)
+
 It consists of various modules that aids penetration testing operations:
 
 - exploits - modules that take advantage of identified vulnerabilities
