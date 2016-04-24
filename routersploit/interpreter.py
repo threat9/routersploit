@@ -288,10 +288,6 @@ class RoutersploitInterpreter(BaseInterpreter):
     @utils.module_required
     def command_run(self, *args, **kwargs):
         utils.print_status("Running module...")
-        if self.current_module.target.startswith("file://"):
-            self.__multiple_run()
-            return
-
         try:
             self.current_module.run()
         except:
