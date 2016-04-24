@@ -125,6 +125,8 @@ def multi(fn):
                 self.target, _, port = target.partition(':')
                 if port:
                     self.port = port
+                else:
+                    self.port = original_port
                 print_status("Attack against: {}:{}".format(self.target, self.port))
                 fn(self, *args, **kwargs)
             self.target = original_target
