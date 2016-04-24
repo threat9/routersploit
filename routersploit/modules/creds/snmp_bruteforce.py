@@ -10,6 +10,7 @@ from routersploit import (
     print_success,
     print_table,
     boolify,
+    multi,
 )
 
 
@@ -23,7 +24,7 @@ class Exploit(exploits.Exploit):
         'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
-    target = exploits.Option('', 'Target IP address')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(161, 'Target port')
     threads = exploits.Option(8, 'Number of threads')
     snmp = exploits.Option(wordlists.snmp, 'Community string or file with community strings (file://)')
@@ -32,7 +33,11 @@ class Exploit(exploits.Exploit):
     strings = []
 
     def run(self):
-        self.strings= []
+        self.strings = []
+        self.attack()
+
+    @multi
+    def attack(self):
 
         # todo: check if service is up
 
@@ -46,7 +51,7 @@ class Exploit(exploits.Exploit):
 
         if len(self.strings):
             print_success("Credentials found!")
-            headers = tuple(["Community Strings"])
+            headers = ("Target", "Port", "Community Strings")
             print_table(headers, *self.strings)
         else:
             print_error("Valid community strings not found")
@@ -67,10 +72,10 @@ class Exploit(exploits.Exploit):
 
                 if res[0] is not None:
                     running.clear()
-                    print_success("{}: Valid community string found!".format(name), string, verbose=module_verbosity)
-                    self.strings.append(tuple([string]))
+                    print_success("Target: {}:{} {}: Valid community string found - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
+                    self.strings.append((self.target, self.port, string))
                 else:
-                    print_error("{}: Invalid community string.".format(name), string, verbose=module_verbosity)
+                    print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
 
             except StopIteration:
                 break

