@@ -132,7 +132,7 @@ def multi(fn):
             self.target = original_target
             self.port = original_port
             file_handler.close()
-            return fn(self, *args, **kwargs)
+            return  # Nothing to return, ran multiple times.
         else:
             return fn(self, *args, **kwargs)
     return wrapper
