@@ -176,8 +176,8 @@ class RoutersploitInterpreter(BaseInterpreter):
      Router Exploitation Framework   |_|
 
  Dev Team : Marcin Bury (lucyoa) & Mariusz Kupidura (fwkz)
- Codename : Wildest Dreams
- Version  : 1.0.0
+ Codename : Bad Blood
+ Version  : 2.0.0
 
  Total module count: {modules_count}
 """.format(modules_count=len(self.modules))
