@@ -105,6 +105,18 @@ def mute(fn):
 
 
 def multi(fn):
+    """ Decorator for exploit.Exploit class
+
+    Decorator that allows to feed exploit using text file containing
+    multiple targets definition. Decorated function will be executed
+    as many times as there is targets in the feed file.
+
+    WARNING:
+    Important thing to remember is fact that decorator will
+    suppress values returned by decorated function. Since method that
+    perform attack is not suppose to return anything this is not a problem.
+
+    """
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
         if self.target.startswith('file://'):
