@@ -73,7 +73,7 @@ class Exploit(exploits.Exploit):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         response = http_request("GET", url)
-        if not response:
+        if response is None:
             return
 
         if response.status_code != 401:
