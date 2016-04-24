@@ -11,7 +11,8 @@ from routersploit import (
     print_table,
     sanitize_url,
     boolify,
-    http_request
+    http_request,
+    multi
 )
 
 
@@ -38,38 +39,10 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.credentials = []
+        self.attack()
 
-        if self.target.startswith('file://'):
-            self.multi_run()
-        else:
-            self.single_run()
-            
-    def multi_run(self):
-        original_target = self.target
-        original_port = self.port
-
-        _, _, feed_path = self.target.partition("file://")
-        try:
-            file_handler = open(feed_path, 'r')
-        except IOError:
-            print_error("Could not read file: {}".format(self.target))
-            return
-
-        for target in file_handler:
-            target = target.strip()
-            if not target:
-                continue
-            self.target, _, port = target.partition(':')
-            if port:
-                self.port = port
-            print_status("Attack against: {}:{}".format(self.target, self.port))
-            self.single_run()
-
-        self.target = original_target
-        self.port = original_port
-        file_handler.close()
-
-    def single_run(self):
+    @multi
+    def attack(self):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
 
         response = http_request("GET", url)

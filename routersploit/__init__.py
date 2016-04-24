@@ -10,6 +10,7 @@ from routersploit.utils import (
     http_request,
     boolify,
     mute,
+    multi,
 )
 
 from routersploit import exploits
