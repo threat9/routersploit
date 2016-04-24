@@ -293,24 +293,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         except:
             utils.print_error(traceback.format_exc(sys.exc_info()))
 
-    def __multiple_run(self):
-        _, _, path = self.current_module.target.partition('file://')
-        with open(path, 'r') as file_handler:
-            for target in file_handler:
-                target = target.strip()
-                if not target:
-                    continue
-                print()
-                utils.print_status("Running module against following target: {}".format(target))
-                self.current_module.target = target
-                try:
-                    self.current_module.run()
-                except KeyboardInterrupt:
-                    utils.print_status("Module has been stopped.")
-                    break
-                except:
-                    utils.print_error(traceback.format_exc(sys.exc_info()))
-
     def command_exploit(self, *args, **kwargs):
         self.command_run()
 
