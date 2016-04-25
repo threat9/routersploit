@@ -16,6 +16,7 @@ It consists of various modules that aids penetration testing operations:
 
 	sudo apt-get install python-requests python-paramiko python-netsnmp
 	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
 	./rsf.py
 
 # Update
