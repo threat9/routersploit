@@ -22,7 +22,7 @@ class Exploit(exploits.Exploit):
          ],
     }
 
-    target = exploits.Option('', 'Target address e.g. http://192.168.1.1')  # target address
+    target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
