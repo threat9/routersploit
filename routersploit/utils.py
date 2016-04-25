@@ -338,6 +338,9 @@ def http_request(method, url, **kwargs):
     except requests.RequestException as error:
         print_error(error)
         return
+    except KeyboardInterrupt:
+        print_info()
+        print_status("Module has been stopped")
 
 
 def boolify(value):
