@@ -17,7 +17,7 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'D-Link Scanner',
         'description': 'Scanner module for D-Link devices',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
         ],
     }
