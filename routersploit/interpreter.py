@@ -11,9 +11,10 @@ from routersploit.exploits import Exploit
 from routersploit import utils
 from routersploit import modules as rsf_modules
 
-if sys.platform == "darwin":
-    import gnureadline as readline
-else:
+try:
+    if sys.platform == "darwin":
+        import gnureadline as readline
+except:
     import readline
 
 
