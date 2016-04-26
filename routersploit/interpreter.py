@@ -384,3 +384,6 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_exit(self, *args, **kwargs):
         raise KeyboardInterrupt
+
+    def command_clear(self, *args, **kwargs):
+    	sys.stderr.write('\x1b[2J\x1b[H')
