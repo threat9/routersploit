@@ -314,7 +314,7 @@ def pprint_dict_in_order(dictionary, order=None):
         prettyprint(rest_keys, dictionary[rest_keys])
 
 
-def random_text(length, alph=string.letters+string.digits):
+def random_text(length, alph=string.ascii_letters+string.digits):
     """ Random text generator. NOT crypto safe.
     
     Generates random text with specified length and alphabet.
