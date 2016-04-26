@@ -14,6 +14,10 @@ It consists of various modules that aids penetration testing operations:
 
 # Installation
 
+	run setup.py
+
+		OR
+
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
 	pip install -r requirements.txt
