@@ -32,7 +32,7 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(80, 'Target port')
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
-    form = exploits.Option('auto', 'Post Data: auto or in form login={{LOGIN}}&password={{PASS}}&submit')
+    form = exploits.Option('auto', 'Post Data: auto or in form login={{USER}}&password={{PASS}}&submit')
     path = exploits.Option('/login.php', 'URL Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
 
