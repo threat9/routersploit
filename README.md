@@ -16,6 +16,8 @@ It consists of various modules that aids penetration testing operations:
 
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
+	virtualenv -p python2.7 venv
+	source venv/bin/activate
 	pip install -r requirements.txt
 	./rsf.py
 
