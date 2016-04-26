@@ -86,7 +86,7 @@ class BaseInterpreter(object):
                 command_handler(args)
             except RoutersploitException as err:
                 utils.print_error(err)
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, EOFError):
                 print()
                 utils.print_status("routersploit stopped")
                 break
