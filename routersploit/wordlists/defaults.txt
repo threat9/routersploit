@@ -166,6 +166,7 @@ admin:rmnetlm
 admin:root
 admin:secure
 admin:setup
+admin:sky
 admin:smallbusiness
 admin:smcadmin
 admin:superuser
