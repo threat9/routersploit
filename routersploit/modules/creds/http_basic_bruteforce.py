@@ -23,7 +23,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'HTTP Basic Bruteforce',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
         ]
     }

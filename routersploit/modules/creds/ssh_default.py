@@ -22,7 +22,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SSH Default Creds',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
         ]
     }
