@@ -34,7 +34,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
-    form = exploits.Option('auto', 'Post Data: auto or in form login={{LOGIN}}&password={{PASS}}&submit')
+    form = exploits.Option('auto', 'Post Data: auto or in form login={{USER}}&password={{PASS}}&submit')
     path = exploits.Option('/login.php', 'URL Path')
     form_path = exploits.Option('same', 'same as path or URL Form Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
