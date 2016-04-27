@@ -1,3 +1,4 @@
+python-dev
 gnureadline
 requests
 paramiko
