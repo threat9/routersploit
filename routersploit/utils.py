@@ -5,6 +5,7 @@ from distutils.util import strtobool
 import sys
 import random
 import string
+import socket
 
 import requests
 
@@ -337,6 +338,9 @@ def http_request(method, url, **kwargs):
         return
     except requests.RequestException as error:
         print_error(error)
+        return
+    except socket.error as err:
+        print_error(err)
         return
     except KeyboardInterrupt:
         print_info()

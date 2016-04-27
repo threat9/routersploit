@@ -21,7 +21,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SNMP Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        'authors': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
