@@ -5,11 +5,14 @@ import traceback
 import atexit
 import importlib
 import inspect
+from socket import inet_ntoa
+from struct import pack
 
 from routersploit.exceptions import RoutersploitException
 from routersploit.exploits import Exploit
 from routersploit import utils
 from routersploit import modules as rsf_modules
+from routersploit.utils import print_status
 
 if sys.platform == "darwin":
     import gnureadline as readline
@@ -60,7 +63,7 @@ class BaseInterpreter(object):
         """ Returns prompt string """
         return ">>>"
 
-    def get_command_handler(self, command):
+    def get_command_handler(self, command, args):
         """ Parsing command and returning appropriate handler.
 
         :param command: command
@@ -82,7 +85,9 @@ class BaseInterpreter(object):
                 command, args = self.parse_line(raw_input(self.prompt))
                 if not command:
                     continue
-                command_handler = self.get_command_handler(command)
+                command_handler = self.get_command_handler(command, args)
+                if command_handler == None:
+                    continue
                 command_handler(args)
             except RoutersploitException as err:
                 utils.print_error(err)
@@ -317,7 +322,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_show(self, *args, **kwargs):
-        info, options = 'info', 'options'
+        info, options, gateway = 'info', 'options', 'gateway'
         sub_command = args[0]
         if sub_command == info:
             utils.pprint_dict_in_order(
@@ -338,6 +343,8 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_table(headers, *self.get_opts(*module_opts))
 
             utils.print_info()
+        elif sub_command == gateway:
+            print_status(self.linux_gateway())
         else:
             print("Unknown command 'show {}'. You want to 'show {}' or 'show {}'?".format(sub_command, info, options))
 
@@ -394,3 +401,13 @@ class RoutersploitInterpreter(BaseInterpreter):
 
  Total module count: {modules_count}
 """.format(modules_count=len(self.modules))
+
+    def linux_gateway(self, *args, **kwargs):
+        """Read the default gateway directly from /proc."""
+        with open("/proc/net/route") as fh:
+            for line in fh:
+                fields = line.strip().split()
+                if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+                    continue
+
+                return inet_ntoa(pack("<L", int(fields[2], 16)))
