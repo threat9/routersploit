@@ -17,9 +17,9 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'AutoPwn',
         'description': 'Scanner module for all vulnerabilities.',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
-         ],
+        ],
     }
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
