@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys
+import os, sys, platform
 
 if os.geteuid() != 0:
 	print("%s needs root privildeges\nTry running 'sudo %s'" % (sys.argv[0], sys.argv[0]))
@@ -24,4 +24,7 @@ with open(HOME + '/.bashrc', 'r+') as f:
 
 os.system('export PATH=$PATH:$(pwd)')
 
-os.system('/usr/bin/pip install -r %s/requirements.txt' % PATH)
+if platform.system().lower() == 'darwin':
+	os.system('pip install -r %s/requirements.txt' % PATH)
+else:
+	os.system('pip install requests paramiko beautifulsoup4')
