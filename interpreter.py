@@ -76,6 +76,15 @@ class BaseInterpreter(object):
 
         return command_handler
 
+    def get_show_handler(self, command, args):
+        """ Parsing show commands and returns the appropriate handler. """
+        try:
+            show_handler = getattr(self, "show_{}".format(command))
+        except AttributeError:
+            raise RoutersploitException("Unknown command: '{}'".format(command))
+
+        return show_handler
+
     def start(self):
         """ Routersploit main entry point. Starting interpreter loop. """
 
@@ -322,31 +331,35 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_show(self, *args, **kwargs):
-        info, options, gateway = 'info', 'options', 'gateway'
+        """ While hardcoded show commands work, I thought that implementing something similar
+            to the get_command_handler() for show commands would be good """
         sub_command = args[0]
-        if sub_command == info:
-            utils.pprint_dict_in_order(
+        show_handler = self.get_show_handler(sub_command, args[1:])
+        if show_handler == None:
+                raise RoutersploitException("Unknown command: show {}".format(sub_command))
+        show_handler(args)
+
+    def show_info(self, args):
+        utils.pprint_dict_in_order(
                 self.module_metadata,
                 ("name", "description", "targets", "authors", "references"),
             )
-            utils.print_info()
-        elif sub_command == options:
-            target_opts = {'port', 'target'}
-            module_opts = set(self.current_module.options) - target_opts
-            headers = ("Name", "Current settings", "Description")
 
-            utils.print_info('\nTarget options:')
-            utils.print_table(headers, *self.get_opts(*target_opts))
+    def show_options(self, args):
+        target_opts = {'port', 'target'}
+        module_opts = set(self.current_module.options) - target_opts
+        headers = ("Name", "Current settings", "Description")
 
-            if module_opts:
-                utils.print_info('\nModule options:')
-                utils.print_table(headers, *self.get_opts(*module_opts))
+        utils.print_info('\nTarget options:')
+        utils.print_table(headers, *self.get_opts(*target_opts))
 
-            utils.print_info()
-        elif sub_command == gateway:
-            print_status(self.linux_gateway())
-        else:
-            print("Unknown command 'show {}'. You want to 'show {}' or 'show {}'?".format(sub_command, info, options))
+        if module_opts:
+            utils.print_info('\nModule options:')
+            utils.print_table(headers, *self.get_opts(*module_opts))
+
+        utils.print_info()
+    def show_gateway(self, args):
+        print_status(self.linux_gateway())
 
     @utils.stop_after(2)
     def complete_show(self, text, *args, **kwargs):
