@@ -27,6 +27,14 @@ It consists of various modules that aids penetration testing operations:
 	cd routersploit
 	apt-get install python-netsnmp
 	./rsf.py
+	
+## Installation on Ubuntu
+
+	sudo apt-get install python-dev python-pip libncurses5-dev git
+	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
+	pip install -r requirements
+	./rsf.py
 
 ## Installation on OSX
 
