@@ -14,10 +14,26 @@ It consists of various modules that aids penetration testing operations:
 
 # Installation
 
+## Requirements
+
+* gnureadline
+* requests
+* paramiko
+* beautifulsoup4
+
+## Installation on Kali
+
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
-	sudo apt-get install python-dev pip
-	pip install -r requirements.txt
+	apt-get install python-netsnmp
+	./rsf.py
+
+## Installation on OSX
+
+	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
+	sudo easy_install pip
+	sudo pip install -r requirements.txt
 	./rsf.py
 
 # Update
