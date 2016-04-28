@@ -20,12 +20,12 @@ It consists of various modules that aids penetration testing operations:
 * requests
 * paramiko
 * beautifulsoup4
+* pysnmp
 
 ## Installation on Kali
 
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
-	apt-get install python-netsnmp
 	./rsf.py
 	
 ## Installation on Ubuntu
