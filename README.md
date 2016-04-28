@@ -13,14 +13,6 @@ It consists of various modules that aids penetration testing operations:
 - scanners - modules that check if target is vulnerable to any exploit
 
 # Installation
-
-	git clone https://github.com/reverse-shell/routersploit
-	cd routersploit
-	./setup.py
-	rsfconsole
-
-	OR
-
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
 	pip install -r requirements.txt
