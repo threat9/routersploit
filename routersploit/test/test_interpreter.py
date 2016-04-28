@@ -22,8 +22,8 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         RoutersploitInterpreter.setup = mock.Mock()
         self.interpreter = RoutersploitInterpreter()
         self.interpreter.current_module = mock.MagicMock()
-        self.raw_prompt_default = "\033[4mrsf\033[0m > "
-        self.module_prompt_default = lambda x: "\033[4mrsf\033[0m (\033[91m{}\033[0m) > ".format(x)
+        self.raw_prompt_default = "\001\033[4m\002rsf\001\033[0m\002 > "
+        self.module_prompt_default = lambda x: "\001\033[4m\002rsf\001\033[0m\002 (\001\033[91m\002{}\001\033[0m\002) > ".format(x)
 
     def prepare_prompt_env_variables(self, raw_prompt=None, module_prompt=None):
         if raw_prompt:
