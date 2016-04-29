@@ -166,23 +166,23 @@ def __cprint(*args, **kwargs):
             file_ = kwargs.get('file', sys.stdout)
             sep = kwargs.get('sep', ' ')
             end = kwargs.get('end', '\n')
-            print('\001\033[{}m\002'.format(colors[color]), end='', file=file_, sep=sep)
+            print('\033[{}m'.format(colors[color]), end='', file=file_, sep=sep)
             print(*args, end='', file=file_, sep=sep)  # TODO printing text that starts from newline
-            print('\001\033[0m\002', sep=sep, end=end, file=file_)
+            print('\033[0m', sep=sep, end=end, file=file_)
         else:
             print(*args, **kwargs)
 
 
 def print_error(*args, **kwargs):
-    __cprint('\001\033[91m\002[-]\001\033[0m\002', *args, **kwargs)
+    __cprint('\033[91m[-]\033[0m', *args, **kwargs)
 
 
 def print_status(*args, **kwargs):
-    __cprint('\001\033[94m\002[*]\001\033[0m\002', *args, **kwargs)
+    __cprint('\033[94m[*]\033[0m', *args, **kwargs)
 
 
 def print_success(*args, **kwargs):
-    __cprint('\001\033[92m\002[+]\001\033[0m\002', *args, **kwargs)
+    __cprint('\033[92m[+]\033[0m', *args, **kwargs)
 
 
 def print_info(*args, **kwargs):
