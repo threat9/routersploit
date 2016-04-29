@@ -261,7 +261,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if self.current_module:
             return ['run', 'back', 'set ', 'show ', 'check', 'debug', 'exit']
         else:
-            return ['use ', 'debug', 'exit']
+            return ['use ', 'debug', 'exit', 'clear']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -367,7 +367,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if text:
             return [(filter(lambda command: command.startswith('show_'+text), sub_commands)[0].split('show_')[1])]
         else:
-            return sub_commands
+            return [(filter(lambda command: command.startswith('show_'), sub_commands)[0].split('show_'))]
 
     @utils.module_required
     def command_check(self, *args, **kwargs):
