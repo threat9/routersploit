@@ -29,7 +29,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     snmp = exploits.Option(wordlists.snmp, 'Community string or file with community strings (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
-    exit_on_success = exploits.Option('yes', 'Exit on first valid community string')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid community string')
     strings = []
 
     def run(self):
@@ -76,7 +76,7 @@ class Exploit(exploits.Exploit):
                 if errorIndication or errorStatus:
                     print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
                 else:
-                    if boolify(self.exit_on_success):
+                    if boolify(self.stop_on_success):
                         running.clear()
                     print_success("Target: {}:{} {}: Valid community string found - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
                     self.strings.append((self.target, self.port, string))

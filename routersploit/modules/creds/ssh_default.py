@@ -32,6 +32,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Numbers of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -90,10 +91,10 @@ class Exploit(exploits.Exploit):
 
                 print_error("Target: {}:{} {}: {} Username: '{}' Password: '{}'".format(self.target, self.port, name, err, user, password), verbose=module_verbosity)
             else:
-                running.clear()
+                if boolify(self.stop_on_success):
+                    running.clear()
 
                 print_success("Target: {}:{} {} Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
-
                 self.credentials.append((self.target, self.port, user, password))
 
         print_status(name, 'process is terminated.', verbose=module_verbosity)

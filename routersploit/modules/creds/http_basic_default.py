@@ -33,6 +33,7 @@ class Exploit(exploits.Exploit):
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     path = exploits.Option('/', 'URL Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -85,7 +86,9 @@ class Exploit(exploits.Exploit):
                 response = http_request(method="GET", url=url, auth=(user, password))
 
                 if response.status_code != 401:
-                    running.clear()
+                    if boolify(self.stop_on_success):
+                        running.clear()
+
                     print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 else:

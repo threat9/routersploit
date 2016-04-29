@@ -36,6 +36,7 @@ class Exploit(exploits.Exploit):
     path = exploits.Option('/login.php', 'URL Path')
     form_path = exploits.Option('same', 'same as path or URL Form Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
     data = ""
@@ -165,7 +166,9 @@ class Exploit(exploits.Exploit):
                 l = len(r.text)
 
                 if l < self.invalid["min"] or l > self.invalid["max"]:
-                    running.clear()
+                    if boolify(self.stop_on_success):
+                        running.clear()
+
                     print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 else:
