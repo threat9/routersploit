@@ -160,6 +160,7 @@ admin:netadmin
 admin:noway
 admin:operator
 admin:password
+admin:pentagram
 admin:pwp
 admin:radius
 admin:rmnetlm
