@@ -5,6 +5,7 @@ from distutils.util import strtobool
 import sys
 import random
 import string
+import socket
 
 import requests
 
@@ -125,26 +126,26 @@ def multi(fn):
 
             _, _, feed_path = self.target.partition("file://")
             try:
-                file_handler = open(feed_path, 'r')
+                with open(feed_path) as file_handler:
+                    for target in file_handler:
+                        target = target.strip()
+                        if not target:
+                            continue
+                        self.target, _, port = target.partition(':')
+                        if port:
+                            self.port = port
+                        else:
+                            self.port = original_port
+                        print_status("Attack against: {}:{}".format(self.target,
+                                                                    self.port))
+                        fn(self, *args, **kwargs)
+                    self.target = original_target
+                    self.port = original_port
+                    return  # Nothing to return, ran multiple times.
             except IOError:
                 print_error("Could not read file: {}".format(self.target))
                 return
 
-            for target in file_handler:
-                target = target.strip()
-                if not target:
-                    continue
-                self.target, _, port = target.partition(':')
-                if port:
-                    self.port = port
-                else:
-                    self.port = original_port
-                print_status("Attack against: {}:{}".format(self.target, self.port))
-                fn(self, *args, **kwargs)
-            self.target = original_target
-            self.port = original_port
-            file_handler.close()
-            return  # Nothing to return, ran multiple times.
         else:
             return fn(self, *args, **kwargs)
     return wrapper
@@ -337,6 +338,9 @@ def http_request(method, url, **kwargs):
         return
     except requests.RequestException as error:
         print_error(error)
+        return
+    except socket.error as err:
+        print_error(err)
         return
     except KeyboardInterrupt:
         print_info()

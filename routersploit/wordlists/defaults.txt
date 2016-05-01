@@ -166,6 +166,7 @@ admin:rmnetlm
 admin:root
 admin:secure
 admin:setup
+admin:sky
 admin:smallbusiness
 admin:smcadmin
 admin:superuser
@@ -384,6 +385,7 @@ topicalt:password
 topicnorm:password
 topicres:password
 tw:tw
+ubnt:ubnt
 user:pass
 user:password
 user:public

