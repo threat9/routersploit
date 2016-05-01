@@ -336,7 +336,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if sub_command == info:
             utils.pprint_dict_in_order(
                 self.module_metadata,
-                ("name", "description", "targets", "authors", "references"),
+                ("name", "description", "devices", "authors", "references"),
             )
             utils.print_info()
         elif sub_command == options:

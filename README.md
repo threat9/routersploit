@@ -126,7 +126,7 @@ Display information about exploit:
 	Description:
 	Module exploits D-Link DIR-300, DIR-600 Remote Code Execution vulnerability which allows executing command on operating system level with root privileges.
 
-	Targets:
+	Devices:
 	- D-Link DIR 300
 	- D-Link DIR 600
 

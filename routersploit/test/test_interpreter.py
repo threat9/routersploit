@@ -290,7 +290,7 @@ class RoutersploitInterpreterTest(unittest.TestCase):
     @mock.patch('__builtin__.print')
     def test_command_show_info(self, mock_print):
         metadata = {
-            'targets': 'target_desc',
+            'devices': 'target_desc',
             'authors': 'authors_desc',
             'references': 'references_desc',
             'description': 'description_desc',
@@ -308,7 +308,7 @@ class RoutersploitInterpreterTest(unittest.TestCase):
                 mock.call('name_desc'),
                 mock.call('\nDescription:'),
                 mock.call('description_desc'),
-                mock.call('\nTargets:'),
+                mock.call('\nDevices:'),
                 mock.call('target_desc'),
                 mock.call('\nAuthors:'),
                 mock.call('authors_desc'),
