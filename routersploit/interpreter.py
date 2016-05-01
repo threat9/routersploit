@@ -331,7 +331,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_show(self, *args, **kwargs):
-        info, options = 'info', 'options'
+        info, options, devices = 'info', 'options', 'devices'
         sub_command = args[0]
         if sub_command == info:
             utils.pprint_dict_in_order(
@@ -352,12 +352,27 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_table(headers, *self.get_opts(*module_opts))
 
             utils.print_info()
+        elif sub_command == devices:
+            if devices in self.current_module._Exploit__info__.keys():
+                devices = self.current_module._Exploit__info__['devices']
+
+                print("\nTarget devices:")
+                i = 0
+                for device in devices:
+                    if isinstance(device, dict): 
+                        print("   {} - {}".format(i, device['name']))
+                    else:
+                        print("   {} - {}".format(i, device))
+                    i += 1
+                print()
+            else:
+                print("\nTarget devices are not defined")
         else:
             print("Unknown command 'show {}'. You want to 'show {}' or 'show {}'?".format(sub_command, info, options))
 
     @utils.stop_after(2)
     def complete_show(self, text, *args, **kwargs):
-        sub_commands = ['info', 'options']
+        sub_commands = ['info', 'options', 'devices']
         if text:
             return filter(lambda command: command.startswith(text), sub_commands)
         else:
