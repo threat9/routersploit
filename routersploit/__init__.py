@@ -11,6 +11,7 @@ from routersploit.utils import (
     boolify,
     mute,
     multi,
+    index_modules,
 )
 
 from routersploit import exploits

@@ -1,13 +1,22 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import threading
-from functools import wraps
-from distutils.util import strtobool
+import os
 import sys
 import random
 import string
+import socket
+from functools import wraps
+from distutils.util import strtobool
+import importlib
 
 import requests
 
+from .exceptions import RoutersploitException
+from . import modules as rsf_modules
+
+
+MODULES_DIR = rsf_modules.__path__[0]
 
 print_lock = threading.Lock()
 
@@ -17,6 +26,49 @@ colors = {
     'blue': 34,  'magenta': 35,
     'cyan': 36,  'white': 37,
 }
+
+
+def index_modules(modules_directory=MODULES_DIR):
+    """ Return list of all exploits modules """
+
+    modules = []
+    for root, dirs, files in os.walk(modules_directory):
+        _, package, root = root.rpartition('routersploit/modules/'.replace('/', os.sep))
+        root = root.replace(os.sep, '.')
+        files = filter(lambda x: not x.startswith("__") and x.endswith('.py'), files)
+        modules.extend(map(lambda x: '.'.join((root, os.path.splitext(x)[0])), files))
+
+    return modules
+
+
+def import_exploit(path):
+    """ Import exploit module
+
+    :param path: absolute path to exploit e.g. routersploit.modules.exploits.asus.pass_bypass
+    :return: exploit module or error
+    """
+    try:
+        module = importlib.import_module(path)
+        return getattr(module, 'Exploit')
+    except (ImportError, AttributeError, KeyError) as err:
+        raise RoutersploitException(
+            "Error during loading '{}'\n\n"
+            "Error: {}\n\n"
+            "It should be valid path to the module. "
+            "Use <tab> key multiple times for completion.".format(humanize_path(path), err)
+        )
+
+
+def iter_modules(modules_directory=MODULES_DIR):
+    """ Iterate over valid modules """
+
+    modules = index_modules(modules_directory)
+    modules = map(lambda x: "".join(['routersploit.modules.', x]), modules)
+    for path in modules:
+        try:
+            yield import_exploit(path)
+        except RoutersploitException:
+            pass
 
 
 def pythonize_path(path):
@@ -125,26 +177,26 @@ def multi(fn):
 
             _, _, feed_path = self.target.partition("file://")
             try:
-                file_handler = open(feed_path, 'r')
+                with open(feed_path) as file_handler:
+                    for target in file_handler:
+                        target = target.strip()
+                        if not target:
+                            continue
+                        self.target, _, port = target.partition(':')
+                        if port:
+                            self.port = port
+                        else:
+                            self.port = original_port
+                        print_status("Attack against: {}:{}".format(self.target,
+                                                                    self.port))
+                        fn(self, *args, **kwargs)
+                    self.target = original_target
+                    self.port = original_port
+                    return  # Nothing to return, ran multiple times.
             except IOError:
                 print_error("Could not read file: {}".format(self.target))
                 return
 
-            for target in file_handler:
-                target = target.strip()
-                if not target:
-                    continue
-                self.target, _, port = target.partition(':')
-                if port:
-                    self.port = port
-                else:
-                    self.port = original_port
-                print_status("Attack against: {}:{}".format(self.target, self.port))
-                fn(self, *args, **kwargs)
-            self.target = original_target
-            self.port = original_port
-            file_handler.close()
-            return  # Nothing to return, ran multiple times.
         else:
             return fn(self, *args, **kwargs)
     return wrapper
@@ -337,6 +389,9 @@ def http_request(method, url, **kwargs):
         return
     except requests.RequestException as error:
         print_error(error)
+        return
+    except socket.error as err:
+        print_error(err)
         return
     except KeyboardInterrupt:
         print_info()

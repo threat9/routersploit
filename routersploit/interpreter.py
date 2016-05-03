@@ -3,13 +3,9 @@ import os
 import sys
 import traceback
 import atexit
-import importlib
-import inspect
 
 from routersploit.exceptions import RoutersploitException
-from routersploit.exploits import Exploit
 from routersploit import utils
-from routersploit import modules as rsf_modules
 
 if sys.platform == "darwin":
     import gnureadline as readline
@@ -158,13 +154,11 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = 'rsf'
-        self.modules_directory = rsf_modules.__path__[0]
-        self.modules = []
-        self.modules_with_errors = {}
-        self.main_modules_dirs = []
+
+        self.modules = utils.index_modules()
+        self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
 
         self.__parse_prompt()
-        self.load_modules()
 
         self.banner = """ ______            _            _____       _       _ _
  | ___ \          | |          /  ___|     | |     (_) |
@@ -182,34 +176,12 @@ class RoutersploitInterpreter(BaseInterpreter):
  Total module count: {modules_count}
 """.format(modules_count=len(self.modules))
 
-    def load_modules(self):
-        self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if not module.startswith("__")]
-        self.modules = []
-        self.modules_with_errors = {}
-
-        for root, dirs, files in os.walk(self.modules_directory):
-            _, package, root = root.rpartition('routersploit')
-            root = "".join((package, root)).replace(os.sep, '.')
-            modules = map(lambda x: '.'.join((root, os.path.splitext(x)[0])), filter(lambda x: x.endswith('.py'), files))
-            for module_path in modules:
-                try:
-                    module = importlib.import_module(module_path)
-                except ImportError as error:
-                    self.modules_with_errors[module_path] = error
-                else:
-                    klasses = inspect.getmembers(module, inspect.isclass)
-                    exploits = filter(lambda x: issubclass(x[1], Exploit), klasses)
-                    # exploits = map(lambda x: '.'.join([module_path.split('.', 2).pop(), x[0]]), exploits)
-                    # self.modules.extend(exploits)
-                    if exploits:
-                        self.modules.append(module_path.split('.', 2).pop())
-
     def __parse_prompt(self):
-        raw_prompt_default_template = "\033[4m{host}\033[0m > "
+        raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "
         raw_prompt_template = os.getenv("RSF_RAW_PROMPT", raw_prompt_default_template).replace('\\033', '\033')
         self.raw_prompt_template = raw_prompt_template if '{host}' in raw_prompt_template else raw_prompt_default_template
 
-        module_prompt_default_template = "\033[4m{host}\033[0m (\033[91m{module}\033[0m) > "
+        module_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 (\001\033[91m\002{module}\001\033[0m\002) > "
         module_prompt_template = os.getenv("RSF_MODULE_PROMPT", module_prompt_default_template).replace('\\033', '\033')
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
 
@@ -259,9 +231,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         :return: list of most accurate command suggestions
         """
         if self.current_module:
-            return ['run', 'back', 'set ', 'show ', 'check', 'debug', 'exit']
+            return ['run', 'back', 'set ', 'show ', 'check', 'exit']
         else:
-            return ['use ', 'debug', 'exit']
+            return ['use ', 'exit']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -271,12 +243,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         module_path = '.'.join(('routersploit', 'modules', module_path))
         # module_path, _, exploit_name = module_path.rpartition('.')
         try:
-            module = importlib.import_module(module_path)
-            self.current_module = getattr(module, 'Exploit')()
-        except (ImportError, AttributeError, KeyError):
-            utils.print_error("Error during loading '{}' module. "
-                              "It should be valid path to the module. "
-                              "Use <tab> key multiple times for completion.".format(utils.humanize_path(module_path)))
+            self.current_module = utils.import_exploit(module_path)()
+        except RoutersploitException as err:
+            utils.print_error(err.message)
 
     @utils.stop_after(2)
     def complete_use(self, text, *args, **kwargs):
@@ -331,12 +300,12 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_show(self, *args, **kwargs):
-        info, options = 'info', 'options'
+        info, options, devices = 'info', 'options', 'devices'
         sub_command = args[0]
         if sub_command == info:
             utils.pprint_dict_in_order(
                 self.module_metadata,
-                ("name", "description", "targets", "authors", "references"),
+                ("name", "description", "devices", "authors", "references"),
             )
             utils.print_info()
         elif sub_command == options:
@@ -352,12 +321,27 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_table(headers, *self.get_opts(*module_opts))
 
             utils.print_info()
+        elif sub_command == devices:
+            if devices in self.current_module._Exploit__info__.keys():
+                devices = self.current_module._Exploit__info__['devices']
+
+                print("\nTarget devices:")
+                i = 0
+                for device in devices:
+                    if isinstance(device, dict): 
+                        print("   {} - {}".format(i, device['name']))
+                    else:
+                        print("   {} - {}".format(i, device))
+                    i += 1
+                print()
+            else:
+                print("\nTarget devices are not defined")
         else:
             print("Unknown command 'show {}'. You want to 'show {}' or 'show {}'?".format(sub_command, info, options))
 
     @utils.stop_after(2)
     def complete_show(self, text, *args, **kwargs):
-        sub_commands = ['info', 'options']
+        sub_commands = ['info', 'options', 'devices']
         if text:
             return filter(lambda command: command.startswith(text), sub_commands)
         else:
@@ -376,11 +360,6 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_error("Target is not vulnerable")
             else:
                 utils.print_status("Target could not be verified")
-
-    def command_debug(self, *args, **kwargs):
-        for key, value in self.modules_with_errors.iteritems():
-            utils.print_info(key)
-            utils.print_error(value, '\n')
 
     def command_exit(self, *args, **kwargs):
         raise KeyboardInterrupt
