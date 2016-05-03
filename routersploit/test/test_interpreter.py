@@ -1,7 +1,6 @@
 from __future__ import print_function
 import unittest
 import os
-import inspect
 
 try:
     import unittest.mock as mock
@@ -9,11 +8,7 @@ except ImportError:
     import mock
 
 from routersploit.interpreter import RoutersploitInterpreter
-from routersploit.exploits import Exploit
-
-
-class TestExploit(Exploit):
-    pass
+from routersploit.exceptions import RoutersploitException
 
 
 class RoutersploitInterpreterTest(unittest.TestCase):
@@ -197,14 +192,14 @@ class RoutersploitInterpreterTest(unittest.TestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'debug', 'exit']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'show ', 'check', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'debug', 'exit']
+            ['use ', 'exit']
         )
 
     @mock.patch('importlib.import_module')
@@ -255,14 +250,17 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.interpreter.current_module = None
         self.interpreter.modules = ['doo/pa/foo/bar']
         module_path = "creds/foo/bar/baz"
-        mocked_import_module.side_effect = ImportError
+        mocked_import_module.side_effect = ImportError("Not working")
 
         self.interpreter.command_use(module_path)
 
         mocked_import_module.assert_called_once_with('routersploit.modules.creds.foo.bar.baz')
-        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/creds/foo/bar/baz' "
-                                                   "module. It should be valid path to the module. "
-                                                   "Use <tab> key multiple times for completion.")
+
+        mocked_print_error.assert_called_once_with(
+            "Error during loading 'routersploit/modules/creds/foo/bar/baz'\n\n"
+            "Error: Not working\n\n"
+            "It should be valid path to the module. Use <tab> key multiple times for completion."
+        )
         self.assertEqual(self.interpreter.current_module, None)
 
     @mock.patch('importlib.import_module')
@@ -282,9 +280,12 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.interpreter.command_use(module_path)
 
         mocked_import_module.assert_called_once_with('routersploit.modules.exploits.foo.bar')
-        mocked_print_error.assert_called_once_with("Error during loading 'routersploit/modules/exploits/foo/bar' "
-                                                   "module. It should be valid path to the module. "
-                                                   "Use <tab> key multiple times for completion.")
+        mocked_print_error.assert_called_once_with(
+            "Error during loading 'routersploit/modules/exploits/foo/bar'\n\n"
+            "Error: Exploit\n\n"
+            "It should be valid path to the module. Use <tab> key multiple times for completion."
+        )
+
         self.assertEqual(self.interpreter.current_module, None)
 
     @mock.patch('__builtin__.print')
@@ -431,140 +432,6 @@ class RoutersploitInterpreterTest(unittest.TestCase):
         self.assertIsDecorated(
             self.interpreter.command_check,
             "module_required"
-        )
-
-    @mock.patch('os.walk')
-    @mock.patch('importlib.import_module')
-    @mock.patch('inspect.getmembers')
-    def test_load_modules(self, mock_getmembers, mock_import_module, mock_walk):
-        mock_walk.return_value = (
-            ('/Abs/Path/routersploit/routersploit/modules', ['asmax', 'creds'], ['__init__.py', '__init__.pyc']),
-            ('/Abs/Path/routersploit/routersploit/modules/creds', [], ['__init__.py', '__init__.pyc', 'ftp_bruteforce.py', 'ftp_bruteforce.pyc']),
-            ('/Abs/Path/routersploit/routersploit/modules/exploits/asmax', [], ['__init__.py', '__init__.pyc', 'asmax_exploit.py', 'asmax_exploit.pyc']),
-        )
-        mock_import_module.side_effect = [1, 2, 3, 4, 5]
-        mock_getmembers.side_effect = [
-            [],
-            [],
-            [("FTPBruteforce", TestExploit), ('SomeClass', mock.MagicMock), ('Exploit123', TestExploit)],
-            [],
-            [("Exploit", TestExploit), ('SomeClass', mock.MagicMock)]
-        ]
-
-        self.interpreter.load_modules()
-
-        mock_walk.assert_called_once_with(self.interpreter.modules_directory)
-        self.assertEqual(
-            mock_import_module.mock_calls,
-            [
-                mock.call('routersploit.modules.__init__'),
-                mock.call('routersploit.modules.creds.__init__'),
-                mock.call('routersploit.modules.creds.ftp_bruteforce'),
-                mock.call('routersploit.modules.exploits.asmax.__init__'),
-                mock.call('routersploit.modules.exploits.asmax.asmax_exploit')
-            ]
-        )
-        self.assertEqual(
-            mock_getmembers.mock_calls,
-            [
-                mock.call(1, inspect.isclass),
-                mock.call(2, inspect.isclass),
-                mock.call(3, inspect.isclass),
-                mock.call(4, inspect.isclass),
-                mock.call(5, inspect.isclass),
-            ]
-        )
-        self.assertEqual(
-            self.interpreter.modules,
-            [
-                'creds.ftp_bruteforce',
-                'exploits.asmax.asmax_exploit'
-            ]
-        )
-
-    @mock.patch('os.walk')
-    @mock.patch('importlib.import_module')
-    @mock.patch('inspect.getmembers')
-    def test_load_modules_import_error(self, mock_getmembers, mock_import_module, mock_walk):
-        mock_walk.return_value = (
-            ('/Abs/Path/routersploit/routersploit/modules', ['asmax', 'creds'], ['__init__.py', '__init__.pyc']),
-            ('/Abs/Path/routersploit/routersploit/modules/creds', [], ['__init__.py', '__init__.pyc', 'ftp_bruteforce.py', 'ftp_bruteforce.pyc']),
-            ('/Abs/Path/routersploit/routersploit/modules/exploits/asmax', [], ['__init__.py', '__init__.pyc', 'asmax_exploit.py', 'asmax_exploit.pyc', 'asmax_multi.py', 'asmax_multi.pyc']),
-        )
-        import_error = ImportError("No module doopaa")
-        mock_import_module.side_effect = [1, 2, import_error, 4, 5, import_error]
-        mock_getmembers.side_effect = [
-            [],
-            [],
-            [],
-            [("Exploit", TestExploit), ('SomeClass', mock.MagicMock)]
-        ]
-
-        self.interpreter.load_modules()
-
-        mock_walk.assert_called_once_with(self.interpreter.modules_directory)
-        self.assertEqual(
-            mock_import_module.mock_calls,
-            [
-                mock.call('routersploit.modules.__init__'),
-                mock.call('routersploit.modules.creds.__init__'),
-                mock.call('routersploit.modules.creds.ftp_bruteforce'),
-                mock.call('routersploit.modules.exploits.asmax.__init__'),
-                mock.call('routersploit.modules.exploits.asmax.asmax_exploit'),
-                mock.call('routersploit.modules.exploits.asmax.asmax_multi')
-            ]
-        )
-        self.assertEqual(
-            mock_getmembers.mock_calls,
-            [
-                mock.call(1, inspect.isclass),
-                mock.call(2, inspect.isclass),
-                mock.call(4, inspect.isclass),
-                mock.call(5, inspect.isclass),
-            ]
-        )
-        self.assertEqual(
-            self.interpreter.modules,
-            [
-                'exploits.asmax.asmax_exploit'
-            ]
-        )
-
-        self.assertEqual(
-            self.interpreter.modules_with_errors,
-            {
-                "routersploit.modules.creds.ftp_bruteforce": import_error,
-                'routersploit.modules.exploits.asmax.asmax_multi': import_error,
-            }
-        )
-
-    @mock.patch('routersploit.utils.print_info')
-    @mock.patch('routersploit.utils.print_error')
-    def test_command_debug(self, mocked_print_error, mocked_print_info, ):
-        self.interpreter.modules_with_errors = {
-            "foo.bar.exploit": "foo foo error",
-            "foo.baz.exploit": "foo baz error",
-            "doo.paa.exploit": "doo paa error",
-        }
-
-        self.interpreter.command_debug()
-
-        self.assertItemsEqual(
-            mocked_print_info.mock_calls,
-            [
-                mock.call("foo.baz.exploit"),
-                mock.call("foo.bar.exploit"),
-                mock.call("doo.paa.exploit"),
-            ]
-        )
-
-        self.assertItemsEqual(
-            mocked_print_error.mock_calls,
-            [
-                mock.call("doo paa error", '\n'),
-                mock.call("foo foo error", '\n'),
-                mock.call("foo baz error", '\n'),
-            ]
         )
 
     def test_command_exit(self):

@@ -1,13 +1,18 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import threading
-from functools import wraps
-from distutils.util import strtobool
+import os
 import sys
 import random
 import string
 import socket
+from functools import wraps
+from distutils.util import strtobool
+import importlib
 
 import requests
+
+from .exceptions import RoutersploitException
 
 
 print_lock = threading.Lock()
@@ -18,6 +23,36 @@ colors = {
     'blue': 34,  'magenta': 35,
     'cyan': 36,  'white': 37,
 }
+
+
+def index_modules(modules_directory):
+    """ Return list of all exploits modules """
+    modules = []
+    for root, dirs, files in os.walk(modules_directory):
+        _, package, root = root.rpartition('routersploit/modules/'.replace('/', os.sep))
+        root = root.replace(os.sep, '.')
+        files = filter(lambda x: not x.startswith("__") and x.endswith('.py'), files)
+        modules.extend(map(lambda x: '.'.join((root, os.path.splitext(x)[0])), files))
+
+    return modules
+
+
+def import_exploit(path):
+    """ Import exploit module
+
+    :param path: absolute path to exploit e.g. routersploit.modules.exploits.asus.pass_bypass
+    :return: exploit module or error
+    """
+    try:
+        module = importlib.import_module(path)
+        return getattr(module, 'Exploit')
+    except (ImportError, AttributeError, KeyError) as err:
+        raise RoutersploitException(
+            "Error during loading '{}'\n\n"
+            "Error: {}\n\n"
+            "It should be valid path to the module. "
+            "Use <tab> key multiple times for completion.".format(humanize_path(path), err)
+        )
 
 
 def pythonize_path(path):
