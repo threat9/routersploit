@@ -3,11 +3,9 @@ import os
 import sys
 import traceback
 import atexit
-import importlib
 
 from routersploit.exceptions import RoutersploitException
 from routersploit import utils
-from routersploit import modules as rsf_modules
 
 if sys.platform == "darwin":
     import gnureadline as readline
@@ -157,9 +155,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_prompt_template = None
         self.prompt_hostname = 'rsf'
 
-        modules_directory = rsf_modules.__path__[0]
-        self.modules = utils.index_modules(modules_directory)
-        self.main_modules_dirs = [module for module in os.listdir(modules_directory) if not module.startswith("__")]
+        self.modules = utils.index_modules()
+        self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
 
         self.__parse_prompt()
 
@@ -178,33 +175,6 @@ class RoutersploitInterpreter(BaseInterpreter):
 
  Total module count: {modules_count}
 """.format(modules_count=len(self.modules))
-
-    # def load_modules(self):
-    #     self.main_modules_dirs = [module for module in os.listdir(self.modules_directory) if not module.startswith("__")]
-    #     self.modules = []
-    #     self.modules_with_errors = {}
-    #
-    #     for root, dirs, files in os.walk(self.modules_directory):
-    #         _, package, root = root.rpartition('routersploit/modules/'.replace('/', os.sep))
-    #         root = root.replace(os.sep, '.')
-    #         files = filter(lambda x: not x.startswith("__") and x.endswith('.py'), files)
-    #         self.modules.extend(map(lambda x: '.'.join((root, os.path.splitext(x)[0])), files))
-    #
-    #         exploits = map(lambda x: '.'.join([module_path.split('.', 2).pop(), x[0]]), exploits)
-    #
-    #         for module_path in self.modules:
-    #             print(module_path)
-    #             try:
-    #                 module = importlib.import_module(module_path)
-    #             except ImportError as error:
-    #                 self.modules_with_errors[module_path] = error
-    #             else:
-    #                 klasses = inspect.getmembers(module, inspect.isclass)
-    #                 exploits = filter(lambda x: issubclass(x[1], Exploit), klasses)
-    #                 # exploits = map(lambda x: '.'.join([module_path.split('.', 2).pop(), x[0]]), exploits)
-    #                 # self.modules.extend(exploits)
-    #                 if exploits:
-    #                     self.modules.append(module_path.split('.', 2).pop())
 
     def __parse_prompt(self):
         raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "

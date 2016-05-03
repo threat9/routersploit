@@ -13,7 +13,10 @@ import importlib
 import requests
 
 from .exceptions import RoutersploitException
+from . import modules as rsf_modules
 
+
+MODULES_DIR = rsf_modules.__path__[0]
 
 print_lock = threading.Lock()
 
@@ -25,8 +28,9 @@ colors = {
 }
 
 
-def index_modules(modules_directory):
+def index_modules(modules_directory=MODULES_DIR):
     """ Return list of all exploits modules """
+
     modules = []
     for root, dirs, files in os.walk(modules_directory):
         _, package, root = root.rpartition('routersploit/modules/'.replace('/', os.sep))
@@ -53,6 +57,18 @@ def import_exploit(path):
             "It should be valid path to the module. "
             "Use <tab> key multiple times for completion.".format(humanize_path(path), err)
         )
+
+
+def iter_modules(modules_directory=MODULES_DIR):
+    """ Iterate over valid modules """
+
+    modules = index_modules(modules_directory)
+    modules = map(lambda x: "".join(['routersploit.modules.', x]), modules)
+    for path in modules:
+        try:
+            yield import_exploit(path)
+        except RoutersploitException:
+            pass
 
 
 def pythonize_path(path):
