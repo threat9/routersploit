@@ -1,9 +1,8 @@
 from inspect import getmodule
-from itertools import chain
 from unittest import main, TestCase, TestSuite
 
 from routersploit.exploits import Exploit
-from routersploit.interpreter import RoutersploitInterpreter
+from routersploit.utils import iter_modules
 
 
 class ModuleTest(TestCase):
@@ -25,7 +24,7 @@ class ModuleTest(TestCase):
         legal_keys = set([
             "name",
             "description",
-            "targets",
+            "devices",
             "authors",
             "references"])
 
@@ -35,31 +34,26 @@ class ModuleTest(TestCase):
 def load_tests(loader, tests, pattern):
     """Map every module to a test case, and group them into a suite."""
 
-    def tests():
-
-        # let interpreter load the modules
-        interpreter = RoutersploitInterpreter()
-
-        for module_path in interpreter.modules:
-
-            # use the given module
-            interpreter.command_use(module_path)
-
-            class ParametrizedModuleTest(ModuleTest):
-
-                # bind module and metadata
-                module = interpreter.current_module
-                metadata = interpreter.module_metadata
-
-                def shortDescription(self):
-                    # provide the module name in the test description
-                    return getmodule(self.module).__name__
-
-            # yield the tests from this test case
-            yield loader.loadTestsFromTestCase(ParametrizedModuleTest)
-
     suite = TestSuite()
-    suite.addTests(chain(*tests()))
+
+    for m in iter_modules():
+
+        class ParametrizedModuleTest(ModuleTest):
+
+            # bind module
+            module = m()
+
+            @property
+            def metadata(self):
+                return getattr(self.module, "_{}__info__".format(self.module.__class__.__name__))
+
+            def shortDescription(self):
+                # provide the module name in the test description
+                return getmodule(self.module).__name__
+
+        # add the tests from this test case
+        suite.addTests(loader.loadTestsFromTestCase(ParametrizedModuleTest))
+
     return suite
 
 if __name__ == '__main__':
