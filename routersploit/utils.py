@@ -377,6 +377,7 @@ def random_text(length, alph=string.ascii_letters+string.digits):
 def http_request(method, url, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
+    kwargs.setdefault('timeout', 30.0)
     kwargs.setdefault('verify', False)
 
     try:
