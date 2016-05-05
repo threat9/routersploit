@@ -20,6 +20,8 @@ class Exploit(exploits.Exploit):
         'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
         ],
+        'references': '',
+        'devices': 'Multi',
     }
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
