@@ -1,11 +1,9 @@
-from inspect import getmodule
-from unittest import main, TestCase, TestSuite
+import unittest
 
-from routersploit.exploits import Exploit
 from routersploit.utils import iter_modules
 
 
-class ModuleTest(TestCase):
+class ModuleTest(unittest.TestCase):
     """A test case that every module must pass.
 
     Attributes:
@@ -13,48 +11,37 @@ class ModuleTest(TestCase):
         metadata (Dict): The info associated with the module.
     """
 
-    def test_has_exploit(self):
-        self.assertIsInstance(self.module, Exploit)
+    def __init__(self, methodName='runTest', module=None):
+        super(ModuleTest, self).__init__(methodName)
+        self.module = module
 
-    def test_has_metadata(self):
-        self.assertIsInstance(self.metadata, dict)
+    def __str__(self):
+        return " ".join([super(ModuleTest, self).__str__(), self.module.__module__])
 
-    def test_legal_metadata_keys(self):
+    @property
+    def module_metadata(self):
+        return getattr(self.module, "_{}__info__".format(self.module.__name__))
 
-        legal_keys = set([
+    def test_required_metadata(self):
+        required_metadata = (
             "name",
             "description",
             "devices",
             "authors",
-            "references"])
-
-        self.assertTrue(set(self.metadata.keys()).issubset(legal_keys))
+            "references"
+        )
+        self.assertItemsEqual(required_metadata, self.module_metadata.keys())
 
 
 def load_tests(loader, tests, pattern):
-    """Map every module to a test case, and group them into a suite."""
+    """ Map every module to a test case, and group them into a suite. """
 
-    suite = TestSuite()
-
-    for m in iter_modules():
-
-        class ParametrizedModuleTest(ModuleTest):
-
-            # bind module
-            module = m()
-
-            @property
-            def metadata(self):
-                return getattr(self.module, "_{}__info__".format(self.module.__class__.__name__))
-
-            def shortDescription(self):
-                # provide the module name in the test description
-                return getmodule(self.module).__name__
-
-        # add the tests from this test case
-        suite.addTests(loader.loadTestsFromTestCase(ParametrizedModuleTest))
-
+    suite = unittest.TestSuite()
+    test_names = loader.getTestCaseNames(ModuleTest)
+    for module in iter_modules():
+        suite.addTests([ModuleTest(name, module) for name in test_names])
     return suite
 
+
 if __name__ == '__main__':
-    main()
+    unittest.main()
