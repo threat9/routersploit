@@ -78,7 +78,7 @@ Update RouterSploit Framework often. Project is under heavy development and new 
 	rsf > use exploits/dlink/dir_300_600_rce
 	rsf (D-LINK DIR-300 & DIR-600 RCE) > 
 
-U can use tab key for completion.
+You can use the tab key for completion.
 
 ### Options
 
