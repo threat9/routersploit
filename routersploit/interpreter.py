@@ -171,7 +171,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
  Dev Team : Marcin Bury (lucyoa) & Mariusz Kupidura (fwkz)
  Codename : Bad Blood
- Version  : 2.0.0
+ Version  : 2.1.0
 
  Total module count: {modules_count}
 """.format(modules_count=len(self.modules))
