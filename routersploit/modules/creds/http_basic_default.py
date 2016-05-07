@@ -24,11 +24,15 @@ class Exploit(exploits.Exploit):
         'name': 'HTTP Basic Default Creds',
         'description': 'Module perform dictionary attack with default credentials against HTTP Basic Auth service. '
                        'If valid credentials are found, they are displayed to the user.',
-        'authors': (
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
-        ),
-        'references': '',
-        'devices': 'Multi',
+        'authors': [
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')

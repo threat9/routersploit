@@ -25,11 +25,15 @@ class Exploit(exploits.Exploit):
         'name': 'SSH Bruteforce',
         'description': 'Module performs bruteforce attack against SSH service. '
                        'If valid credentials are found, they are displayed to the user.',
-        'authors': (
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
-        ),
-        'references': '',
-        'devices': 'Multi',
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
