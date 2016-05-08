@@ -38,6 +38,7 @@ Gearguy
 GlobalAdmin
 Guest
 HELLO
+HPN
 HPOFFICE
 HPP187
 HPWORD
@@ -91,6 +92,7 @@ admin2
 administrator
 adminstat
 adminstrator
+telecomadmin
 adminttd
 adminuser
 adminview
@@ -201,6 +203,7 @@ nms
 nmt
 none
 often
+on
 op
 operator
 patrol
@@ -260,6 +263,7 @@ ubnt
 user
 vcr
 veda
+vodafone
 volition
 vt100
 webadmin
@@ -270,3 +274,4 @@ wradmin
 write
 xbox
 xd
+ZXDSL
