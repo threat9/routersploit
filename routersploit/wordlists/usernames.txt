@@ -92,6 +92,7 @@ admin2
 administrator
 adminstat
 adminstrator
+telecomadmin
 adminttd
 adminuser
 adminview
@@ -262,6 +263,7 @@ ubnt
 user
 vcr
 veda
+vodafone
 volition
 vt100
 webadmin
