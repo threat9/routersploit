@@ -338,6 +338,7 @@ root:root
 root:tini
 root:tslinux
 root:wyse
+root:Zte521
 router:router
 rw:rw
 rwa:rwa
