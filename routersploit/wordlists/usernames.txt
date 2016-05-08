@@ -38,6 +38,7 @@ Gearguy
 GlobalAdmin
 Guest
 HELLO
+HPN
 HPOFFICE
 HPP187
 HPWORD
@@ -201,6 +202,7 @@ nms
 nmt
 none
 often
+on
 op
 operator
 patrol
@@ -270,3 +272,4 @@ wradmin
 write
 xbox
 xd
+ZXDSL
