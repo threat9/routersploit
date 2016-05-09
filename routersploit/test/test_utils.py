@@ -8,9 +8,10 @@ except ImportError:
     import mock
 
 from routersploit.utils import index_modules
+from routersploit.test import RoutersploitTestCase
 
 
-class UtilsTest(unittest.TestCase):
+class UtilsTest(RoutersploitTestCase):
     @mock.patch('os.walk')
     def test_load_modules_01(self, mock_walk):
         mock_walk.return_value = (
