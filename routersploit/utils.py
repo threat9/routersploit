@@ -1,20 +1,21 @@
 from __future__ import print_function
 from __future__ import absolute_import
+
 import threading
 import os
 import sys
 import random
 import string
 import socket
+import importlib
 from functools import wraps
 from distutils.util import strtobool
-import importlib
+from abc import ABCMeta, abstractmethod
 
 import requests
 
 from .exceptions import RoutersploitException
 from . import modules as rsf_modules
-
 
 MODULES_DIR = rsf_modules.__path__[0]
 
@@ -254,6 +255,23 @@ class LockedIterator(object):
             return self.it.next()
         finally:
             self.lock.release()
+
+
+class NonStringIterable:
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def __iter__(self):
+        while False:
+            yield None
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        if cls is NonStringIterable:
+            if any("__iter__" in B.__dict__ for B in C.__mro__):
+                return True
+        return NotImplemented
 
 
 def print_table(headers, *args, **kwargs):
