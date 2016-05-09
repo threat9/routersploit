@@ -1,9 +1,10 @@
 import unittest
 
 from routersploit.utils import iter_modules
+from routersploit.test import RoutersploitTestCase
 
 
-class ModuleTest(unittest.TestCase):
+class ModuleTest(RoutersploitTestCase):
     """A test case that every module must pass.
 
     Attributes:
@@ -31,6 +32,11 @@ class ModuleTest(unittest.TestCase):
             "references"
         )
         self.assertItemsEqual(required_metadata, self.module_metadata.keys())
+
+    def test_metadata_type(self):
+        self.assertIsSequence(self.module_metadata['authors'])
+        self.assertIsSequence(self.module_metadata['references'])
+        self.assertIsSequence(self.module_metadata['devices'])
 
 
 def load_tests(loader, tests, pattern):

@@ -3,8 +3,10 @@ import os
 
 import pexpect
 
+from routersploit.test import RoutersploitTestCase
 
-class RoutersploitCompleterTest(unittest.TestCase):
+
+class RoutersploitCompleterTest(RoutersploitTestCase):
 
     def __init__(self, methodName='runTest'):
         super(RoutersploitCompleterTest, self).__init__(methodName)

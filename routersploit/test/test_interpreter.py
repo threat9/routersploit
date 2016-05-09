@@ -8,10 +8,10 @@ except ImportError:
     import mock
 
 from routersploit.interpreter import RoutersploitInterpreter
-from routersploit.exceptions import RoutersploitException
+from routersploit.test import RoutersploitTestCase
 
 
-class RoutersploitInterpreterTest(unittest.TestCase):
+class RoutersploitInterpreterTest(RoutersploitTestCase):
 
     def setUp(self):
         RoutersploitInterpreter.setup = mock.Mock()
@@ -38,18 +38,6 @@ class RoutersploitInterpreterTest(unittest.TestCase):
                 pass
 
         getattr(self.interpreter, '_{}__parse_prompt'.format(self.interpreter.__class__.__name__))()
-
-    def assertIsDecorated(self, function, decorator_name):
-        try:
-            decorator_list = function.__decorators__
-        except AttributeError:
-            decorator_list = []
-
-        self.assertIn(
-            decorator_name,
-            decorator_list,
-            msg="'{}' method should be decorated with 'module_required'".format(function.__name__)
-        )
 
     @mock.patch('routersploit.utils.print_success')
     def test_command_set(self, mock_print_success):
