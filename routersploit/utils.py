@@ -28,6 +28,9 @@ colors = {
     'cyan': 36,  'white': 37,
 }
 
+# Disable certificate verification warnings
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 
 def index_modules(modules_directory=MODULES_DIR):
     """ Return list of all exploits modules """
