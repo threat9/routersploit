@@ -16,7 +16,7 @@ It consists of various modules that aids penetration testing operations:
 
 ## Requirements
 
-* gnureadline
+* gnureadline (OSX only)
 * requests
 * paramiko
 * beautifulsoup4
