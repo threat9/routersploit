@@ -106,7 +106,6 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_command_check_not_supported_by_module(self, print_status):
         with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
             mock_check.return_value = None
-            mock_check.assert_called_once_with()
 
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')
@@ -178,14 +177,14 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'exit', 'exec', 'help']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'show ', 'check', 'exec', 'help', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'exit', 'exec', 'help']
+            ['use ', 'exec', 'help', 'exit']
         )
 
     @mock.patch('importlib.import_module')
