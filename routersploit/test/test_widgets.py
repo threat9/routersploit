@@ -1,13 +1,12 @@
-from __future__ import print_function
-from __future__ import absolute_import
+import unittest
 
 try:
     import unittest.mock as mock
 except ImportError:
     import mock
 
-from . import RoutersploitTestCase
-from .. import widgets
+from routersploit.test import RoutersploitTestCase
+from routersploit import widgets
 
 
 class WidgetsTest(RoutersploitTestCase):
@@ -19,3 +18,7 @@ class WidgetsTest(RoutersploitTestCase):
 
     def test_url_already_with_https_prefix(self):
         self.assertEqual(widgets.url("https://127.0.0.1"), "https://127.0.0.1")
+
+
+if __name__ == '__main__':
+    unittest.main()
