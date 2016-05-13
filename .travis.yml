@@ -6,4 +6,4 @@ install:
   - "pip install -r requirements.txt"
   - "pip install pexpect"
 
-script: "python -m unittest discover -s routersploit/test"
+script: "python -m unittest discover"
