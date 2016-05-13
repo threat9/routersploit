@@ -274,6 +274,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         utils.print_status("Running module...")
         try:
             self.current_module.run()
+        except KeyboardInterrupt:
+            print()
+            utils.print_error("Operation cancelled by user")
         except:
             utils.print_error(traceback.format_exc(sys.exc_info()))
 
