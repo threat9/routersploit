@@ -95,7 +95,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             print_error.assert_called_once_with('Target is not vulnerable')
 
     @mock.patch('routersploit.utils.print_status')
-    def test_command_check_target_could_not_be_verified_1(self, print_status):
+    def test_command_check_target_could_not_be_verified(self, print_status):
         with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
             mock_check.return_value = "something"
             self.interpreter.command_check()
@@ -103,12 +103,10 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             print_status.assert_called_once_with('Target could not be verified')
 
     @mock.patch('routersploit.utils.print_status')
-    def test_command_check_target_could_not_be_verified_2(self, print_status):
+    def test_command_check_not_supported_by_module(self, print_status):
         with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
             mock_check.return_value = None
-            self.interpreter.command_check()
             mock_check.assert_called_once_with()
-            print_status.assert_called_once_with('Target could not be verified')
 
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')
@@ -180,14 +178,14 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'exit']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'show ', 'check', 'exit', 'exec', 'help']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'exit']
+            ['use ', 'exit', 'exec', 'help']
         )
 
     @mock.patch('importlib.import_module')

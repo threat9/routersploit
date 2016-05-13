@@ -367,13 +367,13 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_check(self, *args, **kwargs):
-        if self.current_module.check() == None:
-            return
-        if not self.current_module.target:
-            utils.print_error("No target set")
-            return
         try:
             result = self.current_module.check()
+            if result is None:
+                return
+            if not self.current_module.target:
+                utils.print_error("No target set")
+                return
         except:
             utils.print_error(traceback.format_exc(sys.exc_info()))
         else:
