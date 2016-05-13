@@ -28,7 +28,7 @@ It consists of various modules that aids penetration testing operations:
 	cd routersploit
 	./rsf.py
 	
-## Installation on Ubuntu
+## Installation on Ubuntu 16.04
 
 	sudo apt-get install python-dev python-pip libncurses5-dev git
 	git clone https://github.com/reverse-shell/routersploit
