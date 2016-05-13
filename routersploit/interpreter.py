@@ -158,7 +158,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     module_help = """Module commands:
     run                                 Run the selected module with the given options
     back                                De-select the current module
-    set <option name>=<option value>    Set an option for the selected module
+    set <option name> <option value>    Set an option for the selected module
     show [info|options|devices]         Print information, options, or target devices for a module
     check                               Check if a given target is vulnerable to a selected module's exploit"""
 
