@@ -109,6 +109,15 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             mock_check.assert_called_once_with()
             print_status.assert_called_once_with('Target could not be verified')
 
+    @mock.patch('routersploit.utils.print_error')
+    def test_command_check_not_supported_by_module(self, print_error):
+        with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
+            exception = NotImplementedError("Not available")
+            mock_check.side_effect = exception
+            self.interpreter.command_check()
+            mock_check.assert_called_once_with()
+            print_error.assert_called_once_with(exception)
+
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')
     @mock.patch('routersploit.utils.print_error')
@@ -179,14 +188,14 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'exit']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'show ', 'check', 'exec', 'help', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'exit']
+            ['use ', 'exec', 'help', 'exit']
         )
 
     @mock.patch('importlib.import_module')
@@ -424,6 +433,11 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_command_exit(self):
         with self.assertRaises(KeyboardInterrupt):
             self.interpreter.command_exit()
+
+    @mock.patch('os.system')
+    def test_command_exec(self, mock_system):
+        self.interpreter.command_exec("foo -bar")
+        mock_system.assert_called_once_with("foo -bar")
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,6 +16,7 @@ else:
 class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
     history_length = 100
+    global_help = ""
 
     def __init__(self):
         self.setup()
@@ -146,6 +147,18 @@ class BaseInterpreter(object):
 
 class RoutersploitInterpreter(BaseInterpreter):
     history_file = os.path.expanduser("~/.rsf_history")
+    global_help = """Global commands:
+    help                        Print this help menu
+    use <module>                Select a module for usage
+    exec <shell command> <args> Execute a command in a shell
+    exit                        Exit RouterSploit"""
+
+    module_help = """Module commands:
+    run                                 Run the selected module with the given options
+    back                                De-select the current module
+    set <option name> <option value>    Set an option for the selected module
+    show [info|options|devices]         Print information, options, or target devices for a module
+    check                               Check if a given target is vulnerable to a selected module's exploit"""
 
     def __init__(self):
         super(RoutersploitInterpreter, self).__init__()
@@ -231,9 +244,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         :return: list of most accurate command suggestions
         """
         if self.current_module:
-            return ['run', 'back', 'set ', 'show ', 'check', 'exit']
+            return ['run', 'back', 'set ', 'show ', 'check', 'exec', 'help', 'exit']
         else:
-            return ['use ', 'exit']
+            return ['use ', 'exec', 'help', 'exit']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -259,6 +272,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         utils.print_status("Running module...")
         try:
             self.current_module.run()
+        except KeyboardInterrupt:
+            print()
+            utils.print_error("Operation cancelled by user")
         except:
             utils.print_error(traceback.format_exc(sys.exc_info()))
 
@@ -351,8 +367,8 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_check(self, *args, **kwargs):
         try:
             result = self.current_module.check()
-        except:
-            utils.print_error(traceback.format_exc(sys.exc_info()))
+        except Exception as error:
+            utils.print_error(error)
         else:
             if result is True:
                 utils.print_success("Target is vulnerable")
@@ -360,6 +376,14 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_error("Target is not vulnerable")
             else:
                 utils.print_status("Target could not be verified")
+
+    def command_help(self, *args, **kwargs):
+        print(self.global_help)
+        if self.current_module:
+            print("\n", self.module_help)
+
+    def command_exec(self, *args, **kwargs):
+        os.system(args[0])
 
     def command_exit(self, *args, **kwargs):
         raise KeyboardInterrupt
