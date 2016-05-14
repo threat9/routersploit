@@ -434,5 +434,10 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         with self.assertRaises(KeyboardInterrupt):
             self.interpreter.command_exit()
 
+    @mock.patch('os.system')
+    def test_command_exec(self, mock_system):
+        self.interpreter.command_exec("foo -bar")
+        mock_system.assert_called_once_with("foo -bar")
+
 if __name__ == '__main__':
     unittest.main()

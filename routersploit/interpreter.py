@@ -3,7 +3,6 @@ import os
 import sys
 import traceback
 import atexit
-from subprocess import call
 
 from routersploit.exceptions import RoutersploitException
 from routersploit import utils
@@ -384,8 +383,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             print("\n", self.module_help)
 
     def command_exec(self, *args, **kwargs):
-        print(' '.join(args))
-        call(' '.join(args))
+        os.system(args[0])
 
     def command_exit(self, *args, **kwargs):
         raise KeyboardInterrupt
