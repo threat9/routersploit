@@ -94,7 +94,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             print_error.assert_called_once_with('Target is not vulnerable')
 
     @mock.patch('routersploit.utils.print_status')
-    def test_command_check_target_could_not_be_verified(self, print_status):
+    def test_command_check_target_could_not_be_verified_1(self, print_status):
         with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
             mock_check.return_value = "something"
             self.interpreter.command_check()
@@ -102,9 +102,21 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             print_status.assert_called_once_with('Target could not be verified')
 
     @mock.patch('routersploit.utils.print_status')
-    def test_command_check_not_supported_by_module(self, print_status):
+    def test_command_check_target_could_not_be_verified_2(self, print_status):
         with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
             mock_check.return_value = None
+            self.interpreter.command_check()
+            mock_check.assert_called_once_with()
+            print_status.assert_called_once_with('Target could not be verified')
+
+    @mock.patch('routersploit.utils.print_error')
+    def test_command_check_not_supported_by_module(self, print_error):
+        with mock.patch.object(self.interpreter.current_module, 'check') as mock_check:
+            exception = NotImplementedError("Not available")
+            mock_check.side_effect = exception
+            self.interpreter.command_check()
+            mock_check.assert_called_once_with()
+            print_error.assert_called_once_with(exception)
 
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')

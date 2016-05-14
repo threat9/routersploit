@@ -69,6 +69,6 @@ class Exploit(exploits.Exploit):
                 print_info(" - {}".format(v))
         else:
             print_error("Device is not vulnerable to any exploits!\n")
-        
+
     def check(self):
-        print_error("Check method is not available")
+        raise NotImplementedError("Check method is not available")

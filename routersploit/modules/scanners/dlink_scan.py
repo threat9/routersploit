@@ -68,4 +68,4 @@ class Exploit(exploits.Exploit):
         print
 
     def check(self):
-        print_error("Check method is not available")
+        raise NotImplementedError("Check method is not available")

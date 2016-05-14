@@ -18,7 +18,6 @@ class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
     history_length = 100
     global_help = ""
-        
 
     def __init__(self):
         self.setup()
@@ -369,13 +368,8 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_check(self, *args, **kwargs):
         try:
             result = self.current_module.check()
-            if result is None:
-                return
-            if not self.current_module.target:
-                utils.print_error("No target set")
-                return
-        except:
-            utils.print_error(traceback.format_exc(sys.exc_info()))
+        except Exception as error:
+            utils.print_error(error)
         else:
             if result is True:
                 utils.print_success("Target is vulnerable")
@@ -387,10 +381,10 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_help(self, *args, **kwargs):
         print(self.global_help)
         if self.current_module:
-            print()
-            print(self.module_help)
+            print("\n", self.module_help)
 
     def command_exec(self, *args, **kwargs):
+        print(' '.join(args))
         call(' '.join(args))
 
     def command_exit(self, *args, **kwargs):
