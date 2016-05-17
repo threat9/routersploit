@@ -439,5 +439,23 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.command_exec("foo -bar")
         mock_system.assert_called_once_with("foo -bar")
 
+    @mock.patch('__builtin__.print')
+    def test_command_help(self, mock_print):
+        self.interpreter.current_module = None
+        self.interpreter.command_help()
+        mock_print.assert_called_once_with(self.interpreter.global_help)
+
+    @mock.patch('__builtin__.print')
+    def test_command_help_with_module_loaded(self, mock_print):
+        self.interpreter.command_help()
+
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call(self.interpreter.global_help),
+                mock.call("\n", self.interpreter.module_help),
+            ]
+        )
+
 if __name__ == '__main__':
     unittest.main()
