@@ -8,6 +8,8 @@ import random
 import string
 import socket
 import importlib
+import errno
+from collections import namedtuple
 from functools import wraps
 from distutils.util import strtobool
 from abc import ABCMeta, abstractmethod
@@ -30,6 +32,8 @@ colors = {
 
 # Disable certificate verification warnings
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+Resource = namedtuple("Resource", ["name", "template_path", "context"])
 
 
 def index_modules(modules_directory=MODULES_DIR):
@@ -435,3 +439,44 @@ def boolify(value):
             return False
     else:
         return bool(value)
+
+
+def create_resource(name, content=(), python_package=False):
+    """ Creates resource directory in current working directory. """
+    root_path = os.path.join(MODULES_DIR, name)
+    mkdir_p(root_path)
+
+    if python_package:
+        open(os.path.join(root_path, "__init__.py"), "a").close()
+        print_success("__init__.py successfully created.")
+
+    for name, template_path, context in content:
+        if os.path.splitext(name)[-1] == "":  # Checking if resource has extension if not it's directory
+            os.mkdir(os.path.join(root_path, name))
+            print_success("Sub-directory /{name} successfully created.".format(name=name))
+        else:
+            try:
+                with open(template_path, "rb") as template_file:
+                    template = string.Template(template_file.read())
+            except (IOError, TypeError):
+                template = string.Template("")
+            finally:
+                with open(os.path.join(root_path, name), "wb") as target_file:
+                    target_file.write(template.substitute(**context))
+                    print_success("{file} successfully created.".format(file=name))
+
+
+def mkdir_p(path):
+    """
+    Simulate mkdir -p shell command. Creates directory with all needed parents.
+    :param path: Directory path that may include non existing parent directories
+    :return:
+    """
+    try:
+        os.makedirs(path)
+        print_success("Directory {path} sucessfully created.".format(path=path))
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            print_success("Directory {path}".format(path=path))
+        else:
+            raise
