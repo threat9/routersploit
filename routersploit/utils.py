@@ -448,22 +448,28 @@ def create_resource(name, content=(), python_package=False):
 
     if python_package:
         open(os.path.join(root_path, "__init__.py"), "a").close()
-        print_success("__init__.py successfully created.")
 
     for name, template_path, context in content:
         if os.path.splitext(name)[-1] == "":  # Checking if resource has extension if not it's directory
-            os.mkdir(os.path.join(root_path, name))
-            print_success("Sub-directory /{name} successfully created.".format(name=name))
+            mkdir_p(os.path.join(root_path, name))
         else:
             try:
                 with open(template_path, "rb") as template_file:
                     template = string.Template(template_file.read())
             except (IOError, TypeError):
                 template = string.Template("")
-            finally:
-                with open(os.path.join(root_path, name), "wb") as target_file:
+
+            try:
+                file_handle = os.open(os.path.join(root_path, name), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    print_status("{} already exist.".format(name))
+                else:
+                    raise
+            else:
+                with os.fdopen(file_handle, 'w') as target_file:
                     target_file.write(template.substitute(**context))
-                    print_success("{file} successfully created.".format(file=name))
+                    print_success("{} successfully created.".format(name))
 
 
 def mkdir_p(path):
@@ -474,7 +480,7 @@ def mkdir_p(path):
     """
     try:
         os.makedirs(path)
-        print_success("Directory {path} sucessfully created.".format(path=path))
+        print_success("Directory {path} successfully created.".format(path=path))
     except OSError as exc:
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             print_success("Directory {path}".format(path=path))
