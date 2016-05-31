@@ -441,6 +441,31 @@ def boolify(value):
         return bool(value)
 
 
+def create_exploit(path):
+    from .templates import exploit
+
+    try:
+        module_type, vendor, name = path.split(os.sep)
+    except ValueError:
+        print_error("Invalid path. ;(")
+        return
+
+    if module_type not in ['creds', 'exploits', 'scanners']:
+        print_error("Invalid module type. ;(")
+        return
+
+    create_resource(
+        name=os.path.join(module_type, vendor),
+        content=(
+            Resource(
+                name="{}.py".format(name),
+                template_path=os.path.abspath(exploit.__file__.rstrip("c")),
+                context={}),
+        ),
+        python_package=True
+    )
+
+
 def create_resource(name, content=(), python_package=False):
     """ Creates resource directory in current working directory. """
     root_path = os.path.join(MODULES_DIR, name)
