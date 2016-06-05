@@ -312,9 +312,11 @@ readwrite:lucenttech1
 recovery:recovery
 replicator:replicator
 ro:ro
+root:zsun1188
 root:1234
 root:12345
 root:123456
+root:20080826
 root:3ep5w2u
 root:Cisco
 root:Mau'dib
