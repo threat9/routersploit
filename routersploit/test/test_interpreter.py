@@ -152,8 +152,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module = None
         self.assertEqual(self.raw_prompt_default, self.interpreter.prompt)
 
-    def test_custom_module_\
-                    (self):
+    def test_custom_module_prompt(self):
         self.prepare_prompt_env_variables(module_prompt="*{host}*{module} >>>")
         module_name = "module_name"
         self.interpreter.current_module._MagicMock__info__ = {'name': module_name}
@@ -431,7 +430,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         )
 
     def test_command_exit(self):
-        with self.assertRaises(KeyboardInterrupt):
+        with self.assertRaises(EOFError):
             self.interpreter.command_exit()
 
     @mock.patch('os.system')

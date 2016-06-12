@@ -83,10 +83,12 @@ class BaseInterpreter(object):
                 command_handler(args)
             except RoutersploitException as err:
                 utils.print_error(err)
-            except (KeyboardInterrupt, EOFError):
+            except EOFError:
                 print()
                 utils.print_status("routersploit stopped")
                 break
+            except KeyboardInterrupt:
+                print()
 
     def complete(self, text, state):
         """Return the next possible completion for 'text'.
@@ -386,4 +388,4 @@ class RoutersploitInterpreter(BaseInterpreter):
         os.system(args[0])
 
     def command_exit(self, *args, **kwargs):
-        raise KeyboardInterrupt
+        raise EOFError
