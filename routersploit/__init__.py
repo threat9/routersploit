@@ -12,6 +12,7 @@ from routersploit.utils import (
     mute,
     multi,
     index_modules,
+    ssh_interactive,
 )
 
 from routersploit import exploits

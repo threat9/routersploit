@@ -8,6 +8,10 @@ import random
 import string
 import socket
 import importlib
+import termios
+import tty
+import select
+import socket
 from functools import wraps
 from distutils.util import strtobool
 from abc import ABCMeta, abstractmethod
@@ -435,3 +439,40 @@ def boolify(value):
             return False
     else:
         return bool(value)
+
+
+def ssh_interactive(ssh):
+    chan = ssh.invoke_shell()
+    oldtty = termios.tcgetattr(sys.stdin)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        tty.setcbreak(sys.stdin.fileno())
+        chan.settimeout(0.0)
+
+        while(True):
+            r, w, e = select.select([chan, sys.stdin], [], [])
+            if(chan in r):
+                try:
+                    x = unicode(chan.recv(1024))
+
+                    if(len(x) == 0):
+                        sys.stdout.write('\r\nExiting...\r\n')
+                        break
+
+                    sys.stdout.write(x)
+                    sys.stdout.flush()
+    
+                except socket.timeout:
+                    pass
+
+            if(sys.stdin in r):
+                x = sys.stdin.read(1)
+
+                if(len(x) == 0):
+                   break
+
+                chan.send(x)
+            
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
+        return 
