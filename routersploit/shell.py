@@ -24,7 +24,7 @@ def shell(exploit, architecture="", method="", **params):
             return
 
         c = cmd.split()
-        if c[0] == "reverse_tcp":
+        if len(c) and c[0] == "reverse_tcp":
             if len(c) == 3:
                 lhost = c[1]
                 lport = c[2]
