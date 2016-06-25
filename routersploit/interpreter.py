@@ -5,6 +5,7 @@ import traceback
 import atexit
 
 from routersploit.exceptions import RoutersploitException
+from routersploit.exploits import GLOBAL_OPTS
 from routersploit import utils
 
 if sys.platform == "darwin":
@@ -299,6 +300,20 @@ class RoutersploitInterpreter(BaseInterpreter):
             return [' '.join((attr, "")) for attr in self.current_module.options if attr.startswith(text)]
         else:
             return self.current_module.options
+
+    @utils.module_required
+    def command_setg(self, *args, **kwargs):
+        key, _, value = args[0].partition(' ')
+        if key in self.current_module.options:
+            GLOBAL_OPTS[key] = value
+            utils.print_success({key: value})
+        else:
+            utils.print_error("You can't set option '{}'.\n"
+                              "Available options: {}".format(key, self.current_module.options))
+
+    @utils.stop_after(2)
+    def complete_setg(self, text, *args, **kwargs):
+        return self.complete_set(text, *args, **kwargs)
 
     @utils.module_required
     def get_opts(self, *args):
