@@ -187,7 +187,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
             self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'show ', 'check', 'exec', 'help', 'exit']  # Extra space at the end because of following param
+            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
