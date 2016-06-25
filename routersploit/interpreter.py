@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import sys
+import itertools
 import traceback
 import atexit
 
@@ -314,6 +315,27 @@ class RoutersploitInterpreter(BaseInterpreter):
     @utils.stop_after(2)
     def complete_setg(self, text, *args, **kwargs):
         return self.complete_set(text, *args, **kwargs)
+
+    @utils.module_required
+    def command_unsetg(self, *args, **kwargs):
+        key, _, value = args[0].partition(' ')
+        if key in self.current_module.options:
+            try:
+                del GLOBAL_OPTS[key]
+            except KeyError:
+                utils.print_error("There is no such option set!")
+            else:
+                utils.print_success({key: value})
+        else:
+            utils.print_error("You can't unset global option '{}'.\n"
+                              "Available global options: {}".format(key, GLOBAL_OPTS.keys()))
+
+    @utils.stop_after(2)
+    def complete_unsetg(self, text, *args, **kwargs):
+        if text:
+            return [' '.join((attr, "")) for attr in GLOBAL_OPTS.keys() if attr.startswith(text)]
+        else:
+            return GLOBAL_OPTS.keys()
 
     @utils.module_required
     def get_opts(self, *args):
