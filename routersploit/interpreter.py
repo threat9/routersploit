@@ -250,7 +250,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         if self.current_module:
             module_commands = ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']
             if GLOBAL_OPTS.keys():
-                return itertools.chain(module_commands, ('unsetg',))
+                return itertools.chain(module_commands, ('unsetg ',))
             return module_commands
         else:
             return ['use ', 'exec', 'help', 'exit']
