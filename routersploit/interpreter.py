@@ -293,6 +293,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         key, _, value = args[0].partition(' ')
         if key in self.current_module.options:
             setattr(self.current_module, key, value)
+            if kwargs.get("global", False):
+                GLOBAL_OPTS[key] = value
             utils.print_success({key: value})
         else:
             utils.print_error("You can't set option '{}'.\n"
@@ -307,13 +309,8 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_setg(self, *args, **kwargs):
-        key, _, value = args[0].partition(' ')
-        if key in self.current_module.options:
-            GLOBAL_OPTS[key] = value
-            utils.print_success({key: value})
-        else:
-            utils.print_error("You can't set option '{}'.\n"
-                              "Available options: {}".format(key, self.current_module.options))
+        kwargs['global'] = True
+        self.command_set(*args, **kwargs)
 
     @utils.stop_after(2)
     def complete_setg(self, text, *args, **kwargs):
