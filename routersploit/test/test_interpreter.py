@@ -230,7 +230,15 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module._MagicMock__info__ = {}
         self.assertEqual(self.module_prompt_default('UnnamedModule'), self.interpreter.prompt)
 
-    def test_suggested_commands_with_loaded_module(self):
+    def test_suggested_commands_with_loaded_module_and_no_global_value_set(self):
+        GLOBAL_OPTS.clear()
+        self.assertEqual(
+            list(self.interpreter.suggested_commands()),
+            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
+        )
+
+    def test_suggested_commands_with_loaded_module_and_global_value_set(self):
+        GLOBAL_OPTS['key'] = 'value'
         self.assertEqual(
             list(self.interpreter.suggested_commands()),
             ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit', 'unsetg ']  # Extra space at the end because of following param
