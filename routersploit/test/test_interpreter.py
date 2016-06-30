@@ -6,8 +6,14 @@ try:
 except ImportError:
     import mock
 
-from routersploit.interpreter import RoutersploitInterpreter
+from routersploit.exploits import Exploit, Option
+from routersploit.interpreter import RoutersploitInterpreter, GLOBAL_OPTS
 from routersploit.test import RoutersploitTestCase
+
+
+class TestExploitFoo(Exploit):
+    doo = Option(default=1, description="description_one")
+    paa = Option(default=2, description="description_two")
 
 
 class RoutersploitInterpreterTest(RoutersploitTestCase):
@@ -51,8 +57,14 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
 
         self.interpreter.command_set('rhost {}'.format(new_rhost_value))
         self.interpreter.command_set('port {}'.format(new_port_value))
+
         self.assertEqual(self.interpreter.current_module.rhost, new_rhost_value)
         self.assertEqual(self.interpreter.current_module.port, new_port_value)
+
+        with self.assertRaises(KeyError):
+            self.assertNotEqual(GLOBAL_OPTS['rhost'], new_rhost_value)
+            self.assertNotEqual(GLOBAL_OPTS['port'], new_port_value)
+
         self.assertEqual(
             mock_print_success.mock_calls,
             [mock.call({'rhost': new_rhost_value}), mock.call({'port': new_port_value})]
@@ -71,6 +83,40 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             mock_print_error.mock_calls,
             [mock.call("You can't set option '{}'.\nAvailable options: {}".format(unknown_option, known_options))]
         )
+
+    @mock.patch('routersploit.utils.print_success')
+    def test_command_set_global(self, mock_print_success):
+        rhost, new_rhost_value = 'rhost_value', "new_rhost_value"
+        port, new_port_value = 'port_value', "new_port_value"
+
+        self.interpreter.current_module.options = ['rhost', 'port']
+        self.interpreter.current_module.rhost = rhost
+        self.interpreter.current_module.port = port
+        self.assertEqual(self.interpreter.current_module.rhost, rhost)
+        self.assertEqual(self.interpreter.current_module.port, port)
+
+        self.interpreter.command_set('rhost {}'.format(new_rhost_value), glob=True)
+        self.interpreter.command_set('port {}'.format(new_port_value), glob=True)
+
+        self.assertEqual(self.interpreter.current_module.rhost, new_rhost_value)
+        self.assertEqual(self.interpreter.current_module.port, new_port_value)
+        self.assertEqual(GLOBAL_OPTS['rhost'], new_rhost_value)
+        self.assertEqual(GLOBAL_OPTS['port'], new_port_value)
+        self.assertEqual(
+            mock_print_success.mock_calls,
+            [mock.call({'rhost': new_rhost_value}), mock.call({'port': new_port_value})]
+        )
+
+    def test_command_setg(self):
+        target, new_target_value = 'target_value', "new_target_value"
+        self.interpreter.current_module.options = ['target', 'port']
+        self.interpreter.current_module.target = target
+
+        self.interpreter.command_setg('target {}'.format(new_target_value))
+
+        self.assertEqual(self.interpreter.current_module.target, new_target_value)
+        self.interpreter.current_module = TestExploitFoo()
+        self.assertEqual(self.interpreter.current_module.target, new_target_value)
 
     def test_command_run(self):
         with mock.patch.object(self.interpreter.current_module, 'run') as mock_run:
@@ -186,8 +232,8 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
 
     def test_suggested_commands_with_loaded_module(self):
         self.assertEqual(
-            self.interpreter.suggested_commands(),
-            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
+            list(self.interpreter.suggested_commands()),
+            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit', 'unsetg ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
