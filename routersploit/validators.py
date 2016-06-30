@@ -15,9 +15,12 @@ def url(address):
         return "http://{}".format(address)
 
 
+def address(addr):
+    addr = urlparse.urlsplit(addr)
+    return addr.netloc or address.path
+
+
 def ipv4(address):
-    address = urlparse.urlsplit(address)
-    address = address.netloc or address.path
     try:
         socket.inet_pton(socket.AF_INET, address)
     except AttributeError:

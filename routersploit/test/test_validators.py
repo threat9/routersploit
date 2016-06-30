@@ -73,13 +73,13 @@ class ValidatorsTest(RoutersploitTestCase):
         with self.assertRaises(OptionValidationError):
             validators.ipv4(address)
 
-    def test_ipv4_strip_scheme_1(self):
+    def test_address_strip_scheme_1(self):
         address = "http://127.0.0.1"
-        self.assertEqual(validators.ipv4(address), "127.0.0.1")
+        self.assertEqual(validators.address(address), "127.0.0.1")
 
-    def test_ipv4_strip_scheme_2(self):
+    def test_address_strip_scheme_2(self):
         address = "ftp://127.0.0.1"
-        self.assertEqual(validators.ipv4(address), "127.0.0.1")
+        self.assertEqual(validators.address(address), "127.0.0.1")
 
 
 if __name__ == '__main__':
