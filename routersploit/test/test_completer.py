@@ -141,9 +141,6 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
             self.module_prompt('FTP Bruteforce'),
         )
 
-    def test_complete_setg(self):  # TODO: cover setg/unsetg
-        pass
-
     def test_complete_set(self):
         self.set_module()
         self.rsf.send("set \t\t")
@@ -159,6 +156,23 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.assertPrompt(
             self.module_prompt('FTP Bruteforce'),
             'set usernames ',
+        )
+
+    def test_complete_setg(self):
+        self.set_module()
+        self.rsf.send("setg \t\t")
+        self.assertPrompt(
+            'passwords        stop_on_success  threads          verbosity\r\nport             target           usernames        \r\n',
+            self.module_prompt('FTP Bruteforce'),
+            'setg ',
+        )
+
+    def test_complete_setg_2(self):
+        self.set_module()
+        self.rsf.send("setg u\t\t")
+        self.assertPrompt(
+            self.module_prompt('FTP Bruteforce'),
+            'setg usernames ',
         )
 
     def test_complete_show_raw(self):
