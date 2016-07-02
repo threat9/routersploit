@@ -175,6 +175,54 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
             'setg usernames ',
         )
 
+    def test_complete_unsetg(self):
+        """
+        Not present in completion if no global option is set
+        """
+        self.set_module()
+        self.rsf.send("\t\t")
+        self.assertPrompt(
+            "  check  exec   exit   help   run    set    setg   show   \r\n",
+            self.module_prompt('FTP Bruteforce'),
+        )
+
+    def test_complete_unsetg_2(self):
+        """
+        Available only when global options is set
+        """
+        self.set_module()
+        self.rsf.send("setg target foo\r\n")
+        self.rsf.send("\t\t")
+        self.assertPrompt(
+            "  show     \r\ncheck    exit     run      setg     unsetg   \r\n",
+            self.module_prompt('FTP Bruteforce'),
+        )
+
+    def test_complete_unsetg_3(self):
+        """
+        Testing presence of available options
+        """
+        self.set_module()
+        self.rsf.send("setg target foo\r\n")
+        self.rsf.send("setg port bar\r\n")
+        self.rsf.send("unsetg \t\t")
+        self.assertPrompt(
+            "port    target  \r\n",
+            self.module_prompt('FTP Bruteforce'),
+        )
+
+    def test_complete_unsetg_4(self):
+        """
+        Testing presence of available options
+        """
+        self.set_module()
+        self.rsf.send("setg target foo\r\n")
+        self.rsf.send("unsetg t\t\t")
+        self.assertPrompt(
+            self.module_prompt('FTP Bruteforce'),
+            "unsetg target"
+        )
+
     def test_complete_show_raw(self):
         self.set_module()
         self.rsf.send("sh\t\t")
