@@ -6,8 +6,8 @@ try:
 except ImportError:
     import mock
 
-from routersploit.exploits import Exploit, Option
-from routersploit.interpreter import RoutersploitInterpreter, GLOBAL_OPTS
+from routersploit.exploits import Exploit, Option, GLOBAL_OPTS
+from routersploit.interpreter import RoutersploitInterpreter
 from routersploit.test import RoutersploitTestCase
 
 
@@ -24,6 +24,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module = mock.MagicMock()
         self.raw_prompt_default = "\001\033[4m\002rsf\001\033[0m\002 > "
         self.module_prompt_default = lambda x: "\001\033[4m\002rsf\001\033[0m\002 (\001\033[91m\002{}\001\033[0m\002) > ".format(x)
+        GLOBAL_OPTS.clear()
 
     def prepare_prompt_env_variables(self, raw_prompt=None, module_prompt=None):
         if raw_prompt:
@@ -107,7 +108,8 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             [mock.call({'rhost': new_rhost_value}), mock.call({'port': new_port_value})]
         )
 
-    def test_command_setg(self):
+    @mock.patch('routersploit.utils.print_success')
+    def test_command_setg(self, mock_print_success):
         target, new_target_value = 'target_value', "new_target_value"
         self.interpreter.current_module.options = ['target', 'port']
         self.interpreter.current_module.target = target
@@ -117,6 +119,23 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.assertEqual(self.interpreter.current_module.target, new_target_value)
         self.interpreter.current_module = TestExploitFoo()
         self.assertEqual(self.interpreter.current_module.target, new_target_value)
+        mock_print_success.assert_called_once_with({'target': '{}'.format(new_target_value)})
+
+    @mock.patch('routersploit.utils.print_success')
+    def test_command_unsetg(self, mock_print_success):
+        GLOBAL_OPTS['foo'] = 'bar'
+        self.interpreter.command_unsetg('foo')
+        self.assertNotIn('foo', GLOBAL_OPTS.keys())
+        mock_print_success.assert_called_once_with({'foo': ''})
+
+    @mock.patch('routersploit.utils.print_error')
+    def test_command_unsetg_unknown_option(self, mock_print_error):
+        unknown_option = "unknown"
+        GLOBAL_OPTS['foo'] = 'bar'
+
+        self.interpreter.command_unsetg('{} doesnt_matter_value'.format(unknown_option))
+        mock_print_error.assert_called_once_with("You can't unset global option '{}'.\n"
+                                                 "Available global options: ['foo']".format(unknown_option))
 
     def test_command_run(self):
         with mock.patch.object(self.interpreter.current_module, 'run') as mock_run:
@@ -231,7 +250,6 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.assertEqual(self.module_prompt_default('UnnamedModule'), self.interpreter.prompt)
 
     def test_suggested_commands_with_loaded_module_and_no_global_value_set(self):
-        GLOBAL_OPTS.clear()
         self.assertEqual(
             list(self.interpreter.suggested_commands()),
             ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
