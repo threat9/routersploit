@@ -161,8 +161,8 @@ class RoutersploitInterpreter(BaseInterpreter):
     run                                 Run the selected module with the given options
     back                                De-select the current module
     set <option name> <option value>    Set an option for the selected module
-    setg                                Set an option for all of the modules
-    unsetg                              Unset option that was set globally
+    setg <option name> <option value>   Set an option for all of the modules
+    unsetg <option name>                Unset option that was set globally
     show [info|options|devices]         Print information, options, or target devices for a module
     check                               Check if a given target is vulnerable to a selected module's exploit"""
 
