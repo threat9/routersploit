@@ -240,7 +240,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             matches.add("".join((text, head, sep)))
         return list(map(utils.humanize_path, matches))  # humanize output, replace dots to forward slashes
 
-    def suggested_commands(self):
+    def suggested_commands(self):  # TODO: sorted list, factor out generic commands
         """ Entry point for intelligent tab completion.
 
         Based on state of interpreter this method will return intelligent suggestions.
@@ -293,7 +293,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         key, _, value = args[0].partition(' ')
         if key in self.current_module.options:
             setattr(self.current_module, key, value)
-            if kwargs.get("global", False):
+            if kwargs.get("glob", False):
                 GLOBAL_OPTS[key] = value
             utils.print_success({key: value})
         else:
@@ -309,7 +309,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_setg(self, *args, **kwargs):
-        kwargs['global'] = True
+        kwargs['glob'] = True
         self.command_set(*args, **kwargs)
 
     @utils.stop_after(2)
@@ -319,16 +319,13 @@ class RoutersploitInterpreter(BaseInterpreter):
     @utils.module_required
     def command_unsetg(self, *args, **kwargs):
         key, _, value = args[0].partition(' ')
-        if key in self.current_module.options:
-            try:
-                del GLOBAL_OPTS[key]
-            except KeyError:
-                utils.print_error("There is no such option set!")
-            else:
-                utils.print_success({key: value})
-        else:
+        try:
+            del GLOBAL_OPTS[key]
+        except KeyError:
             utils.print_error("You can't unset global option '{}'.\n"
                               "Available global options: {}".format(key, GLOBAL_OPTS.keys()))
+        else:
+            utils.print_success({key: value})
 
     @utils.stop_after(2)
     def complete_unsetg(self, text, *args, **kwargs):
