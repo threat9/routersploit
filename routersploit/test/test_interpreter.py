@@ -477,7 +477,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.command_show('unknown_sub_command')
         mock_print_error.assert_called_once_with("Unknown 'show' sub-command 'unknown_sub_command'. "
                                                  "What do you want to show?\n"
-                                                 "Possible choices are: ('info', 'options', 'devices')")
+                                                 "Possible choices are: {}".format(self.interpreter.show_sub_commands))
 
     def test_if_command_run_has_module_required_decorator(self):
         self.assertIsDecorated(

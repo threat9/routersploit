@@ -235,7 +235,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("show \t\t")
         self.assertPrompt(
-            'info     options  \r\n',
+            'all       creds     devices   exploits  info      options   scanners\r\n',
             self.module_prompt('FTP Bruteforce')
         )
 

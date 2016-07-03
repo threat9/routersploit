@@ -173,6 +173,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = 'rsf'
+        self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
 
         self.modules = utils.index_modules()
         self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
@@ -392,23 +393,38 @@ class RoutersploitInterpreter(BaseInterpreter):
         except KeyError:
             print("\nTarget devices are not defined")
 
+    def __show_modules(self, root):  # TODO: cover with tests
+        for module in [module for module in self.modules if module.startswith(root)]:
+            print(module.replace('.', os.sep))
+
+    def _show_all(self, *args, **kwargs):  # TODO: cover with tests
+        for module in self.modules:
+            print(module)
+
+    def _show_scanners(self, *args, **kwargs):  # TODO: cover with tests
+        self.__show_modules('scanners')
+
+    def _show_exploits(self, *args, **kwargs):  # TODO: cover with tests
+        self.__show_modules('exploits')
+
+    def _show_creds(self, *args, **kwargs):  # TODO: cover with tests
+        self.__show_modules('creds')
+
     def command_show(self, *args, **kwargs):
-        sub_commands = ('info', 'options', 'devices')
         sub_command = args[0]
         try:
             getattr(self, "_show_{}".format(sub_command))(*args, **kwargs)
         except AttributeError:
             utils.print_error("Unknown 'show' sub-command '{}'. "
                               "What do you want to show?\n"
-                              "Possible choices are: {}".format(sub_command, sub_commands))
+                              "Possible choices are: {}".format(sub_command, self.show_sub_commands))
 
     @utils.stop_after(2)
     def complete_show(self, text, *args, **kwargs):
-        sub_commands = ['info', 'options', 'devices']
         if text:
-            return filter(lambda command: command.startswith(text), sub_commands)
+            return [command for command in self.show_sub_commands if command.startswith(text)]
         else:
-            return sub_commands
+            return self.show_sub_commands
 
     @utils.module_required
     def command_check(self, *args, **kwargs):
