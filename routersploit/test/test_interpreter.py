@@ -356,7 +356,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.assertEqual(self.interpreter.current_module, None)
 
     @mock.patch('__builtin__.print')
-    def test_command_show_info(self, mock_print):
+    def test_show_info(self, mock_print):
         metadata = {
             'devices': 'target_desc',
             'authors': 'authors_desc',
@@ -368,7 +368,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module.__doc__ = description
         self.interpreter.current_module._MagicMock__info__ = metadata
 
-        self.interpreter.command_show('info')
+        self.interpreter._show_info()
         self.assertEqual(
             mock_print.mock_calls,
             [
@@ -392,7 +392,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module.__doc__ = description
         self.interpreter.current_module._MagicMock__info__ = metadata
 
-        self.interpreter.command_show('info')
+        self.interpreter._show_info()
         self.assertEqual(
             mock_print.mock_calls,
             [
@@ -400,7 +400,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             )
 
     @mock.patch('__builtin__.print')
-    def test_command_show_options(self, mock_print):
+    def test_show_options(self, mock_print):
         exploit_attributes = {
             'target': 'target_desc',
             'port': 'port_desc',
@@ -417,7 +417,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module.target = '127.0.0.1'
         self.interpreter.current_module.port = 22
 
-        self.interpreter.command_show('options')
+        self.interpreter._show_options()
         self.assertEqual(
             mock_print.mock_calls,
             [
@@ -452,7 +452,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module.target = '127.0.0.1'
         self.interpreter.current_module.port = 22
 
-        self.interpreter.command_show('options')
+        self.interpreter._show_options()
         self.assertEqual(
             mock_print.mock_calls,
             [
@@ -467,15 +467,17 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             ]
         )
 
-    @mock.patch('__builtin__.print')
-    def test_command_show_unknown_sub_command(self, mock_print):
-        help_text = "Unknown command 'show unknown_sub_command'. You want to 'show info' or 'show options'?"
+    def test_command_show(self):
+        with mock.patch.object(self.interpreter, "_show_options") as mock_show_options:
+            self.interpreter.command_show("options")
+            mock_show_options.assert_called_once_with("options")
 
+    @mock.patch('routersploit.utils.print_error')
+    def test_command_show_unknown_sub_command(self, mock_print_error):
         self.interpreter.command_show('unknown_sub_command')
-        self.assertEqual(
-            mock_print.mock_calls,
-            [mock.call(help_text)]
-        )
+        mock_print_error.assert_called_once_with("Unknown 'show' sub-command 'unknown_sub_command'. "
+                                                 "What do you want to show?\n"
+                                                 "Possible choices are: ('info', 'options', 'devices')")
 
     def test_if_command_run_has_module_required_decorator(self):
         self.assertIsDecorated(

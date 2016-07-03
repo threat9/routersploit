@@ -352,46 +352,53 @@ class RoutersploitInterpreter(BaseInterpreter):
             else:
                 yield opt_key, opt_value, opt_description
 
-    @utils.module_required
-    def command_show(self, *args, **kwargs):
-        info, options, devices = 'info', 'options', 'devices'
-        sub_command = args[0]
-        if sub_command == info:
-            utils.pprint_dict_in_order(
+    def _show_info(self, *args, **kwargs):
+        utils.pprint_dict_in_order(
                 self.module_metadata,
                 ("name", "description", "devices", "authors", "references"),
             )
-            utils.print_info()
-        elif sub_command == options:
-            target_opts = {'port', 'target'}
-            module_opts = set(self.current_module.options) - target_opts
-            headers = ("Name", "Current settings", "Description")
+        utils.print_info()
 
-            utils.print_info('\nTarget options:')
-            utils.print_table(headers, *self.get_opts(*target_opts))
+    def _show_options(self, *args, **kwargs):
+        target_opts = {'port', 'target'}
+        module_opts = set(self.current_module.options) - target_opts
+        headers = ("Name", "Current settings", "Description")
 
-            if module_opts:
-                utils.print_info('\nModule options:')
-                utils.print_table(headers, *self.get_opts(*module_opts))
+        utils.print_info('\nTarget options:')
+        utils.print_table(headers, *self.get_opts(*target_opts))
 
-            utils.print_info()
-        elif sub_command == devices:
-            if devices in self.current_module._Exploit__info__.keys():
-                devices = self.current_module._Exploit__info__['devices']
+        if module_opts:
+            utils.print_info('\nModule options:')
+            utils.print_table(headers, *self.get_opts(*module_opts))
 
-                print("\nTarget devices:")
-                i = 0
-                for device in devices:
-                    if isinstance(device, dict): 
-                        print("   {} - {}".format(i, device['name']))
-                    else:
-                        print("   {} - {}".format(i, device))
-                    i += 1
-                print()
-            else:
-                print("\nTarget devices are not defined")
-        else:
-            print("Unknown command 'show {}'. You want to 'show {}' or 'show {}'?".format(sub_command, info, options))
+        utils.print_info()
+
+    def _show_devices(self, *args, **kwargs):  # TODO: cover with tests
+        try:
+            devices = self.current_module._Exploit__info__['devices']
+
+            print("\nTarget devices:")
+            i = 0
+            for device in devices:
+                if isinstance(device, dict):
+                    print("   {} - {}".format(i, device['name']))
+                else:
+                    print("   {} - {}".format(i, device))
+                i += 1
+            print()
+        except KeyError:
+            print("\nTarget devices are not defined")
+
+    @utils.module_required
+    def command_show(self, *args, **kwargs):
+        sub_commands = ('info', 'options', 'devices')
+        sub_command = args[0]
+        try:
+            getattr(self, "_show_{}".format(sub_command))(*args, **kwargs)
+        except AttributeError:
+            utils.print_error("Unknown 'show' sub-command '{}'. "
+                              "What do you want to show?\n"
+                              "Possible choices are: {}".format(sub_command, sub_commands))
 
     @utils.stop_after(2)
     def complete_show(self, text, *args, **kwargs):
