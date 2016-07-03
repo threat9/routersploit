@@ -399,7 +399,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def _show_all(self, *args, **kwargs):  # TODO: cover with tests
         for module in self.modules:
-            print(module)
+            print(module.replace('.', '/'))
 
     def _show_scanners(self, *args, **kwargs):  # TODO: cover with tests
         self.__show_modules('scanners')
