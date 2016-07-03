@@ -1,8 +1,8 @@
 # RouterSploit - Router Exploitation Framework
 
-[![Join the chat at https://gitter.im/reverse-shell/routersploit](https://badges.gitter.im/reverse-shell/routersploit.svg)](https://gitter.im/reverse-shell/routersploit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![Python 2.7](https://img.shields.io/badge/Python-2.7-yellow.svg)](http://www.python.org/download/)
 [![Build Status](https://travis-ci.org/reverse-shell/routersploit.svg?branch=master)](https://travis-ci.org/reverse-shell/routersploit)
+[![Join the chat at https://gitter.im/reverse-shell/routersploit](https://badges.gitter.im/reverse-shell/routersploit.svg)](https://gitter.im/reverse-shell/routersploit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The RouterSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
