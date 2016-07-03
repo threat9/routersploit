@@ -266,7 +266,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'exec', 'help', 'exit']
+            ['use ', 'exec', 'help', 'exit', 'show ']
         )
 
     @mock.patch('importlib.import_module')
@@ -491,9 +491,21 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             "module_required"
         )
 
-    def test_if_command_show_has_module_required_decorator(self):
+    def test_if_command_show_info_has_module_required_decorator(self):
         self.assertIsDecorated(
-            self.interpreter.command_show,
+            self.interpreter._show_info,
+            "module_required"
+        )
+
+    def test_if_command_show_options_has_module_required_decorator(self):
+        self.assertIsDecorated(
+            self.interpreter._show_options,
+            "module_required"
+        )
+
+    def test_if_command_show_devices_has_module_required_decorator(self):
+        self.assertIsDecorated(
+            self.interpreter._show_devices,
             "module_required"
         )
 

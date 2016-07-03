@@ -255,7 +255,7 @@ class RoutersploitInterpreter(BaseInterpreter):
                 return itertools.chain(module_commands, ('unsetg ',))
             return module_commands
         else:
-            return ['use ', 'exec', 'help', 'exit']
+            return ['use ', 'exec', 'help', 'exit', 'show ']
 
     def command_back(self, *args, **kwargs):
         self.current_module = None
@@ -352,6 +352,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             else:
                 yield opt_key, opt_value, opt_description
 
+    @utils.module_required
     def _show_info(self, *args, **kwargs):
         utils.pprint_dict_in_order(
                 self.module_metadata,
@@ -359,6 +360,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             )
         utils.print_info()
 
+    @utils.module_required
     def _show_options(self, *args, **kwargs):
         target_opts = {'port', 'target'}
         module_opts = set(self.current_module.options) - target_opts
@@ -373,6 +375,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         utils.print_info()
 
+    @utils.module_required
     def _show_devices(self, *args, **kwargs):  # TODO: cover with tests
         try:
             devices = self.current_module._Exploit__info__['devices']
@@ -389,7 +392,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         except KeyError:
             print("\nTarget devices are not defined")
 
-    @utils.module_required
     def command_show(self, *args, **kwargs):
         sub_commands = ('info', 'options', 'devices')
         sub_command = args[0]
