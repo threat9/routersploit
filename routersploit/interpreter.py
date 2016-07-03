@@ -393,13 +393,12 @@ class RoutersploitInterpreter(BaseInterpreter):
         except KeyError:
             print("\nTarget devices are not defined")
 
-    def __show_modules(self, root):  # TODO: cover with tests
+    def __show_modules(self, root=''):  # TODO: cover with tests
         for module in [module for module in self.modules if module.startswith(root)]:
             print(module.replace('.', os.sep))
 
     def _show_all(self, *args, **kwargs):  # TODO: cover with tests
-        for module in self.modules:
-            print(module.replace('.', '/'))
+        self.__show_modules()
 
     def _show_scanners(self, *args, **kwargs):  # TODO: cover with tests
         self.__show_modules('scanners')
