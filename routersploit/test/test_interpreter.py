@@ -479,6 +479,81 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
                                                  "What do you want to show?\n"
                                                  "Possible choices are: {}".format(self.interpreter.show_sub_commands))
 
+    @mock.patch('__builtin__.print')
+    def test_show_all(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.foo',
+            'exploits.bar',
+            'scanners.foo',
+            'scanners.bar',
+            'creds.foo',
+            'creds.bar',
+        ]
+
+        self.interpreter._show_all()
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call('exploits/foo'),
+                mock.call('exploits/bar'),
+                mock.call('scanners/foo'),
+                mock.call("scanners/bar"),
+                mock.call("creds/foo"),
+                mock.call("creds/bar"),
+            ]
+        )
+
+    @mock.patch('__builtin__.print')
+    def test_show_scanners(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.foo',
+            'exploits.bar',
+            'scanners.foo',
+            'scanners.bar',
+            'creds.foo',
+            'creds.bar',
+        ]
+
+        self.interpreter._show_scanners()
+        self.assertEqual(
+            mock_print.mock_calls,
+            [mock.call("scanners/foo"), mock.call("scanners/bar")]
+        )
+
+    @mock.patch('__builtin__.print')
+    def test_show_exploits(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.foo',
+            'exploits.bar',
+            'scanners.foo',
+            'scanners.bar',
+            'creds.foo',
+            'creds.bar',
+        ]
+
+        self.interpreter._show_exploits()
+        self.assertEqual(
+            mock_print.mock_calls,
+            [mock.call("exploits/foo"), mock.call("exploits/bar")]
+        )
+
+    @mock.patch('__builtin__.print')
+    def test_show_creds(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.foo',
+            'exploits.bar',
+            'scanners.foo',
+            'scanners.bar',
+            'creds.foo',
+            'creds.bar',
+        ]
+
+        self.interpreter._show_creds()
+        self.assertEqual(
+            mock_print.mock_calls,
+            [mock.call("creds/foo"), mock.call("creds/bar")]
+        )
+
     def test_if_command_run_has_module_required_decorator(self):
         self.assertIsDecorated(
             self.interpreter.command_run,
