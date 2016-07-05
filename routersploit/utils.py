@@ -441,21 +441,18 @@ def boolify(value):
         return bool(value)
 
 
-def create_exploit(path):
+def create_exploit(path):  # TODO: cover with tests
     from .templates import exploit
 
-    try:
-        module_type, vendor, name = path.split(os.sep)
-    except ValueError:
-        print_error("Invalid path. ;(")
-        return
+    parts = path.split(os.sep)
+    module_type, name = parts[0], parts[-1]
 
     if module_type not in ['creds', 'exploits', 'scanners']:
         print_error("Invalid module type. ;(")
         return
 
     create_resource(
-        name=os.path.join(module_type, vendor),
+        name=os.path.join(*parts[:-1]),
         content=(
             Resource(
                 name="{}.py".format(name),
@@ -466,7 +463,7 @@ def create_exploit(path):
     )
 
 
-def create_resource(name, content=(), python_package=False):
+def create_resource(name, content=(), python_package=False):  # TODO: cover with tests
     """ Creates resource directory in current working directory. """
     root_path = os.path.join(MODULES_DIR, name)
     mkdir_p(root_path)
@@ -497,7 +494,7 @@ def create_resource(name, content=(), python_package=False):
                     print_success("{} successfully created.".format(name))
 
 
-def mkdir_p(path):
+def mkdir_p(path):  # TODO: cover with tests
     """
     Simulate mkdir -p shell command. Creates directory with all needed parents.
     :param path: Directory path that may include non existing parent directories

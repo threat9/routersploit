@@ -9,7 +9,8 @@ from routersploit.utils import create_exploit
 
 
 parser = argparse.ArgumentParser(description='RouterSploit - Router Exploitation Framework')
-parser.add_argument('--add-exploit',
+parser.add_argument('-a',
+                    '--add-exploit',
                     metavar='exploit_path',
                     help='Add exploit using default template.')
 
