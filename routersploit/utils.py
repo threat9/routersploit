@@ -447,6 +447,10 @@ def create_exploit(path):  # TODO: cover with tests
     parts = path.split(os.sep)
     module_type, name = parts[0], parts[-1]
 
+    if not name:
+        print_error("Invalid exploit name. ;(")
+        return
+
     if module_type not in ['creds', 'exploits', 'scanners']:
         print_error("Invalid module type. ;(")
         return
