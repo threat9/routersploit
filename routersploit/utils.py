@@ -8,8 +8,6 @@ import random
 import string
 import socket
 import importlib
-import termios
-import tty
 import select
 import socket
 from functools import wraps
@@ -443,6 +441,16 @@ def boolify(value):
 
 def ssh_interactive(ssh):
     chan = ssh.invoke_shell()
+    try:
+        import termios
+        import tty
+
+        posix_shell(chan)
+    except:
+        windows_shell(chan)
+
+
+def posix_shell(chan):
     oldtty = termios.tcgetattr(sys.stdin)
     try:
         tty.setraw(sys.stdin.fileno())
@@ -456,12 +464,11 @@ def ssh_interactive(ssh):
                     x = unicode(chan.recv(1024))
 
                     if(len(x) == 0):
-                        sys.stdout.write('\r\nExiting...\r\n')
                         break
 
                     sys.stdout.write(x)
                     sys.stdout.flush()
-    
+
                 except socket.timeout:
                     pass
 
@@ -472,7 +479,31 @@ def ssh_interactive(ssh):
                    break
 
                 chan.send(x)
-            
     finally:
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
         return 
+
+
+def windows_shell(chan):
+    def writeall(sock):
+        while True:
+            data = sock.recv(256)
+            if not data:
+                sys.stdout.flush()
+                return
+
+            sys.stdout.write(data)
+            sys.stdout.flush()
+
+    writer = threading.Thread(target=writeall, args=(chan,))
+    writer.start()
+
+    try:
+        while True:
+            d = sys.stdin.read(1)
+            if not d:
+                break
+
+            chan.send(d)
+    except:
+        pass
