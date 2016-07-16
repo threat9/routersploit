@@ -17,7 +17,7 @@ def url(address):
 
 def address(addr):
     addr = urlparse.urlsplit(addr)
-    return addr.netloc or address.path
+    return addr.netloc or addr.path
 
 
 def ipv4(address):
