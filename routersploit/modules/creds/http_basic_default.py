@@ -36,7 +36,7 @@ class Exploit(exploits.Exploit):
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
-    port = exploits.Option(80, 'Target port') 
+    port = exploits.Option(80, 'Target port')
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     path = exploits.Option('/', 'URL Path')

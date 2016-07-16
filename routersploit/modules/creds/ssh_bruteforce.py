@@ -51,7 +51,7 @@ class Exploit(exploits.Exploit):
         self.credentials = []
         self.attack()
 
-    @multi        
+    @multi
     def attack(self):
         ssh = paramiko.SSHClient()
 

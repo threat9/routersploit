@@ -36,9 +36,9 @@ class Exploit(exploits.Exploit):
         path = 'exploits'
 
         modules = []
-        for device in listdir(rootpath+path):  # TODO refactor this, using load_modules() from core
+        for device in listdir(rootpath + path):  # TODO refactor this, using load_modules() from core
             if not device.endswith(".py") and not device.endswith(".pyc"):
-                for f in listdir(rootpath+path + "/" + device):
+                for f in listdir(rootpath + path + "/" + device):
                     if f.endswith(".py") and f != "__init__.py":
                         modules.append(device + "/" + f[:-3])
 
