@@ -13,6 +13,7 @@ from routersploit.utils import (
     multi,
     index_modules,
     ssh_interactive,
+    tokenize,
 )
 
 from routersploit import exploits

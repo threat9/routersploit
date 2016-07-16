@@ -4,9 +4,10 @@ from __future__ import absolute_import
 import threading
 import os
 import sys
+import re
+import collections
 import random
 import string
-import socket
 import importlib
 import select
 import socket
@@ -507,3 +508,28 @@ def windows_shell(chan):
             chan.send(d)
     except:
         pass
+
+
+def tokenize(token_specification, text):
+    Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column', 'mo'])
+
+    token_specification.extend((
+        ('NEWLINE', r'\n'),          # Line endings
+        ('SKIP', r'.'),              # Any other character
+    ))
+
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    line_num = 1
+    line_start = 0
+    for mo in re.finditer(tok_regex, text):
+        kind = mo.lastgroup
+        value = filter(lambda x: x is not None, mo.groups())
+        if kind == 'NEWLINE':
+            line_start = mo.end()
+            line_num += 1
+        elif kind == 'SKIP':
+            pass
+        else:
+            column = mo.start() - line_start
+            yield Token(kind, value, line_num, column, mo)
+
