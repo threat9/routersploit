@@ -7,7 +7,7 @@ NC='\033[0m' # No Color
 MODULES_PATH=./routersploit/modules
 FAILURE=0
 
-PEP=$(pep8 --ignore E501 $MODULES_PATH)
+PEP=$(pep8 --ignore E501,W503 $MODULES_PATH)
 PYFLAKES=$(pyflakes $MODULES_PATH)
 
 if [ "$PEP" ]; then
