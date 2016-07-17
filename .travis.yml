@@ -4,6 +4,8 @@ python:
 
 install:
   - "pip install -r requirements.txt"
-  - "pip install pexpect"
+  - "pip install pexpect pep8 pyflakes"
 
-script: "python -m unittest discover"
+script:
+  - "python -m unittest discover"
+  - "./run_linter.sh"
