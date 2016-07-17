@@ -7,25 +7,16 @@ NC='\033[0m' # No Color
 MODULES_PATH=./routersploit/modules
 FAILURE=0
 
-PEP=$(pep8 --ignore E501,W503 $MODULES_PATH)
-PYFLAKES=$(pyflakes $MODULES_PATH)
+FLAKE8_IGNORED_RULES='E501,W503'
+FLAKE8=$(flake8 --ignore=$FLAKE8_IGNORED_RULES $MODULES_PATH)
 
-if [ "$PEP" ]; then
-    echo -e "${RED}- PEP8 violations:${NC}"
-    echo -e $PEP
+if [ "$FLAKE8" ]; then
+    echo -e "\n${RED}- flake8 violations:${NC}"
+    echo -e $FLAKE8
     echo ""
-    FAILURE=1
-else
-    echo -e "${GREEN}+ PEP8${NC}"
-fi
-
-if [ "$PYFLAKES" ]; then
-    echo -e "\n${RED}- pyflakes violations:${NC}"
-    echo -e $PYFLAKES
-    echo "\n"
     FAILURE=1 
 else
-    echo -e "${GREEN}+ pyflakes${NC}"
+    echo -e "${GREEN}+ flake8${NC}"
 fi
 
 exit $FAILURE

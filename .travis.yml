@@ -4,7 +4,7 @@ python:
 
 install:
   - "pip install -r requirements.txt"
-  - "pip install pexpect pep8 pyflakes"
+  - "pip install pexpect flake8"
 
 script:
   - "python -m unittest discover"
