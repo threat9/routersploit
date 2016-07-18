@@ -356,9 +356,9 @@ class RoutersploitInterpreter(BaseInterpreter):
     @utils.module_required
     def _show_info(self, *args, **kwargs):
         utils.pprint_dict_in_order(
-                self.module_metadata,
-                ("name", "description", "devices", "authors", "references"),
-            )
+            self.module_metadata,
+            ("name", "description", "devices", "authors", "references"),
+        )
         utils.print_info()
 
     @utils.module_required

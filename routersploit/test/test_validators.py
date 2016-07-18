@@ -1,5 +1,4 @@
 import unittest
-import socket
 
 try:
     import unittest.mock as mock

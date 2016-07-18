@@ -19,4 +19,4 @@ from routersploit.utils import (
 from routersploit import exploits
 from routersploit import wordlists
 from routersploit import validators
-from routersploit.shell import shell 
+from routersploit.shell import shell

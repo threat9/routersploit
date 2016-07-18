@@ -25,10 +25,10 @@ MODULES_DIR = rsf_modules.__path__[0]
 print_lock = threading.Lock()
 
 colors = {
-    'grey': 30,  'red': 31,
+    'grey': 30, 'red': 31,
     'green': 32, 'yellow': 33,
-    'blue': 34,  'magenta': 35,
-    'cyan': 36,  'white': 37,
+    'blue': 34, 'magenta': 35,
+    'cyan': 36, 'white': 37,
 }
 
 # Disable certificate verification warnings
@@ -148,7 +148,8 @@ def stop_after(space_number):
 
 class DummyFile(object):
     """  Mocking file object. Optimalization for the "mute" decorator. """
-    def write(self, x): pass
+    def write(self, x):
+        pass
 
 
 def mute(fn):
@@ -390,9 +391,9 @@ def pprint_dict_in_order(dictionary, order=None):
         prettyprint(rest_keys, dictionary[rest_keys])
 
 
-def random_text(length, alph=string.ascii_letters+string.digits):
+def random_text(length, alph=string.ascii_letters + string.digits):
     """ Random text generator. NOT crypto safe.
-    
+
     Generates random text with specified length and alphabet.
     """
     return ''.join(random.choice(alph) for _ in range(length))
@@ -460,29 +461,24 @@ def posix_shell(chan):
 
         while(True):
             r, w, e = select.select([chan, sys.stdin], [], [])
-            if(chan in r):
+            if chan in r:
                 try:
                     x = unicode(chan.recv(1024))
-
-                    if(len(x) == 0):
+                    if len(x) == 0:
                         break
-
                     sys.stdout.write(x)
                     sys.stdout.flush()
-
                 except socket.timeout:
                     pass
 
-            if(sys.stdin in r):
+            if sys.stdin in r:
                 x = sys.stdin.read(1)
-
-                if(len(x) == 0):
-                   break
-
+                if len(x) == 0:
+                    break
                 chan.send(x)
     finally:
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
-        return 
+        return
 
 
 def windows_shell(chan):
@@ -532,4 +528,3 @@ def tokenize(token_specification, text):
         else:
             column = mo.start() - line_start
             yield Token(kind, value, line_num, column, mo)
-

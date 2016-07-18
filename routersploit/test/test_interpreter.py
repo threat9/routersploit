@@ -382,8 +382,9 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
                 mock.call('authors_desc'),
                 mock.call('\nReferences:'),
                 mock.call('references_desc'),
-                mock.call()]
-            )
+                mock.call()
+            ]
+        )
 
     @mock.patch('__builtin__.print')
     def test_command_show_info_module_with_no_metadata(self, mock_print):
@@ -395,9 +396,8 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter._show_info()
         self.assertEqual(
             mock_print.mock_calls,
-            [
-                mock.call()]
-            )
+            [mock.call()]
+        )
 
     @mock.patch('__builtin__.print')
     def test_show_options(self, mock_print):
