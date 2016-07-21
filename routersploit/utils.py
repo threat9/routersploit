@@ -539,12 +539,18 @@ def create_exploit(path):  # TODO: cover with tests
     parts = path.split(os.sep)
     module_type, name = parts[0], parts[-1]
 
-    if not name:
-        print_error("Invalid exploit name. ;(")
+    if len(parts) == 1 or not name:
+        print_error("Invalid exploit name: '{}'\n"
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(name))
         return
 
-    if module_type not in ['creds', 'exploits', 'scanners']:
-        print_error("Invalid module type. ;(")
+    types = ['creds', 'exploits', 'scanners']
+    if module_type not in types:
+        print_error("Invalid module type: '{}'\n"
+                    "Available types: {}\n"
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(module_type, types))
         return
 
     create_resource(
