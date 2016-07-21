@@ -537,9 +537,14 @@ def create_exploit(path):  # TODO: cover with tests
     from .templates import exploit
 
     parts = path.split(os.sep)
-    module_type, name = parts[0], parts[-1]
+    module_type, vendor, name = parts[0], [1], parts[-1]
+    if len(parts) < 3:
+        print_error("Invalid format. "
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(name))
+        return
 
-    if len(parts) == 1 or not name:
+    if not name:
         print_error("Invalid exploit name: '{}'\n"
                     "Use following naming convention: module_type/vendor_name/exploit_name\n"
                     "e.g. exploits/dlink/password_disclosure".format(name))
