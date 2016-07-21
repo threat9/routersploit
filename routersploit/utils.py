@@ -11,6 +11,7 @@ import string
 import importlib
 import select
 import socket
+import errno
 from functools import wraps
 from distutils.util import strtobool
 from abc import ABCMeta, abstractmethod
@@ -33,6 +34,8 @@ colors = {
 
 # Disable certificate verification warnings
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+Resource = collections.namedtuple("Resource", ["name", "template_path", "context"])
 
 
 def index_modules(modules_directory=MODULES_DIR):
@@ -528,3 +531,76 @@ def tokenize(token_specification, text):
         else:
             column = mo.start() - line_start
             yield Token(kind, value, line_num, column, mo)
+
+
+def create_exploit(path):  # TODO: cover with tests
+    from .templates import exploit
+
+    parts = path.split(os.sep)
+    module_type, name = parts[0], parts[-1]
+
+    if not name:
+        print_error("Invalid exploit name. ;(")
+        return
+
+    if module_type not in ['creds', 'exploits', 'scanners']:
+        print_error("Invalid module type. ;(")
+        return
+
+    create_resource(
+        name=os.path.join(*parts[:-1]),
+        content=(
+            Resource(
+                name="{}.py".format(name),
+                template_path=os.path.abspath(exploit.__file__.rstrip("c")),
+                context={}),
+        ),
+        python_package=True
+    )
+
+
+def create_resource(name, content=(), python_package=False):  # TODO: cover with tests
+    """ Creates resource directory in current working directory. """
+    root_path = os.path.join(MODULES_DIR, name)
+    mkdir_p(root_path)
+
+    if python_package:
+        open(os.path.join(root_path, "__init__.py"), "a").close()
+
+    for name, template_path, context in content:
+        if os.path.splitext(name)[-1] == "":  # Checking if resource has extension if not it's directory
+            mkdir_p(os.path.join(root_path, name))
+        else:
+            try:
+                with open(template_path, "rb") as template_file:
+                    template = string.Template(template_file.read())
+            except (IOError, TypeError):
+                template = string.Template("")
+
+            try:
+                file_handle = os.open(os.path.join(root_path, name), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    print_status("{} already exist.".format(name))
+                else:
+                    raise
+            else:
+                with os.fdopen(file_handle, 'w') as target_file:
+                    target_file.write(template.substitute(**context))
+                    print_success("{} successfully created.".format(name))
+
+
+def mkdir_p(path):  # TODO: cover with tests
+    """
+    Simulate mkdir -p shell command. Creates directory with all needed parents.
+    :param path: Directory path that may include non existing parent directories
+    :return:
+    """
+    try:
+        os.makedirs(path)
+        print_success("Directory {path} successfully created.".format(path=path))
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            print_success("Directory {path}".format(path=path))
+        else:
+            raise
