@@ -446,23 +446,23 @@ def boolify(value):
 
 def ssh_interactive(ssh):
     chan = ssh.invoke_shell()
-    try:
-        import termios
-        import tty
-
+    if os.name == 'posix':
         posix_shell(chan)
-    except:
+    else:
         windows_shell(chan)
 
 
 def posix_shell(chan):
+    import termios
+    import tty
+
     oldtty = termios.tcgetattr(sys.stdin)
     try:
         tty.setraw(sys.stdin.fileno())
         tty.setcbreak(sys.stdin.fileno())
         chan.settimeout(0.0)
 
-        while(True):
+        while True:
             r, w, e = select.select([chan, sys.stdin], [], [])
             if chan in r:
                 try:
