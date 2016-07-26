@@ -137,10 +137,12 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         mock_print_error.assert_called_once_with("You can't unset global option '{}'.\n"
                                                  "Available global options: ['foo']".format(unknown_option))
 
-    def test_command_run(self):
+    @mock.patch('routersploit.utils.print_status')
+    def test_command_run(self, mock_print_status):
         with mock.patch.object(self.interpreter.current_module, 'run') as mock_run:
             self.interpreter.command_run()
             mock_run.assert_called_once_with()
+            mock_print_status.assert_called_once_with('Running module...')
 
     @mock.patch('routersploit.utils.print_success')
     def test_command_check_target_vulnerable(self, mock_print_success):
@@ -186,7 +188,8 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')
     @mock.patch('routersploit.utils.print_error')
-    def test_command_run_exception_during_exploit_execution(self, mock_print_error, mock_format_exc, mock_exc_info):
+    @mock.patch('routersploit.utils.print_status')
+    def test_command_run_exception_during_exploit_execution(self, mock_print_status, mock_print_error, mock_format_exc, mock_exc_info):
         with mock.patch.object(self.interpreter.current_module, 'run') as mock_run:
             mock_run.side_effect = RuntimeError
             mock_format_exc.return_value = stacktrace = "stacktrace"
@@ -196,6 +199,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             mock_run.assert_called_once_with()
             mock_format_exc.assert_called_once_with(info)
             mock_print_error.assert_called_once_with(stacktrace)
+            mock_print_status.assert_called_once_with('Running module...')
 
     def test_command_back(self):
         self.assertIsNotNone(self.interpreter.current_module)
