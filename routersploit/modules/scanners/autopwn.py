@@ -1,12 +1,10 @@
-from os import listdir
-import imp
-
 from routersploit import (
     exploits,
     print_error,
     print_success,
     print_status,
     print_info,
+    utils,
 )
 
 
@@ -32,38 +30,25 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
-        rootpath = 'routersploit/modules/'
-        path = 'exploits'
-
-        modules = []
-        for device in listdir(rootpath + path):  # TODO refactor this, using load_modules() from core
-            if not device.endswith(".py") and not device.endswith(".pyc"):
-                for f in listdir(rootpath + path + "/" + device):
-                    if f.endswith(".py") and f != "__init__.py":
-                        modules.append(device + "/" + f[:-3])
-
         vulnerabilities = []
-        for module_name in modules:
-            f = "".join((path, "/", module_name))
 
-            module = imp.load_source('module', rootpath + f + '.py')
-            exploit = module.Exploit()
-
+        for exploit in utils.iter_modules(utils.EXPLOITS_DIR):
+            exploit = exploit()
             exploit.target = self.target
             exploit.port = self.port
 
             response = exploit.check()
 
             if response is True:
-                print_success("{} is vulnerable".format(f))
-                vulnerabilities.append(f)
+                print_success("{} is vulnerable".format(exploit))
+                vulnerabilities.append(exploit)
             elif response is False:
-                print_error("{} is not vulnerable".format(f))
+                print_error("{} is not vulnerable".format(exploit))
             else:
-                print_status("{} could not be verified".format(f))
+                print_status("{} could not be verified".format(exploit))
 
         if vulnerabilities:
-            print
+            print_info()
             print_success("Device is vulnerable!")
             for v in vulnerabilities:
                 print_info(" - {}".format(v))
