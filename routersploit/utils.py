@@ -22,6 +22,9 @@ from .exceptions import RoutersploitException
 from . import modules as rsf_modules
 
 MODULES_DIR = rsf_modules.__path__[0]
+CREDS_DIR = os.path.join(MODULES_DIR, 'creds')
+EXPLOITS_DIR = os.path.join(MODULES_DIR, 'exploits')
+SCANNERS_DIR = os.path.join(MODULES_DIR, 'scanners')
 
 print_lock = threading.Lock()
 
