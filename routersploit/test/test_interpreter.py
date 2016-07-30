@@ -254,16 +254,16 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.assertEqual(self.module_prompt_default('UnnamedModule'), self.interpreter.prompt)
 
     def test_suggested_commands_with_loaded_module_and_no_global_value_set(self):
-        self.assertItemsEqual(
+        self.assertEqual(
             list(self.interpreter.suggested_commands()),
-            ['use ', 'run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
+            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'set ', 'setg ', 'show ', 'use ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_with_loaded_module_and_global_value_set(self):
         GLOBAL_OPTS['key'] = 'value'
-        self.assertItemsEqual(
+        self.assertEqual(
             list(self.interpreter.suggested_commands()),
-            ['use ', 'run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit', 'unsetg ']  # Extra space at the end because of following param
+            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'set ', 'setg ', 'show ', 'unsetg ', 'use ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
