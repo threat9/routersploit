@@ -1,3 +1,4 @@
+import threading
 from routersploit import (
     exploits,
     print_error,
@@ -5,6 +6,7 @@ from routersploit import (
     print_status,
     print_info,
     utils,
+    LockedIterator
 )
 
 
@@ -28,32 +30,35 @@ class Exploit(exploits.Exploit):
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
+    threads = exploits.Option(8, "Number of threads")
 
     def run(self):
-        vulnerabilities = []
-
-        for exploit in utils.iter_modules(utils.EXPLOITS_DIR):
-            exploit = exploit()
-            exploit.target = self.target
-            exploit.port = self.port
-
-            response = exploit.check()
-
-            if response is True:
-                print_success("{} is vulnerable".format(exploit))
-                vulnerabilities.append(exploit)
-            elif response is False:
-                print_error("{} is not vulnerable".format(exploit))
-            else:
-                print_status("{} could not be verified".format(exploit))
-
-        if vulnerabilities:
-            print_info()
-            print_success("Device is vulnerable!")
-            for v in vulnerabilities:
-                print_info(" - {}".format(v))
-        else:
-            print_error("Device is not vulnerable to any exploits!\n")
+        data = LockedIterator(utils.iter_modules(utils.EXPLOITS_DIR))
+        self.run_threads(self.threads, self.target_function, data)
 
     def check(self):
         raise NotImplementedError("Check method is not available")
+
+    def target_function(self, running, data):
+        name = threading.current_thread().name
+        print_status(name, 'process is starting...')
+
+        while running.is_set():
+            try:
+                exploit = data.next()
+            except StopIteration:
+                break
+            else:
+                exploit = exploit()
+                exploit.target = self.target
+                exploit.port = self.port
+
+                response = exploit.check()
+
+                if response is True:
+                    print_success("{} {} is vulnerable".format(name, exploit))
+                elif response is False:
+                    print_error("{} {} is not vulnerable".format(name, exploit))
+                else:
+                    print_status("{} {} could not be verified".format(name, exploit))
+
