@@ -89,7 +89,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("\t\t")
         self.assertPrompt(
-            'back   check  exec   exit   help   run    set    setg   show   \r\n',
+            '  exec   exit   help   run    set    setg   show   use    \r\n',
             self.module_prompt('FTP Bruteforce')
         )
 
@@ -182,7 +182,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("\t\t")
         self.assertPrompt(
-            "  check  exec   exit   help   run    set    setg   show   \r\n",
+            "  exec   exit   help   run    set    setg   show   use    \r\n",
             self.module_prompt('FTP Bruteforce'),
         )
 
@@ -194,7 +194,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.rsf.send("setg target foo\r\n")
         self.rsf.send("\t\t")
         self.assertPrompt(
-            "  show     \r\ncheck    exit     run      setg     unsetg   \r\n",
+            '  use      \r\ncheck    exit     run      setg     unsetg   \r\n',
             self.module_prompt('FTP Bruteforce'),
         )
 

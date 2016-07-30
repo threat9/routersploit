@@ -175,6 +175,11 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.prompt_hostname = 'rsf'
         self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
 
+        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show '])
+        self.module_commands = ['run', 'back', 'set ', 'setg ', 'check']
+        self.module_commands.extend(self.global_commands)
+        self.module_commands.sort()
+
         self.modules = utils.index_modules()
         self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
 
@@ -243,20 +248,19 @@ class RoutersploitInterpreter(BaseInterpreter):
             matches.add("".join((text, head, sep)))
         return list(map(utils.humanize_path, matches))  # humanize output, replace dots to forward slashes
 
-    def suggested_commands(self):  # TODO: sorted list, factor out generic commands
+    def suggested_commands(self):
         """ Entry point for intelligent tab completion.
 
         Based on state of interpreter this method will return intelligent suggestions.
 
         :return: list of most accurate command suggestions
         """
-        if self.current_module:
-            module_commands = ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']
-            if GLOBAL_OPTS.keys():
-                return itertools.chain(module_commands, ('unsetg ',))
-            return module_commands
+        if self.current_module and GLOBAL_OPTS:
+            return sorted(itertools.chain(self.module_commands, ('unsetg ',)))
+        elif self.current_module:
+            return self.module_commands
         else:
-            return ['use ', 'exec', 'help', 'exit', 'show ']
+            return self.global_commands
 
     def command_back(self, *args, **kwargs):
         self.current_module = None

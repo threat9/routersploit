@@ -254,23 +254,23 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.assertEqual(self.module_prompt_default('UnnamedModule'), self.interpreter.prompt)
 
     def test_suggested_commands_with_loaded_module_and_no_global_value_set(self):
-        self.assertEqual(
+        self.assertItemsEqual(
             list(self.interpreter.suggested_commands()),
-            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
+            ['use ', 'run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_with_loaded_module_and_global_value_set(self):
         GLOBAL_OPTS['key'] = 'value'
-        self.assertEqual(
+        self.assertItemsEqual(
             list(self.interpreter.suggested_commands()),
-            ['run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit', 'unsetg ']  # Extra space at the end because of following param
+            ['use ', 'run', 'back', 'set ', 'setg ', 'show ', 'check', 'exec ', 'help', 'exit', 'unsetg ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['use ', 'exec', 'help', 'exit', 'show ']
+            ['exec ', 'exit', 'help', 'show ', 'use ']
         )
 
     @mock.patch('importlib.import_module')
