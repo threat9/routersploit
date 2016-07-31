@@ -359,7 +359,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
 
         self.assertEqual(self.interpreter.current_module, None)
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_info(self, mock_print):
         metadata = {
             'devices': 'target_desc',
@@ -390,7 +390,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             ]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_command_show_info_module_with_no_metadata(self, mock_print):
         metadata = {}
         description = "Elaborate description fo the module"
@@ -403,7 +403,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             [mock.call()]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_options(self, mock_print):
         exploit_attributes = {
             'target': 'target_desc',
@@ -444,7 +444,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             ]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_command_show_options_when_there_is_no_module_opts(self, mock_print):
         exploit_attributes = {
             'target': 'target_desc',
@@ -483,7 +483,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
                                                  "What do you want to show?\n"
                                                  "Possible choices are: {}".format(self.interpreter.show_sub_commands))
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_all(self, mock_print):
         self.interpreter.modules = [
             'exploits.foo',
@@ -507,7 +507,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             ]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_scanners(self, mock_print):
         self.interpreter.modules = [
             'exploits.foo',
@@ -524,7 +524,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             [mock.call("scanners/foo"), mock.call("scanners/bar")]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_exploits(self, mock_print):
         self.interpreter.modules = [
             'exploits.foo',
@@ -541,7 +541,7 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             [mock.call("exploits/foo"), mock.call("exploits/bar")]
         )
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_show_creds(self, mock_print):
         self.interpreter.modules = [
             'exploits.foo',
@@ -603,13 +603,13 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         self.interpreter.command_exec("foo -bar")
         mock_system.assert_called_once_with("foo -bar")
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_command_help(self, mock_print):
         self.interpreter.current_module = None
         self.interpreter.command_help()
         mock_print.assert_called_once_with(self.interpreter.global_help)
 
-    @mock.patch('__builtin__.print')
+    @mock.patch('routersploit.utils.print_info')
     def test_command_help_with_module_loaded(self, mock_print):
         self.interpreter.command_help()
 

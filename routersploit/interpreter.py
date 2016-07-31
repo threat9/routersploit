@@ -5,6 +5,7 @@ import itertools
 import traceback
 import atexit
 
+from routersploit.threads import PrinterThread, printer_queue
 from routersploit.exceptions import RoutersploitException
 from routersploit.exploits import GLOBAL_OPTS
 from routersploit import utils
@@ -75,7 +76,7 @@ class BaseInterpreter(object):
     def start(self):
         """ Routersploit main entry point. Starting interpreter loop. """
 
-        print(self.banner)
+        utils.print_info(self.banner)
         while True:
             try:
                 command, args = self.parse_line(raw_input(self.prompt))
@@ -86,11 +87,13 @@ class BaseInterpreter(object):
             except RoutersploitException as err:
                 utils.print_error(err)
             except EOFError:
-                print()
+                utils.print_info()
                 utils.print_status("routersploit stopped")
                 break
             except KeyboardInterrupt:
-                print()
+                utils.print_info()
+            finally:
+                printer_queue.join()
 
     def complete(self, text, state):
         """Return the next possible completion for 'text'.
@@ -168,6 +171,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def __init__(self):
         super(RoutersploitInterpreter, self).__init__()
+        PrinterThread().start()
 
         self.current_module = None
         self.raw_prompt_template = None
@@ -287,7 +291,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             self.current_module.run()
         except KeyboardInterrupt:
-            print()
+            utils.print_info()
             utils.print_error("Operation cancelled by user")
         except:
             utils.print_error(traceback.format_exc(sys.exc_info()))
@@ -385,21 +389,21 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             devices = self.current_module._Exploit__info__['devices']
 
-            print("\nTarget devices:")
+            utils.print_info("\nTarget devices:")
             i = 0
             for device in devices:
                 if isinstance(device, dict):
-                    print("   {} - {}".format(i, device['name']))
+                    utils.print_info("   {} - {}".format(i, device['name']))
                 else:
-                    print("   {} - {}".format(i, device))
+                    utils.print_info("   {} - {}".format(i, device))
                 i += 1
-            print()
+            utils.print_info()
         except KeyError:
-            print("\nTarget devices are not defined")
+            utils.print_info("\nTarget devices are not defined")
 
     def __show_modules(self, root=''):
         for module in [module for module in self.modules if module.startswith(root)]:
-            print(module.replace('.', os.sep))
+            utils.print_info(module.replace('.', os.sep))
 
     def _show_all(self, *args, **kwargs):
         self.__show_modules()
@@ -444,9 +448,9 @@ class RoutersploitInterpreter(BaseInterpreter):
                 utils.print_status("Target could not be verified")
 
     def command_help(self, *args, **kwargs):
-        print(self.global_help)
+        utils.print_info(self.global_help)
         if self.current_module:
-            print("\n", self.module_help)
+            utils.print_info("\n", self.module_help)
 
     def command_exec(self, *args, **kwargs):
         os.system(args[0])

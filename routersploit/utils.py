@@ -18,6 +18,7 @@ from abc import ABCMeta, abstractmethod
 
 import requests
 
+from .threads import printer_queue
 from .exceptions import RoutersploitException
 from . import modules as rsf_modules
 
@@ -39,6 +40,7 @@ colors = {
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 Resource = collections.namedtuple("Resource", ["name", "template_path", "context"])
+PrintResource = collections.namedtuple("PrintResource", ['content', 'sep', 'end', 'file',])
 
 
 def index_modules(modules_directory=MODULES_DIR):
@@ -146,7 +148,7 @@ def stop_after(space_number):
                 if len(args[1].split(' ', space_number)) == space_number + 1:
                     return []
             except Exception as err:
-                print(err)
+                print_info(err)
             return wrapped_function(self, *args, **kwargs)
         return _wrapper
     return _outer_wrapper
@@ -225,17 +227,16 @@ def __cprint(*args, **kwargs):
     if not kwargs.pop("verbose", True):
         return
 
-    with print_lock:
-        color = kwargs.get('color', None)
-        if color:
-            file_ = kwargs.get('file', sys.stdout)
-            sep = kwargs.get('sep', ' ')
-            end = kwargs.get('end', '\n')
-            print('\033[{}m'.format(colors[color]), end='', file=file_, sep=sep)
-            print(*args, end='', file=file_, sep=sep)  # TODO printing text that starts from newline
-            print('\033[0m', sep=sep, end=end, file=file_)
-        else:
-            print(*args, **kwargs)
+    color = kwargs.get('color', None)
+    file_ = kwargs.get('file', sys.stdout)
+    sep = kwargs.get('sep', ' ')
+    end = kwargs.get('end', '\n')
+    if color:
+        printer_queue.put(PrintResource(content='\033[{}m'.format(colors[color]), end='', file=file_, sep=sep))
+        printer_queue.put(PrintResource(content=args, end='', file=file_, sep=sep))  # TODO printing text that starts from newline
+        printer_queue.put(PrintResource(content='\033[0m', sep=sep, end=end, file=file_))
+    else:
+        printer_queue.put(PrintResource(content=args, sep=sep, end=end, file=file_))
 
 
 def print_error(*args, **kwargs):
@@ -328,9 +329,9 @@ def print_table(headers, *args, **kwargs):
             '{:<{}}'.format(header_separator * len(header), current_line_fill)
         ))
 
-    print()
-    print(headers_line)
-    print(headers_separator_line)
+    print_info()
+    print_info(headers_line)
+    print_info(headers_separator_line)
     for arg in args:
         content_line = '   '
         for idx, element in enumerate(arg):
@@ -338,9 +339,9 @@ def print_table(headers, *args, **kwargs):
                 content_line,
                 '{:<{}}'.format(element, fill[idx])
             ))
-        print(content_line)
+        print_info(content_line)
 
-    print()
+    print_info()
 
 
 def sanitize_url(address):
