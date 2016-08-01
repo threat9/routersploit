@@ -40,7 +40,7 @@ colors = {
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 Resource = collections.namedtuple("Resource", ["name", "template_path", "context"])
-PrintResource = collections.namedtuple("PrintResource", ['content', 'sep', 'end', 'file',])
+PrintResource = collections.namedtuple("PrintResource", ['content', 'sep', 'end', 'file', 'thread'])
 
 
 def index_modules(modules_directory=MODULES_DIR):
@@ -231,12 +231,13 @@ def __cprint(*args, **kwargs):
     file_ = kwargs.get('file', sys.stdout)
     sep = kwargs.get('sep', ' ')
     end = kwargs.get('end', '\n')
+    thread = threading.current_thread()
     if color:
-        printer_queue.put(PrintResource(content='\033[{}m'.format(colors[color]), end='', file=file_, sep=sep))
-        printer_queue.put(PrintResource(content=args, end='', file=file_, sep=sep))  # TODO printing text that starts from newline
-        printer_queue.put(PrintResource(content='\033[0m', sep=sep, end=end, file=file_))
+        printer_queue.put(PrintResource(content='\033[{}m'.format(colors[color]), end='', file=file_, sep=sep, thread=thread))
+        printer_queue.put(PrintResource(content=args, end='', file=file_, sep=sep, thread=thread))  # TODO printing text that starts from newline
+        printer_queue.put(PrintResource(content='\033[0m', sep=sep, end=end, file=file_, thread=thread))
     else:
-        printer_queue.put(PrintResource(content=args, sep=sep, end=end, file=file_))
+        printer_queue.put(PrintResource(content=args, sep=sep, end=end, file=file_, thread=thread))
 
 
 def print_error(*args, **kwargs):
