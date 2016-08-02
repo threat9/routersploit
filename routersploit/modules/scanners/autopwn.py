@@ -61,4 +61,3 @@ class Exploit(exploits.Exploit):
                     print_error("{} {} is not vulnerable".format(name, exploit))
                 else:
                     print_status("{} {} could not be verified".format(name, exploit))
-
