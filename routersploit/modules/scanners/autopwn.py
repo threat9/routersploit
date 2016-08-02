@@ -4,7 +4,6 @@ from routersploit import (
     print_error,
     print_success,
     print_status,
-    print_info,
     utils,
     LockedIterator
 )
