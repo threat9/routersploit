@@ -13,6 +13,8 @@ except ImportError:
 data_queue = queue.Queue()
 printer_queue = queue.Queue()
 
+thread_output_stream = WeakKeyDictionary()
+
 
 class DataProducerThread(threading.Thread):
     def __init__(self, data):
@@ -42,7 +44,6 @@ class PrinterThread(threading.Thread):
     def __init__(self):
         super(PrinterThread, self).__init__()
         self.daemon = True
-        self.std_out = WeakKeyDictionary()
 
     def run(self):
         while True:

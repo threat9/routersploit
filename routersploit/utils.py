@@ -18,7 +18,7 @@ from abc import ABCMeta, abstractmethod
 
 import requests
 
-from .threads import printer_queue
+from .threads import printer_queue, thread_output_stream
 from .exceptions import RoutersploitException
 from . import modules as rsf_modules
 
@@ -164,11 +164,11 @@ def mute(fn):
     """ Suppress function from printing to sys.stdout """
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
-        sys.stdout = DummyFile()
+        thread_output_stream.setdefault(threading.current_thread(), []).append(DummyFile())
         try:
             return fn(self, *args, **kwargs)
         finally:
-            sys.stdout = sys.__stdout__
+            thread_output_stream[threading.current_thread()].pop()
     return wrapper
 
 
@@ -228,10 +228,14 @@ def __cprint(*args, **kwargs):
         return
 
     color = kwargs.get('color', None)
-    file_ = kwargs.get('file', sys.stdout)
     sep = kwargs.get('sep', ' ')
     end = kwargs.get('end', '\n')
     thread = threading.current_thread()
+    try:
+        file_ = thread_output_stream.get(thread, ())[-1]
+    except IndexError:
+        file_ = kwargs.get('file', sys.stdout)
+
     if color:
         printer_queue.put(PrintResource(content='\033[{}m'.format(colors[color]), end='', file=file_, sep=sep, thread=thread))
         printer_queue.put(PrintResource(content=args, end='', file=file_, sep=sep, thread=thread))  # TODO printing text that starts from newline
