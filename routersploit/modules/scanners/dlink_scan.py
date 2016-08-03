@@ -7,6 +7,7 @@ from routersploit import (
     print_success,
     print_error,
     print_status,
+    utils,
 )
 
 
@@ -32,17 +33,18 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
-        rootpath = 'routersploit/modules/'
+        #rootpath = 'routersploit/modules/'
         path = 'exploits/dlink/'
+        dlink_dir = utils.EXPLOITS_DIR + '/dlink'
 
         # only py exploit files
-        modules = [f.replace(".py", "") for f in listdir(rootpath + path) if isfile(join(rootpath + path, f)) and f.endswith(".py") and f != "__init__.py"]
+        modules = [f.replace(".py", "") for f in listdir(dlink_dir) if isfile(join(dlink_dir, f)) and f.endswith(".py") and f != "__init__.py"]
 
         vulns = []
         for module_name in modules:
-            f = path + module_name
+            f = '/' + path + module_name
 
-            module = imp.load_source('module', rootpath + f + '.py')
+            module = imp.load_source('module', utils.MODULES_DIR + f + '.py')
             exploit = module.Exploit()
 
             exploit.target = self.target
