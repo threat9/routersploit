@@ -33,7 +33,7 @@ class Exploit(exploits.Exploit):
     port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
-        #rootpath = 'routersploit/modules/'
+        # rootpath = 'routersploit/modules/'
         path = 'exploits/dlink/'
         dlink_dir = utils.EXPLOITS_DIR + '/dlink'
 
