@@ -1,5 +1,3 @@
-import time
-
 from routersploit import (
     exploits,
     print_error,
@@ -35,30 +33,9 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.vulnerabilities = []
-        data_producer = threads.DataProducerThread(utils.iter_modules(utils.EXPLOITS_DIR))
-        data_producer.start()
-        time.sleep(1)
-
-        workers = []
-        for worker_id in xrange(int(self.threads)):
-            worker = threads.WorkerThread(
-                target=self.target_function,
-                name='worker-{}'.format(worker_id),
-            )
-            workers.append(worker)
-            worker.start()
-
-        try:
-            while worker.isAlive():
-                worker.join(1)
-        except KeyboardInterrupt:
-            print_info()
-            print_status("Waiting for already scheduled jobs to finish...")
-            data_producer.stop()
-            for worker in workers:
-                worker.join()
-        else:
-            data_producer.join_queue()
+        executor = threads.ThreadPoolExecutor(self.threads)
+        executor.feed(utils.iter_modules(utils.EXPLOITS_DIR))
+        executor.run(self.target_function)
 
         if self.vulnerabilities:
             print_info()

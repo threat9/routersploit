@@ -44,3 +44,39 @@ class WorkerThread(threading.Thread):
                 self.target(record)
             finally:
                 data_queue.task_done()
+
+
+class ThreadPoolExecutor(object):
+    def __init__(self, threads):
+        self.threads = threads
+        self.data_producer = None
+
+    def feed(self, dataset):
+        self.data_producer = DataProducerThread(dataset)
+        self.data_producer.start()
+        time.sleep(0.1)
+
+    def run(self, target):
+        workers = []
+        for worker_id in xrange(int(self.threads)):
+            worker = WorkerThread(
+                target=target,
+                name='worker-{}'.format(worker_id),
+            )
+            workers.append(worker)
+            worker.start()
+
+        start = time.time()
+        try:
+            while worker.isAlive():
+                worker.join(1)
+        except KeyboardInterrupt:
+            utils.print_info()
+            utils.print_status("Waiting for already scheduled jobs to finish...")
+            self.data_producer.stop()
+            for worker in workers:
+                worker.join()
+        else:
+            self.data_producer.join_queue()
+
+        utils.print_status('Elapsed time: ', time.time() - start, 'seconds')
