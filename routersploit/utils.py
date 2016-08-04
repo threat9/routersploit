@@ -18,7 +18,7 @@ from abc import ABCMeta, abstractmethod
 
 import requests
 
-from .threads import printer_queue, thread_output_stream
+from .printer import printer_queue, thread_output_stream
 from .exceptions import RoutersploitException
 from . import modules as rsf_modules
 

@@ -5,7 +5,7 @@ import itertools
 import traceback
 import atexit
 
-from routersploit.threads import PrinterThread, printer_queue
+from routersploit.printer import PrinterThread, printer_queue
 from routersploit.exceptions import RoutersploitException
 from routersploit.exploits import GLOBAL_OPTS
 from routersploit import utils
