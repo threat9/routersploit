@@ -33,15 +33,17 @@ class Exploit(exploits.Exploit):
 
     def run(self):
         self.vulnerabilities = []
-        executor = threads.ThreadPoolExecutor(self.threads)
-        executor.feed(utils.iter_modules(utils.EXPLOITS_DIR))
-        executor.run(self.target_function)
 
+        with threads.ThreadPoolExecutor(self.threads) as executor:
+            for exploit in utils.iter_modules(utils.EXPLOITS_DIR):
+                executor.submit(self.target_function, exploit)
+
+        print_info()
         if self.vulnerabilities:
-            print_info()
             print_success("Device is vulnerable!")
             for v in self.vulnerabilities:
                 print_info(" - {}".format(v))
+            print_info()
         else:
             print_error("Device is not vulnerable to any exploits!\n")
 
