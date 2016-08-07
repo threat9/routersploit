@@ -10,6 +10,7 @@ except ImportError:
     import Queue as queue
 
 from . import utils
+from .exceptions import StopThreadPoolExecutor
 
 
 data_queue = queue.Queue()
@@ -27,6 +28,10 @@ class WorkerThread(threading.Thread):
             args = record[1:]
             try:
                 target(*args)
+            except StopThreadPoolExecutor:
+                utils.print_info()
+                utils.print_status("Waiting for already scheduled jobs to finish...")
+                data_queue.queue.clear()
             finally:
                 data_queue.task_done()
 
@@ -57,10 +62,10 @@ class ThreadPoolExecutor(object):
             utils.print_info()
             utils.print_status("Waiting for already scheduled jobs to finish...")
             data_queue.queue.clear()
+        finally:
             for worker in self.workers:
                 worker.join()
-        else:
-            data_queue.join()
+            data_queue.unfinished_tasks = 0
 
         utils.print_status('Elapsed time: ', time.time() - start, 'seconds')
 

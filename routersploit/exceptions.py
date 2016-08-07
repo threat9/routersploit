@@ -4,3 +4,7 @@ class RoutersploitException(Exception):
 
 class OptionValidationError(RoutersploitException):
     pass
+
+
+class StopThreadPoolExecutor(RoutersploitException):
+    pass
