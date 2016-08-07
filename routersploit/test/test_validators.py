@@ -80,6 +80,61 @@ class ValidatorsTest(RoutersploitTestCase):
         address = "ftp://127.0.0.1"
         self.assertEqual(validators.address(address), "127.0.0.1")
 
+    def test_boolify_false_1(self):
+        value = False
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_2(self):
+        value = "No"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_3(self):
+        value = "n"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_4(self):
+        value = "OFF"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_5(self):
+        value = "0"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_6(self):
+        value = "False"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_false_7(self):
+        value = "f"
+        self.assertEqual(validators.boolify(value), False)
+
+    def test_boolify_true_1(self):
+        value = True
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_2(self):
+        value = "Yes"
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_3(self):
+        value = "y"
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_4(self):
+        value = "oN"
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_5(self):
+        value = "1"
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_6(self):
+        value = "tRuE"
+        self.assertEqual(validators.boolify(value), True)
+
+    def test_boolify_true_7(self):
+        value = "t"
+        self.assertEqual(validators.boolify(value), True)
 
 if __name__ == '__main__':
     unittest.main()
