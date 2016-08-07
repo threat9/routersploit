@@ -41,8 +41,8 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     path = exploits.Option('/', 'URL Path')
-    verbosity = exploits.Option('yes', 'Display authentication attempts', validators=validators.boolify)
-    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt', validators=validators.boolify)
+    verbosity = exploits.Option(True, 'Display authentication attempts', validators=validators.boolify)
+    stop_on_success = exploits.Option(True, 'Stop on first valid authentication attempt', validators=validators.boolify)
 
     credentials = []
 
