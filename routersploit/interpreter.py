@@ -77,6 +77,7 @@ class BaseInterpreter(object):
         """ Routersploit main entry point. Starting interpreter loop. """
 
         utils.print_info(self.banner)
+        printer_queue.join()
         while True:
             try:
                 command, args = self.parse_line(raw_input(self.prompt))
