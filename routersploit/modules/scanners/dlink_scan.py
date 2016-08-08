@@ -17,9 +17,15 @@ class Exploit(exploits.Exploit):
     __info__ = {
         'name': 'D-Link Scanner',
         'description': 'Scanner module for D-Link devices',
-        'author': [
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
         ],
+        'references': (
+            '',
+        ),
+        'devices': (
+            'Multi',
+        )
     }
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
@@ -62,4 +68,4 @@ class Exploit(exploits.Exploit):
         print
 
     def check(self):
-        print_error("Check method is not available")
+        raise NotImplementedError("Check method is not available")

