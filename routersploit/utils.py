@@ -256,6 +256,10 @@ def print_success(*args, **kwargs):
     __cprint('\033[92m[+]\033[0m', *args, **kwargs)
 
 
+def print_warning(*args, **kwargs):
+    __cprint('\033[93m[!]\033[0m', *args, **kwargs)
+
+
 def print_info(*args, **kwargs):
     __cprint(*args, **kwargs)
 
