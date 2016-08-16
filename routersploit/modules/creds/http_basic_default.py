@@ -90,7 +90,7 @@ class Exploit(exploits.Exploit):
 
         response = http_request(method="GET", url=url, auth=(user, password))
 
-        if response.status_code != 401:
+        if response is not None and response.status_code != 401:
             print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=self.verbosity)
             self.credentials.append((self.target, self.port, user, password))
             if self.stop_on_success:
