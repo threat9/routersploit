@@ -70,7 +70,7 @@ class Exploit(exploits.Exploit):
         with ThreadPoolExecutor(self.threads) as executor:
             for record in defaults:
                 username, password = record.split(':')
-                executor.submit(self.target_function, username, password)
+                executor.submit(self.target_function, url, username, password)
 
         if self.credentials:
             print_success("Credentials found!")
@@ -81,9 +81,8 @@ class Exploit(exploits.Exploit):
 
         defaults.close()
 
-    def target_function(self, user, password):
+    def target_function(self, url, user, password):
         name = threading.current_thread().name
-        url = "{}:{}{}".format(self.target, self.port, self.path)
 
         user = user.encode('utf-8').strip()
         password = password.encode('utf-8').strip()
