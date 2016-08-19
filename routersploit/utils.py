@@ -145,7 +145,7 @@ def stop_after(space_number):
         @wraps(wrapped_function)
         def _wrapper(self, *args, **kwargs):
             try:
-                if len(args[1].split(' ', space_number)) == space_number + 1:
+                if args[1].count(' ') == space_number:
                     return []
             except Exception as err:
                 print_info(err)
