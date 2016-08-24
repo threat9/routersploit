@@ -1,6 +1,10 @@
 import unittest
+import logging
 
 from routersploit.utils import NonStringIterable
+
+
+logging.getLogger().addHandler(logging.NullHandler())
 
 
 class RoutersploitTestCase(unittest.TestCase):
