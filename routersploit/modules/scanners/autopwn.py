@@ -1,3 +1,5 @@
+from os import path
+
 from routersploit import (
     exploits,
     print_error,
@@ -26,16 +28,21 @@ class Exploit(exploits.Exploit):
             'Multi',
         ),
     }
+    vendor = ''
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
     threads = exploits.Option(8, "Number of threads")
 
+    def __init__(self):
+        self.vulnerabilities = []
+        self._exploits_directory = path.join(utils.EXPLOITS_DIR, self.vendor)
+
     def run(self):
         self.vulnerabilities = []
 
         with threads.ThreadPoolExecutor(self.threads) as executor:
-            for exploit in utils.iter_modules(utils.EXPLOITS_DIR):
+            for exploit in utils.iter_modules(self._exploits_directory):
                 executor.submit(self.target_function, exploit)
 
         print_info()
