@@ -1,4 +1,3 @@
-from __future__ import print_function
 from __future__ import absolute_import
 
 import threading
@@ -41,38 +40,47 @@ class ThreadPoolExecutor(object):
     def __init__(self, threads):
         self.threads = threads
         self.workers = []
-        self.worker = None
+        self.started_workers = []
+        self.monitor_worker = None
         self.start_time = None
 
     def __enter__(self):
-        self.workers = []
+        workers = []
         data_producing.set()
         for worker_id in xrange(int(self.threads)):
             worker = WorkerThread(
                 name='worker-{}'.format(worker_id),
             )
-            worker.start()
-            self.workers.append(worker)
+            workers.append(worker)
 
-        self.worker = worker
+        self.monitor_worker = worker
+        self.workers = iter(workers)
         self.start_time = time.time()
         return self
 
     def __exit__(self, *args):
         data_producing.clear()
         try:
-            while self.worker.isAlive():
-                self.worker.join(1)
+            while self.monitor_worker.is_alive():
+                self.monitor_worker.join(1)
         except KeyboardInterrupt:
             utils.print_info()
             utils.print_status("Waiting for already scheduled jobs to finish...")
             data_queue.queue.clear()
         finally:
-            for worker in self.workers:
+            for worker in self.started_workers:
                 worker.join()
             data_queue.unfinished_tasks = 0
 
         utils.print_status('Elapsed time: ', time.time() - self.start_time, 'seconds')
 
     def submit(self, *args):
+        try:
+            worker = next(self.workers)
+        except StopIteration:
+            pass
+        else:
+            worker.start()
+            self.started_workers.append(worker)
+
         data_queue.put(args)
