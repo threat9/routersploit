@@ -23,7 +23,10 @@ class WorkerThread(threading.Thread):
 
     def run(self):
         while data_producing.is_set() or not data_queue.empty():
-            record = data_queue.get()
+            try:
+                record = data_queue.get(block=False)
+            except queue.Empty:
+                continue
             target = record[0]
             args = record[1:]
             try:
