@@ -4,6 +4,8 @@ import SimpleHTTPServer
 import BaseHTTPServer
 import threading
 
+from printer import printer_queue
+
 from routersploit.utils import (
     print_info,
     print_error,
@@ -15,6 +17,9 @@ from routersploit.utils import (
 
 def shell(exploit, architecture="", method="", **params):
     while 1:
+        while not printer_queue.empty():
+            pass
+
         cmd = raw_input("cmd > ")
 
         if cmd in ["quit", "exit"]:
