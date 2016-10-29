@@ -140,26 +140,50 @@ class Exploit(exploits.Exploit):
         r = requests.get(url, verify=False)
         soup = BeautifulSoup(r.text, "lxml")
 
-        form = soup.find("form")
+        forms = soup.findAll("form")
 
-        if form is None:
+        if forms is None:
             return None
 
-        action = form.attrs.get('action', None)
+        res = []
+        action = None
+        user_name_list = ["username", "user", "user_name", "login", "username_login", "nameinput", "uname", "__auth_user", "txt_user", "txtusername"]
+        password_list = ["password", "pass", "password_login", "pwd", "passwd", "__auth_pass", "txt_pwd", "txtpwd"]
+        found = False
 
-        if len(form) > 0:
-            res = []
+        for form in forms:
+            tmp = []
+
+            if not len(form):
+                continue
+
+            action = form.attrs.get('action', None)
+            if action and not action.startswith("/"):
+                action = "/" + action
+
             for inp in form.findAll("input"):
-                if 'name' in inp.attrs.keys():
-                    if inp.attrs['name'].lower() in ["username", "user", "login", "username_login"]:
-                        res.append(inp.attrs['name'] + "=" + "{{USER}}")
-                    elif inp.attrs['name'].lower() in ["password", "pass", "password_login"]:
-                        res.append(inp.attrs['name'] + "=" + "{{PASS}}")
+                attributes = ["name", "id"]
+
+                for atr in attributes:
+                    if atr not in inp.attrs.keys():
+                        continue
+
+                    if inp.attrs[atr].lower() in user_name_list and inp.attrs['type'] != "hidden":
+                        found = True
+                        tmp.append(inp.attrs[atr] + "=" + "{{USER}}")
+                    elif inp.attrs[atr].lower() in password_list and inp.attrs['type'] != "hidden":
+                        found = True
+                        tmp.append(inp.attrs[atr] + "=" + "{{PASS}}")
                     else:
                         if 'value' in inp.attrs.keys():
-                            res.append(inp.attrs['name'] + "=" + inp.attrs['value'])
-                        else:
-                            res.append(inp.attrs['name'] + "=")
+                            tmp.append(inp.attrs[atr] + "=" + inp.attrs['value'])
+                        elif inp.attrs['type'] not in ("submit", "button"):
+                            tmp.append(inp.attrs[atr] + "=")
+
+                if found:
+                    res = tmp
+
+        res = list(set(res))
         return (action, '&'.join(res))
 
     def target_function(self, running, data):
