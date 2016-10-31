@@ -54,7 +54,7 @@ class Exploit(exploits.Exploit):
         ftp = ftplib.FTP()
         try:
             ftp.connect(self.target, port=int(self.port), timeout=10)
-        except socket.error, socket.timeout:
+        except (socket.error, socket.timeout):
             print_error("Connection error: %s:%s" % (self.target, str(self.port)))
             ftp.close()
             return
