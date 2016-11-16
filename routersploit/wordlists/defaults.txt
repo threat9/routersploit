@@ -148,6 +148,7 @@ admin:diamond
 admin:epicrouter
 admin:extendnet
 admin:giraff
+admin:gvt12345
 admin:hagpolm1
 admin:hello
 admin:ho4uku6at
@@ -364,6 +365,7 @@ super:surt
 superadmin:secret
 superadmin:Is$uper@dmin
 superman:21241036
+superman:superman
 superman:talent
 superuser:123456
 superuser:admin
@@ -387,6 +389,7 @@ teacher:password
 tech:field
 tech:tech
 telco:telco
+tele2:tele2
 telecom:telecom
 telecomadmin:telecomadmin
 telecomadmin:admintelecom
