@@ -621,5 +621,6 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
             ]
         )
 
+
 if __name__ == '__main__':
     unittest.main()
