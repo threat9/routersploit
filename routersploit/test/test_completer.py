@@ -255,5 +255,6 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
             'show options'
         )
 
+
 if __name__ == '__main__':
     unittest.main()
