@@ -1,26 +1,26 @@
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
 
-import threading
-import os
-import sys
-import re
 import collections
-import random
-import string
+import errno
 import importlib
+import os
+import random
+import re
 import select
 import socket
-import errno
-from functools import wraps
-from distutils.util import strtobool
+import string
+import sys
+import threading
 from abc import ABCMeta, abstractmethod
+from distutils.util import strtobool
+from functools import wraps
 
 import requests
 
-from .printer import printer_queue, thread_output_stream
-from .exceptions import RoutersploitException
-from . import modules as rsf_modules
+from .. import modules as rsf_modules
+from ..exceptions import RoutersploitException
+from ..printer import printer_queue, thread_output_stream
 
 MODULES_DIR = rsf_modules.__path__[0]
 CREDS_DIR = os.path.join(MODULES_DIR, 'creds')
@@ -543,7 +543,7 @@ def tokenize(token_specification, text):
 
 
 def create_exploit(path):  # TODO: cover with tests
-    from .templates import exploit
+    from ..templates import exploit
 
     parts = path.split(os.sep)
     module_type, name = parts[0], parts[-1]
