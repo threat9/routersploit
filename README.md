@@ -46,11 +46,12 @@ It consists of various modules that aids penetration testing operations:
 	sudo pip install -r requirements.txt
 	./rsf.py
 
-# Running on Docker
+## Running on Docker
 
-Set up docker [for your platform](https://docs.docker.com/)
-
-> ./run_docker.sh
+    git clone https://github.com/reverse-shell/routersploit
+    cd routersploit
+    docker build -t routersploit:latest -f Dockerfile .
+    ./run_docker.sh
 
 # Update
 
