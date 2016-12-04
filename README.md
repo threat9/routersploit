@@ -46,6 +46,12 @@ It consists of various modules that aids penetration testing operations:
 	sudo pip install -r requirements.txt
 	./rsf.py
 
+# Running on Docker
+
+Set up docker [for your platform](https://docs.docker.com/)
+
+> ./run_docker.sh
+
 # Update
 
 Update RouterSploit Framework often. Project is under heavy development and new modules are shipped almost everyday.

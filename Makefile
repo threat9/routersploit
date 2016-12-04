@@ -1,5 +1,7 @@
 # Makefile that aggregates common chores before commit
 
+.PHONY: all clean lint lint-modules test build update run help
+
 MODULE=''
 
 all: lint test
@@ -17,6 +19,15 @@ lint-modules:
 
 test: clean
 	./run_tests.sh $(MODULE)
+
+build:
+	docker build -t routersploit:latest -f Dockerfile .
+
+update:
+	./run_docker.sh git pull
+
+run:
+	./run_docker.sh
 
 help:
 	@echo "    clean"
