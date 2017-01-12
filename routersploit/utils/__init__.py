@@ -411,14 +411,14 @@ def random_text(length, alph=string.ascii_letters + string.digits):
     return ''.join(random.choice(alph) for _ in range(length))
 
 
-def http_request(method, url, **kwargs):
+def http_request(method, url, session=requests, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
     kwargs.setdefault('timeout', 30.0)
     kwargs.setdefault('verify', False)
 
     try:
-        return getattr(requests, method.lower())(url, **kwargs)
+        return getattr(session, method.lower())(url, **kwargs)
     except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
         print_error("Invalid URL format: {}".format(url))
         return
