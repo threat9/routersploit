@@ -374,6 +374,7 @@ superuser:admin
 supervisor:PlsChgMe!
 supervisor:PlsChgMe1
 supervisor:supervisor
+supervisor:zyad1234
 support:h179350
 support:support
 support:supportpw
@@ -406,6 +407,7 @@ tiger:tiger123
 topicalt:password
 topicnorm:password
 topicres:password
+true:true
 tw:tw
 ubnt:ubnt
 user:pass
@@ -413,6 +415,7 @@ user:password
 user:public
 user:tivonpw
 user:user
+user3:12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678
 vcr:NetVCR
 volition:volition
 vt100:public
