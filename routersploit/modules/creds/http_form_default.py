@@ -190,7 +190,7 @@ class Exploit(exploits.Exploit):
 
         while running.is_set():
             try:
-                line = data.next().split(":")
+                line = next(data).split(":")
                 user = line[0].strip()
                 password = line[1].strip()
 

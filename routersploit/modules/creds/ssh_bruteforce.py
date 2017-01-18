@@ -96,7 +96,7 @@ class Exploit(exploits.Exploit):
 
         while running.is_set():
             try:
-                user, password = data.next()
+                user, password = next(data)
                 user = user.strip()
                 password = password.strip()
                 ssh.connect(self.target, int(self.port), timeout=5, username=user, password=password)

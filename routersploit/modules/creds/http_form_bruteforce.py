@@ -196,7 +196,7 @@ class Exploit(exploits.Exploit):
 
         while running.is_set():
             try:
-                user, password = data.next()
+                user, password = next(data)
                 user = user.strip()
                 password = password.strip()
 

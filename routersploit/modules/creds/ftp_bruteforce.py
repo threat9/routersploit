@@ -94,7 +94,7 @@ class Exploit(exploits.Exploit):
         ftp = ftplib.FTP()
         while running.is_set():
             try:
-                user, password = data.next()
+                user, password = next(data)
                 user = user.strip()
                 password = password.strip()
             except StopIteration:

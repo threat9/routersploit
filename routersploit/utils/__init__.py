@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+from future.utils import implements_iterator
 
 import collections
 import errno
@@ -12,6 +12,7 @@ import socket
 import string
 import sys
 import threading
+
 from abc import ABCMeta, abstractmethod
 from distutils.util import strtobool
 from functools import wraps
@@ -260,18 +261,19 @@ def print_info(*args, **kwargs):
     __cprint(*args, **kwargs)
 
 
+@implements_iterator
 class LockedIterator(object):
     def __init__(self, it):
         self.lock = threading.Lock()
-        self.it = it.__iter__()
+        self.it = iter(it)
 
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         self.lock.acquire()
         try:
-            return self.it.next()
+            return next(self.it)
         finally:
             self.lock.release()
 
@@ -392,7 +394,7 @@ def pprint_dict_in_order(dictionary, order=None):
         else:
             print_info(body)
 
-    keys = dictionary.keys()
+    keys = list(dictionary.keys())
     for element in order:
         try:
             key = keys.pop(keys.index(element))
