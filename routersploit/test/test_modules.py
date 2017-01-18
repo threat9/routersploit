@@ -31,7 +31,10 @@ class ModuleTest(RoutersploitTestCase):
             "authors",
             "references"
         )
-        self.assertItemsEqual(required_metadata, self.module_metadata.keys())
+        # unittest has assertCountEqual in python3 and assertItemsEqual in python2
+        # See: https://bugs.python.org/issue17866
+        _assertItemsEqual = getattr(self, 'assertCountEqual', getattr(self, 'assertItemsEqual', None))
+        _assertItemsEqual(required_metadata, self.module_metadata.keys())
 
     def test_metadata_type(self):
         self.assertIsSequence(self.module_metadata['authors'])
