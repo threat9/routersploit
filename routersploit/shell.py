@@ -1,7 +1,7 @@
+from __future__ import absolute_import
+
 import socket
 import telnetlib
-import SimpleHTTPServer
-import BaseHTTPServer
 import threading
 
 try:
@@ -27,7 +27,7 @@ def shell(exploit, architecture="", method="", **params):
         while not printer_queue.empty():
             pass
 
-        cmd = raw_input("cmd > ")
+        cmd = input("cmd > ")
 
         if cmd in ["quit", "exit"]:
             return
