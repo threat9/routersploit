@@ -23,7 +23,12 @@
 #
 ##############################################################
 
+import sys
 import collections
+
+
+if sys.version_info >= (3, 0):
+    xrange = range
 
 
 class BitReader:
