@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from future.utils import implements_iterator
+from future.utils import implements_iterator, with_metaclass
 
 import collections
 import errno
@@ -278,9 +278,7 @@ class LockedIterator(object):
             self.lock.release()
 
 
-class NonStringIterable:
-
-    __metaclass__ = ABCMeta
+class NonStringIterable(with_metaclass(ABCMeta, object)):
 
     @abstractmethod
     def __iter__(self):
