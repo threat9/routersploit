@@ -1,15 +1,20 @@
 from __future__ import absolute_import
 
+import sys
 import threading
 import time
 
 try:
     import queue
-except ImportError:
+except ImportError:  # Python 2.x
     import Queue as queue
 
 from . import utils
 from .exceptions import StopThreadPoolExecutor
+
+
+if sys.version_info >= (3, 0):
+    xrange = range
 
 
 data_queue = queue.Queue()
