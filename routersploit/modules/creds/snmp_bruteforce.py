@@ -75,7 +75,7 @@ class Exploit(exploits.Exploit):
         cmdGen = cmdgen.CommandGenerator()
         while running.is_set():
             try:
-                string = data.next().strip()
+                string = next(data).strip()
 
                 errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
                     cmdgen.CommunityData(string),
