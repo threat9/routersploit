@@ -6,7 +6,7 @@ from weakref import WeakKeyDictionary
 
 try:
     import queue
-except ImportError:
+except ImportError:  # Python 3.x
     import Queue as queue
 
 
