@@ -277,7 +277,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             self.current_module = utils.import_exploit(module_path)()
         except RoutersploitException as err:
-            utils.print_error(err.message)
+            utils.print_error(str(err))
 
     @utils.stop_after(2)
     def complete_use(self, text, *args, **kwargs):
