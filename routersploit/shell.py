@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import socket
 import telnetlib
 import threading
@@ -68,7 +70,7 @@ def shell(exploit, architecture="", method="", **params):
         while not printer_queue.empty():
             pass
 
-        cmd = raw_input("cmd > ")
+        cmd = input("cmd > ")
 
         if cmd in ["quit", "exit"]:
             return
