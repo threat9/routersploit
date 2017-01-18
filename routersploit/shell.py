@@ -4,7 +4,14 @@ import SimpleHTTPServer
 import BaseHTTPServer
 import threading
 
-from printer import printer_queue
+try:
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+    input = raw_input
+except ImportError:  # Python 3.x
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+
+from .printer import printer_queue
 
 from routersploit.utils import (
     print_info,
@@ -49,7 +56,7 @@ def shell(exploit, architecture="", method="", **params):
             print_info(exploit.execute(cmd))
 
 
-class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class HttpRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -62,7 +69,7 @@ class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         return
 
 
-class HttpServer(BaseHTTPServer.HTTPServer):
+class HttpServer(HTTPServer):
     def serve_forever(self, content):
         self.stop = False
         self.content = content
