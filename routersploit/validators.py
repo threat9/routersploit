@@ -1,5 +1,8 @@
 import socket
-import urlparse
+try:
+    import urlparse
+except ImportError:  # Python 3.x
+    from urllib import parse as urlparse
 from distutils.util import strtobool
 
 from .exceptions import OptionValidationError
@@ -48,7 +51,11 @@ def boolify(value):
 
     Objects other than string will be transformed using built-in bool() function.
     """
-    if isinstance(value, basestring):
+    try:
+        str_type = basestring  # Python 2.x.
+    except NameError:
+        str_type = str # Python 3.x.
+    if isinstance(value, str_type):
         try:
             return bool(strtobool(value))
         except ValueError:
