@@ -1,12 +1,17 @@
 import socket
 import telnetlib
-import SimpleHTTPServer
-import BaseHTTPServer
 import threading
 import time
 
-from printer import printer_queue
-from routersploit import validators
+try:
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+    input = raw_input
+except ImportError:  # Python 3.x
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+
+from .printer import printer_queue
+from . import validators
 
 from routersploit.utils import (
     print_info,
