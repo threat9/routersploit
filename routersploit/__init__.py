@@ -1,4 +1,6 @@
-from routersploit.utils import (
+from __future__ import absolute_import
+
+from .utils import (
     print_error,
     print_status,
     print_success,
@@ -16,7 +18,7 @@ from routersploit.utils import (
     tokenize,
 )
 
-from routersploit import exploits
-from routersploit import wordlists
-from routersploit import validators
-from routersploit.shell import shell
+from . import exploits
+from . import wordlists
+from . import validators
+from .shell import shell
