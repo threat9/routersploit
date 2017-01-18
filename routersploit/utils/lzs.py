@@ -118,21 +118,20 @@ def LZSDecompress(data, window=RingList(2048)):
 
             lenField = reader.getBits(2)
             if lenField < 3:
-                lenght = lenField + 2
+                length = lenField + 2
             else:
                 lenField <<= 2
                 lenField += reader.getBits(2)
                 if lenField < 15:
-                    lenght = (lenField & 0x0f) + 5
+                    length = (lenField & 0x0f) + 5
                 else:
                     lenCounter = 0
                     lenField = reader.getBits(4)
                     while lenField == 15:
                         lenField = reader.getBits(4)
                         lenCounter += 1
-                    lenght = 15 * lenCounter + 8 + lenField
-
-            for i in xrange(lenght):
+                    length = 15 * lenCounter + 8 + lenField
+            for i in xrange(length):
                 char = window[-offset]
                 result += chr(char)
                 window.append(char)
