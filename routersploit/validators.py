@@ -54,7 +54,7 @@ def boolify(value):
     try:
         str_type = basestring  # Python 2.x.
     except NameError:
-        str_type = str # Python 3.x.
+        str_type = str  # Python 3.x.
     if isinstance(value, str_type):
         try:
             return bool(strtobool(value))
