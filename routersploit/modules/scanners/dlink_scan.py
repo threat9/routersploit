@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from os import listdir
 from os.path import isfile, join
 import imp
@@ -58,14 +60,14 @@ class Exploit(exploits.Exploit):
             else:
                 print_status("{} could not be verified".format(f))
 
-        print
+        print()
         if len(vulns):
             print_success("Device is vulnerable!")
             for v in vulns:
-                print " - {}".format(v)
+                print(" - {}".format(v))
         else:
             print_error("Device is not vulnerable to any exploits!")
-        print
+        print()
 
     def check(self):
         raise NotImplementedError("Check method is not available")
