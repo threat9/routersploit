@@ -378,8 +378,8 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def _show_options(self, *args, **kwargs):
-        target_opts = {'port', 'target'}
-        module_opts = set(self.current_module.options) - target_opts
+        target_opts = ['target', 'port']
+        module_opts = [opt for opt in self.current_module.options if opt not in target_opts]
         headers = ("Name", "Current settings", "Description")
 
         utils.print_info('\nTarget options:')
