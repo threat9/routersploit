@@ -326,7 +326,10 @@ def print_table(headers, *args, **kwargs):
     headers_line = '   '
     headers_separator_line = '   '
     for idx, header in enumerate(headers):
-        current_line_fill = max(len(header), *map(lambda x: custom_len(x[idx]), args)) + extra_fill
+        column = [custom_len(arg[idx]) for arg in args]
+        column.append(len(header))
+
+        current_line_fill = max(column) + extra_fill
         fill.append(current_line_fill)
         headers_line = "".join((headers_line, "{header:<{fill}}".format(header=header, fill=current_line_fill)))
         headers_separator_line = "".join((
