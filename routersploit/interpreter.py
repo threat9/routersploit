@@ -1,21 +1,18 @@
 from __future__ import print_function
 
+import atexit
+import itertools
 import os
 import sys
-import itertools
 import traceback
-import atexit
 from collections import Counter
 
-from routersploit.printer import PrinterThread, printer_queue
-from routersploit.exceptions import RoutersploitException
-from routersploit.exploits import GLOBAL_OPTS
-from routersploit import utils
+from future.builtins import input
 
-try:
-    input = raw_input
-except NameError:  # Python 3.x
-    pass
+from . import utils
+from .exceptions import RoutersploitException
+from .exploits import GLOBAL_OPTS
+from .printer import PrinterThread, printer_queue
 
 if sys.platform == "darwin":
     import gnureadline as readline
@@ -145,7 +142,7 @@ class BaseInterpreter(object):
 
     def raw_command_completer(self, text, line, start_index, end_index):
         """ Complete command w/o any argument """
-        return filter(lambda entry: entry.startswith(text), self.suggested_commands())
+        return [command for command in self.suggested_commands() if command.startswith(text)]
 
     def default_completer(self, *ignored):
         return []
