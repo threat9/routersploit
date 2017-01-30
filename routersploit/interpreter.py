@@ -159,6 +159,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     help                        Print this help menu
     use <module>                Select a module for usage
     exec <shell command> <args> Execute a command in a shell
+    search <search term>        Search for appropriate module
     exit                        Exit RouterSploit"""
 
     module_help = """Module commands:
@@ -455,6 +456,12 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
+
+    def command_search(self, *args, **kwargs):
+        for arg in args:
+            matches = [s for s in self.modules if arg in str(s)]
+        for match in matches:
+            print(match.replace('.', '/'))
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
