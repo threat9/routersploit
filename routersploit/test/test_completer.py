@@ -32,7 +32,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
 
     def test_raw_commands_no_module(self):
         self.rsf.send("\t\t")
-        self.assertPrompt('exec   exit   help   show   use    \r\n', self.raw_prompt)
+        self.assertPrompt('exec     exit     help     search   show     use      \r\n', self.raw_prompt)
 
     def test_complete_use_raw(self):
         self.rsf.send("u\t\t")
@@ -89,7 +89,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("\t\t")
         self.assertPrompt(
-            '  exec   exit   help   run    set    setg   show   use    \r\n',
+            'back     check    exec     exit     help     run      search   set      setg     show     use      \r\n',
             self.module_prompt('FTP Bruteforce')
         )
 
