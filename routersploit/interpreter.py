@@ -181,7 +181,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.prompt_hostname = 'rsf'
         self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
 
-        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show '])
+        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show ', 'search '])
         self.module_commands = ['run', 'back', 'set ', 'setg ', 'check']
         self.module_commands.extend(self.global_commands)
         self.module_commands.sort()
@@ -459,9 +459,9 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_search(self, *args, **kwargs):
         for arg in args:
-            matches = [s for s in self.modules if arg in str(s)]
+            matches = [s for s in self.modules if arg in s]
         for match in matches:
-            print(match.replace('.', '/'))
+            utils.print_info(match.replace('.', '/'))
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
