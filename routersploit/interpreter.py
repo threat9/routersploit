@@ -159,6 +159,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     help                        Print this help menu
     use <module>                Select a module for usage
     exec <shell command> <args> Execute a command in a shell
+    search <search term>        Search for appropriate module
     exit                        Exit RouterSploit"""
 
     module_help = """Module commands:
@@ -180,7 +181,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.prompt_hostname = 'rsf'
         self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
 
-        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show '])
+        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show ', 'search '])
         self.module_commands = ['run', 'back', 'set ', 'setg ', 'check']
         self.module_commands.extend(self.global_commands)
         self.module_commands.sort()
@@ -455,6 +456,12 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
+
+    def command_search(self, *args, **kwargs):  # TODO cover with unit tests
+        for arg in args:
+            matches = [s for s in self.modules if arg in s]
+        for match in matches:
+            utils.print_info(match.replace('.', '/'))
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
