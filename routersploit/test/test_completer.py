@@ -89,7 +89,8 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("\t\t")
         self.assertPrompt(
-            '\r\n',
+            'back     exec     help     search   setg     use      \r\n'
+            'check    exit     run      set      show     \r\n',
             self.module_prompt('FTP Bruteforce')
         )
 
@@ -115,6 +116,14 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.assertPrompt(
             self.module_prompt('FTP Bruteforce'),
             'run'
+        )
+
+    def test_complete_search(self):
+        self.set_module()
+        self.rsf.send("sea\t")
+        self.assertPrompt(
+            self.module_prompt('FTP Bruteforce'),
+            'search ',
         )
 
     def test_complete_set_raw(self):
@@ -145,7 +154,8 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("set \t\t")
         self.assertPrompt(
-            'passwords        stop_on_success  threads          verbosity\r\nport             target           usernames        \r\n',
+            'passwords        stop_on_success  threads          verbosity\r\n'
+            'port             target           usernames        \r\n',
             self.module_prompt('FTP Bruteforce'),
             'set ',
         )
@@ -162,7 +172,8 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("setg \t\t")
         self.assertPrompt(
-            'passwords        stop_on_success  threads          verbosity\r\nport             target           usernames        \r\n',
+            'passwords        stop_on_success  threads          verbosity\r\n'
+            'port             target           usernames        \r\n',
             self.module_prompt('FTP Bruteforce'),
             'setg ',
         )
@@ -182,8 +193,9 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("\t\t")
         self.assertPrompt(
-            "\r\n",
-            self.module_prompt('FTP Bruteforce')
+            "back     exec     help     search   setg     use      \r\n"
+            "check    exit     run      set      show     \r\n",
+            self.module_prompt('FTP Bruteforce'),
         )
 
     def test_complete_unsetg_2(self):
@@ -194,8 +206,9 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.rsf.send("setg target foo\r\n")
         self.rsf.send("\t\t")
         self.assertPrompt(
-            '\r\n',
-            self.module_prompt('FTP Bruteforce')
+            'back     exec     help     search   setg     unsetg   \r\n'
+            'check    exit     run      set      show     use      \r\n',
+            self.module_prompt('FTP Bruteforce'),
         )
 
     def test_complete_unsetg_3(self):

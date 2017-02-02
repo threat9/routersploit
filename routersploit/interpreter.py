@@ -457,7 +457,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
 
-    def command_search(self, *args, **kwargs):
+    def command_search(self, *args, **kwargs):  # TODO cover with unit tests
         for arg in args:
             matches = [s for s in self.modules if arg in s]
         for match in matches:
