@@ -14,10 +14,10 @@ from .exceptions import RoutersploitException
 from .exploits import GLOBAL_OPTS
 from .printer import PrinterThread, printer_queue
 
-if sys.platform == "darwin":
-    import gnureadline as readline
-else:
-    import readline
+import readline
+
+
+is_libedit = lambda: "libedit" in readline.__doc__
 
 
 class BaseInterpreter(object):
@@ -38,7 +38,9 @@ class BaseInterpreter(object):
         :return:
         """
         if not os.path.exists(self.history_file):
-            open(self.history_file, 'a+').close()
+            with open(self.history_file, 'a+') as history:
+                if is_libedit():
+                    history.write("_HiStOrY_V2_\n\n")
 
         readline.read_history_file(self.history_file)
         readline.set_history_length(self.history_length)
@@ -48,7 +50,10 @@ class BaseInterpreter(object):
 
         readline.set_completer(self.complete)
         readline.set_completer_delims(' \t\n;')
-        readline.parse_and_bind("tab: complete")
+        if is_libedit():
+            readline.parse_and_bind("bind ^I rl_complete")
+        else:
+            readline.parse_and_bind("tab: complete")
 
     def parse_line(self, line):
         """ Split line into command and argument.
