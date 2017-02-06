@@ -457,11 +457,19 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
 
-    def command_search(self, *args, **kwargs):  # TODO cover with unit tests
-        for arg in args:
-            matches = [s for s in self.modules if arg in s]
-        for match in matches:
-            utils.print_info(match.replace('.', '/'))
+    def command_search(self, *args, **kwargs):
+        keyword = args[0]
+
+        if not keyword:
+            utils.print_error("Please specify search keyword. e.g. 'search cisco'")
+            return
+
+        for module in self.modules:
+            if keyword in module:
+                module = utils.humanize_path(module)
+                utils.print_info(
+                    "{}\033[31m{}\033[0m{}".format(*module.partition(keyword))
+                )
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
