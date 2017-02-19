@@ -17,7 +17,8 @@ from .printer import PrinterThread, printer_queue
 import readline
 
 
-is_libedit = lambda: "libedit" in readline.__doc__
+def is_libedit():
+    return "libedit" in readline.__doc__
 
 
 class BaseInterpreter(object):
