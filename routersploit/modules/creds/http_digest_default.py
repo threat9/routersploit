@@ -30,7 +30,6 @@ class Exploit(exploits.Exploit):
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit Http Basic auth module
             'Alexander Yakovlev <https://github.com/toxydose>',  # upgrading to perform bruteforce attack against HTTP Digest Auth service
         ],
-
         'references': [
             '',
         ],
