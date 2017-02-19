@@ -27,7 +27,10 @@ class Exploit(exploits.Exploit):
         'description': 'Module perform dictionary attack with default credentials against HTTP Digest Auth service. '
                        'If valid credentials are found, they are displayed to the user.',
         'authors': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit Http Basic auth module
+            'Alexander Yakovlev <https://github.com/toxydose>', # upgrading to perform bruteforce attack against HTTP Digest Auth service
+33
+        ],
         ],
         'references': [
             '',
