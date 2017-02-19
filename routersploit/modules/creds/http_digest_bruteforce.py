@@ -17,6 +17,7 @@ from routersploit import (
 from routersploit.exceptions import StopThreadPoolExecutor
 from requests.auth import HTTPDigestAuth
 
+
 class Exploit(exploits.Exploit):
     """
     Module performs bruteforce attack against HTTP Digest Auth service.
