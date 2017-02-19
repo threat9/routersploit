@@ -31,7 +31,7 @@ class Exploit(exploits.Exploit):
             'Alexander Yakovlev <https://github.com/toxydose>', # upgrading to perform bruteforce attack against HTTP Digest Auth service
 33
         ],
-        ],
+        
         'references': [
             '',
         ],
