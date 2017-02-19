@@ -28,7 +28,8 @@ class Exploit(exploits.Exploit):
         'description': 'Module performs bruteforce attack against HTTP Digest Auth service. '
                        'If valid credentials are found, they are displayed to the user.',
         'authors': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  #  routersploit HTTP Basic Auth module
+            'Alexander Yakovlev <https://github.com/toxydose>', # upgrading to perform bruteforce attack against HTTP Digest Auth service
         ],
         'references': [
             '',
