@@ -20,6 +20,9 @@ class RoutersploitTestCase(unittest.TestCase):
             msg="'{}' method should be decorated with 'module_required'".format(function.__name__)
         )
 
+    def assertIsSubset(self, subset, container):
+        [self.assertIn(element, container) for element in subset]
+
     def assertIsSequence(self, arg):
         self.assertEqual(
             True,
