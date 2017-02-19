@@ -5,7 +5,10 @@ python:
 install:
   - "pip install -r requirements.txt"
   - "pip install pexpect flake8"
+  - "pip install coveralls"
 
 script:
   - "python -m unittest discover"
   - "./run_linter.sh"
+after_success:
+  - coveralls
