@@ -28,7 +28,7 @@ class Exploit(exploits.Exploit):
                        'If valid credentials are found, they are displayed to the user.',
         'authors': [
             'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit Http Basic auth module
-            'Alexander Yakovlev <https://github.com/toxydose>', # upgrading to perform bruteforce attack against HTTP Digest Auth service
+            'Alexander Yakovlev <https://github.com/toxydose>',  # upgrading to perform bruteforce attack against HTTP Digest Auth service
 33
         ],
         
