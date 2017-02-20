@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import unittest
 
 try:
@@ -5,8 +7,8 @@ try:
 except ImportError:
     import mock
 
-from routersploit.utils import index_modules
-from routersploit.test import RoutersploitTestCase
+from .. import utils
+from . import RoutersploitTestCase
 
 
 class UtilsTest(RoutersploitTestCase):
@@ -19,7 +21,7 @@ class UtilsTest(RoutersploitTestCase):
         )
 
         path = 'path/to/module'
-        modules = index_modules(path)
+        modules = utils.index_modules(path)
 
         mock_walk.assert_called_once_with(path)
         self.assertEqual(
@@ -39,7 +41,7 @@ class UtilsTest(RoutersploitTestCase):
         )
 
         path = 'path/to/module'
-        modules = index_modules(path)
+        modules = utils.index_modules(path)
 
         mock_walk.assert_called_once_with(path)
 
@@ -51,6 +53,43 @@ class UtilsTest(RoutersploitTestCase):
                 'exploits.asmax.asmax_multi',
             ]
         )
+
+    @mock.patch('routersploit.utils.print_info')
+    def test_print_table_01(self, mock_print):
+        utils.print_table(
+            ["Name", "Value", "Description"],
+            ('foo', 'bar', 'baz'),
+            (1, 2, 3),
+            ("port", 80, "port number")
+        )
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call(),
+                mock.call('   Name     Value     Description     '),
+                mock.call('   ----     -----     -----------     '),
+                mock.call('   foo      bar       baz             '),
+                mock.call('   1        2         3               '),
+                mock.call('   port     80        port number     '),
+                mock.call()
+            ]
+        )
+
+    @mock.patch('routersploit.utils.print_info')
+    def test_print_table_02(self, mock_print):
+        utils.print_table(
+            ["Name", "Value", "Description"],
+        )
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call(),
+                mock.call('   Name     Value     Description     '),
+                mock.call('   ----     -----     -----------     '),
+                mock.call()
+            ]
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

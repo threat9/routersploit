@@ -136,5 +136,6 @@ class ValidatorsTest(RoutersploitTestCase):
         value = "t"
         self.assertEqual(validators.boolify(value), True)
 
+
 if __name__ == '__main__':
     unittest.main()

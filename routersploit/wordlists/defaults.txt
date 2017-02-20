@@ -123,8 +123,10 @@ admin:123456
 admin:2222
 admin:22222
 admin:362729
+admin:Admin123
 admin:AitbISP4eCiG
 admin:Ascend
+admin:BGCVDSL2
 admin:NetCache
 admin:OCS
 admin:Protector
@@ -148,6 +150,7 @@ admin:diamond
 admin:epicrouter
 admin:extendnet
 admin:giraff
+admin:gvt12345
 admin:hagpolm1
 admin:hello
 admin:ho4uku6at
@@ -364,12 +367,14 @@ super:surt
 superadmin:secret
 superadmin:Is$uper@dmin
 superman:21241036
+superman:superman
 superman:talent
 superuser:123456
 superuser:admin
 supervisor:PlsChgMe!
 supervisor:PlsChgMe1
 supervisor:supervisor
+supervisor:zyad1234
 support:h179350
 support:support
 support:supportpw
@@ -387,6 +392,7 @@ teacher:password
 tech:field
 tech:tech
 telco:telco
+tele2:tele2
 telecom:telecom
 telecomadmin:telecomadmin
 telecomadmin:admintelecom
@@ -401,6 +407,7 @@ tiger:tiger123
 topicalt:password
 topicnorm:password
 topicres:password
+true:true
 tw:tw
 ubnt:ubnt
 user:pass
@@ -408,6 +415,7 @@ user:password
 user:public
 user:tivonpw
 user:user
+user3:12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678
 vcr:NetVCR
 volition:volition
 vt100:public

@@ -159,6 +159,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     help                        Print this help menu
     use <module>                Select a module for usage
     exec <shell command> <args> Execute a command in a shell
+    search <search term>        Search for appropriate module
     exit                        Exit RouterSploit"""
 
     module_help = """Module commands:
@@ -180,7 +181,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.prompt_hostname = 'rsf'
         self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
 
-        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show '])
+        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show ', 'search '])
         self.module_commands = ['run', 'back', 'set ', 'setg ', 'check']
         self.module_commands.extend(self.global_commands)
         self.module_commands.sort()
@@ -455,6 +456,20 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
+
+    def command_search(self, *args, **kwargs):
+        keyword = args[0]
+
+        if not keyword:
+            utils.print_error("Please specify search keyword. e.g. 'search cisco'")
+            return
+
+        for module in self.modules:
+            if keyword in module:
+                module = utils.humanize_path(module)
+                utils.print_info(
+                    "{}\033[31m{}\033[0m{}".format(*module.partition(keyword))
+                )
 
     def command_exit(self, *args, **kwargs):
         raise EOFError

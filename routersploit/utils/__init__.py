@@ -1,26 +1,26 @@
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
 
-import threading
-import os
-import sys
-import re
 import collections
-import random
-import string
+import errno
 import importlib
+import os
+import random
+import re
 import select
 import socket
-import errno
-from functools import wraps
-from distutils.util import strtobool
+import string
+import sys
+import threading
 from abc import ABCMeta, abstractmethod
+from distutils.util import strtobool
+from functools import wraps
 
 import requests
 
-from .printer import printer_queue, thread_output_stream
-from .exceptions import RoutersploitException
-from . import modules as rsf_modules
+from .. import modules as rsf_modules
+from ..exceptions import RoutersploitException
+from ..printer import printer_queue, thread_output_stream
 
 MODULES_DIR = rsf_modules.__path__[0]
 CREDS_DIR = os.path.join(MODULES_DIR, 'creds')
@@ -326,7 +326,10 @@ def print_table(headers, *args, **kwargs):
     headers_line = '   '
     headers_separator_line = '   '
     for idx, header in enumerate(headers):
-        current_line_fill = max(len(header), *map(lambda x: custom_len(x[idx]), args)) + extra_fill
+        column = [custom_len(arg[idx]) for arg in args]
+        column.append(len(header))
+
+        current_line_fill = max(column) + extra_fill
         fill.append(current_line_fill)
         headers_line = "".join((headers_line, "{header:<{fill}}".format(header=header, fill=current_line_fill)))
         headers_separator_line = "".join((
@@ -411,14 +414,14 @@ def random_text(length, alph=string.ascii_letters + string.digits):
     return ''.join(random.choice(alph) for _ in range(length))
 
 
-def http_request(method, url, **kwargs):
+def http_request(method, url, session=requests, **kwargs):
     """ Wrapper for 'requests' silencing exceptions a little bit. """
 
     kwargs.setdefault('timeout', 30.0)
     kwargs.setdefault('verify', False)
 
     try:
-        return getattr(requests, method.lower())(url, **kwargs)
+        return getattr(session, method.lower())(url, **kwargs)
     except (requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
         print_error("Invalid URL format: {}".format(url))
         return
@@ -543,7 +546,7 @@ def tokenize(token_specification, text):
 
 
 def create_exploit(path):  # TODO: cover with tests
-    from .templates import exploit
+    from ..templates import exploit
 
     parts = path.split(os.sep)
     module_type, name = parts[0], parts[-1]

