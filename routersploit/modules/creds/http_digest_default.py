@@ -61,7 +61,7 @@ class Exploit(exploits.Exploit):
             return
 
         if response.status_code != 401:
-            print_status("Target is not protected by Basic Auth")
+            print_status("Target is not protected by Digest Auth")
             return
 
         if self.defaults.startswith('file://'):
