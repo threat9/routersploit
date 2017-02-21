@@ -160,6 +160,7 @@ The following services are currently supported:
 - ssh
 - telnet
 - http basic auth
+- http digest auth
 - http form auth
 - snmp
 
