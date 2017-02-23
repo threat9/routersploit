@@ -4,6 +4,7 @@ import sys
 import itertools
 import traceback
 import atexit
+from collections import Counter
 
 from routersploit.printer import PrinterThread, printer_queue
 from routersploit.exceptions import RoutersploitException
@@ -187,6 +188,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_commands.sort()
 
         self.modules = utils.index_modules()
+        self.modules_count = Counter()
+        [self.modules_count.update(module.split('.')) for module in self.modules]
         self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
 
         self.__parse_prompt()
@@ -204,8 +207,10 @@ class RoutersploitInterpreter(BaseInterpreter):
  Codename : Bad Blood
  Version  : 2.2.1
 
- Total module count: {modules_count}
-""".format(modules_count=len(self.modules))
+ Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count}
+""".format(exploits_count=self.modules_count['exploits'],
+           scanners_count=self.modules_count['scanners'],
+           creds_count=self.modules_count['creds'])
 
     def __parse_prompt(self):
         raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "
