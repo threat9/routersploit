@@ -34,6 +34,7 @@ FORCE
 Factory
 GEN1
 GEN2
+Geardog
 Gearguy
 GlobalAdmin
 Guest
