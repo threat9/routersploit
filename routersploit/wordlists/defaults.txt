@@ -112,6 +112,7 @@ VTech:VTech
 WP:HPOFFICE
 ZXDSL:ZXDSL
 aaa:often blank
+abarco:mistral5885
 acc:acc
 adfexc:adfexc
 admin2:changeme
@@ -319,6 +320,7 @@ readwrite:lucenttech1
 recovery:recovery
 replicator:replicator
 ro:ro
+root:awind5885
 root:zsun1188
 root:1234
 root:12345
