@@ -32,7 +32,7 @@ class Exploit(exploits.Exploit):
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
-    threads = exploits.Option(8, "Number of threads")
+    threads = exploits.Option(64, "Number of threads")
 
     def __init__(self):
         self.vulnerabilities = []
