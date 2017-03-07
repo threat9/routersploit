@@ -7,6 +7,7 @@ from routersploit import (
     print_success,
     print_error,
     print_status,
+    print_info
 )
 
 
@@ -62,7 +63,7 @@ class Exploit(exploits.Exploit):
         if len(vulns):
             print_success("Device is vulnerable!")
             for v in vulns:
-                print " - {}".format(v)
+                print_info(" - {}".format(v))
         else:
             print_error("Device is not vulnerable to any exploits!")
         print
