@@ -36,23 +36,31 @@ class Exploit(exploits.Exploit):
 
     def __init__(self):
         self.vulnerabilities = []
+        self.not_verified = []
         self._exploits_directory = path.join(utils.EXPLOITS_DIR, self.vendor)
 
     def run(self):
         self.vulnerabilities = []
+        self.not_verified = []
 
         with threads.ThreadPoolExecutor(self.threads) as executor:
             for exploit in utils.iter_modules(self._exploits_directory):
                 executor.submit(self.target_function, exploit)
 
         print_info()
+        if self.not_verified:
+            print_status("Could not verify exploitability:")
+            for v in self.not_verified:
+                print_info(" - {}".format(v))
+
+        print_info()
         if self.vulnerabilities:
-            print_success("Device is vulnerable!")
+            print_success("Device is vulnerable:")
             for v in self.vulnerabilities:
                 print_info(" - {}".format(v))
             print_info()
         else:
-            print_error("Device is not vulnerable to any exploits!\n")
+            print_error("Could not confirm any vulnerablity\n")
 
     def check(self):
         raise NotImplementedError("Check method is not available")
@@ -71,3 +79,4 @@ class Exploit(exploits.Exploit):
             print_error("{} is not vulnerable".format(exploit))
         else:
             print_status("{} could not be verified".format(exploit))
+            self.not_verified.append(exploit)
