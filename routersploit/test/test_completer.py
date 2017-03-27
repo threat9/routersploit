@@ -17,14 +17,14 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
     def setUp(self):
         self.rsf = pexpect.spawn('python {}'.format(self.cli_path))
         self.rsf.send('\r\n')
-        self.assertPrompt(self.raw_prompt)
+        self.rsf.expect_exact(self.raw_prompt, timeout=3)
 
     def tearDown(self):
         self.rsf.terminate(force=True)
 
     def assertPrompt(self, *args):
         value = ''.join(args)
-        self.rsf.expect_exact(value, timeout=3)  # TODO: long timeout because of slow macOS worker (workaround)
+        self.rsf.expect_exact(value, timeout=1)
 
     def set_module(self):
         self.rsf.send("use creds/ftp_bruteforce\r\n")
