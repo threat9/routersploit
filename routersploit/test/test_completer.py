@@ -24,7 +24,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
 
     def assertPrompt(self, *args):
         value = ''.join(args)
-        self.rsf.expect_exact(value, timeout=1)
+        self.rsf.expect_exact(value, timeout=3)  # TODO: long timeout because of slow macOS worker (workaround)
 
     def set_module(self):
         self.rsf.send("use creds/ftp_bruteforce\r\n")
