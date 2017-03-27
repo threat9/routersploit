@@ -1,11 +1,16 @@
 language: python
-python:
-  - "2.7"
+
+matrix:
+  include:
+    - os: linux
+      python: 2.7
+
+    - os: osx
+      language: generic
+      env: PYTHON_VERSION=2.7.13
 
 install:
-  - "pip install -r requirements.txt"
-  - "pip install pexpect flake8"
+  - "./.travis/install.sh"
 
 script:
-  - "python -m unittest discover"
-  - "./run_linter.sh"
+  - "./.travis/run.sh"

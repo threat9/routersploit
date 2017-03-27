@@ -1,0 +1,9 @@
+future>=0.16.0
+requests>=2.9.1
+paramiko>=1.16.0
+beautifulsoup4>=4.4.1
+pysnmp>=4.3.2
+gnureadline
+pexpect
+mock
+flake8
