@@ -17,7 +17,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
     def setUp(self):
         self.rsf = pexpect.spawn('python {}'.format(self.cli_path))
         self.rsf.send('\r\n')
-        self.rsf.expect_exact(self.raw_prompt, timeout=3)
+        self.rsf.expect(self.raw_prompt, timeout=3)
 
     def tearDown(self):
         self.rsf.terminate(force=True)
