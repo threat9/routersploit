@@ -360,6 +360,7 @@ root:inflection
 root:letacla
 root:pass
 root:permit
+root:reecam4debug
 root:root
 root:tini
 root:tslinux
