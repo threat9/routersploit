@@ -21,7 +21,7 @@ def address(addr):
     return addr.netloc or addr.path
 
 
-def enum(valid_values):
+def choice(valid_values):
     valid_values = [] if not valid_values else valid_values
 
     def _enum(value):
