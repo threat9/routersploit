@@ -62,4 +62,4 @@ def integer(number):
     try:
         return int(number)
     except ValueError:
-        raise OptionValidationError("Invalid option. can't cast '{}' to integer.")
+        raise OptionValidationError("Invalid option. can't cast '{}' to integer.".format(number))
