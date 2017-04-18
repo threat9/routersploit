@@ -145,17 +145,15 @@ class ValidatorsTest(RoutersploitTestCase):
         valid_values = ["test1", "test2"]
         selected_value = "t"
 
-        with self.assertRaises(OptionValidationError) as ove:
+        with self.assertRaises(OptionValidationError):
             validators.choice(valid_values)(selected_value)
-            self.assertEqual(ove.exception, OptionValidationError)
 
     def test_choice_3(self):
         valid_values = ["test1", "test2"]
         selected_value = "Test1"
 
-        with self.assertRaises(OptionValidationError) as ove:
+        with self.assertRaises(OptionValidationError):
             validators.choice(valid_values)(selected_value)
-            self.assertEqual(ove.exception, OptionValidationError)
 
 
 if __name__ == '__main__':
