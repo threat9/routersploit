@@ -21,6 +21,18 @@ def address(addr):
     return addr.netloc or addr.path
 
 
+def choice(valid_values):
+    valid_values = [] if not valid_values else valid_values
+
+    def _enum(value):
+        if value not in valid_values:
+            raise OptionValidationError("Selected '{}' value isn't correct. Possible values are: {}".format(value, valid_values))
+
+        return value
+
+    return _enum
+
+
 def ipv4(address):
     try:
         socket.inet_pton(socket.AF_INET, address)
