@@ -136,6 +136,16 @@ class ValidatorsTest(RoutersploitTestCase):
         value = "t"
         self.assertEqual(validators.boolify(value), True)
 
+    def test_integer_1(self):
+        self.assertEqual(validators.integer('1'), 1)
+
+    def test_integer_2(self):
+        self.assertEqual(validators.integer('123'), 123)
+
+    def test_integer_3(self):
+        with self.assertRaises(OptionValidationError):
+            validators.integer('foobar')
+
 
 if __name__ == '__main__':
     unittest.main()
