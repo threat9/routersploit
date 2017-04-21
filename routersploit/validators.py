@@ -67,3 +67,11 @@ def boolify(value):
             return False
     else:
         return bool(value)
+
+
+def integer(number):
+    """ Cast Option value to the integer using int() """
+    try:
+        return int(number)
+    except ValueError:
+        raise OptionValidationError("Invalid option. can't cast '{}' to integer.".format(number))
