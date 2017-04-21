@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Linksys',
         ),
     }
-    vendor = 'linksys'
+    vendor = ['routers/linksys', 'cameras/linksys', 'misc/linksys']

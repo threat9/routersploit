@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Huawei',
         ),
     }
-    vendor = 'huawei'
+    vendor = ['routers/huawei', 'cameras/huawei', 'misc/huawei']

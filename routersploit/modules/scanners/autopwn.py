@@ -28,7 +28,7 @@ class Exploit(exploits.Exploit):
             'Multi',
         ),
     }
-    vendor = ''
+    vendor = ['']
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
@@ -37,7 +37,7 @@ class Exploit(exploits.Exploit):
     def __init__(self):
         self.vulnerabilities = []
         self.not_verified = []
-        self._exploits_directory = path.join(utils.EXPLOITS_DIR, self.vendor)
+        self._exploits_directory = [path.join(utils.EXPLOITS_DIR, v) for v in self.vendor]
 
     def run(self):
         self.vulnerabilities = []

@@ -76,9 +76,12 @@ def import_exploit(path):
 
 def iter_modules(modules_directory=MODULES_DIR):
     """ Iterate over valid modules """
+    modules = []
 
-    modules = index_modules(modules_directory)
-    modules = map(lambda x: "".join(['routersploit.modules.', x]), modules)
+    for directory in modules_directory:
+        m = index_modules(directory)
+        modules += map(lambda x: "".join(['routersploit.modules.', x]), m)
+    
     for path in modules:
         try:
             yield import_exploit(path)

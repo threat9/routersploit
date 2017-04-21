@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'BHU uRouter',
         ),
     }
-    vendor = 'bhu'
+    vendor = ['routers/bhu', 'cameras/bhu', 'misc/bhu']

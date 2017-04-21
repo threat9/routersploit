@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Dlink',
         ),
     }
-    vendor = 'dlink'
+    vendor = ['routers/dlink', 'cameras/dlink', 'misc/dlink']

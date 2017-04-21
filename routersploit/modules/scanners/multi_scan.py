@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Multi',
         ),
     }
-    vendor = 'multi'
+    vendor = ['routers/multi', 'cameras/multi', 'misc/multi']
