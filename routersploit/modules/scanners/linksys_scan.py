@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Linksys',
         ),
     }
-    vendor = 'linksys'
+    modules = ['routers/linksys', 'cameras/linksys', 'misc/linksys']

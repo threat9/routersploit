@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Fortinet',
         ),
     }
-    vendor = 'fortinet'
+    modules = ['routers/fortinet', 'cameras/fortinet', 'misc/fortinet']

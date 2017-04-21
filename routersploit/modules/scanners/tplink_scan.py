@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'TP-Link',
         ),
     }
-    vendor = 'tplink'
+    modules = ['routers/tplink', 'cameras/tplink', 'misc/tplink']

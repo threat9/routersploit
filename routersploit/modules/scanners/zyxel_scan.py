@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Zyxel',
         ),
     }
-    vendor = 'zyxel'
+    modules = ['routers/zyxel', 'cameras/zyxel', 'misc/zyxel']

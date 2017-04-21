@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Billion',
         ),
     }
-    vendor = 'billion'
+    modules = ['routers/billion', 'cameras/billion', 'misc/billion']

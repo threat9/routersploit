@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Grandstream',
         ),
     }
-    vendor = 'grandstream'
+    modules = ['routers/grandstream', 'cameras/grandstream', 'misc/grandstream']

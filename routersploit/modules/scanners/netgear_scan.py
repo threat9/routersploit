@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Netgear',
         ),
     }
-    vendor = 'netgear'
+    modules = ['routers/netgear', 'cameras/netgear', 'misc/netgear']

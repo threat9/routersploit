@@ -28,7 +28,7 @@ class Exploit(exploits.Exploit):
             'Multi',
         ),
     }
-    vendor = ''
+    modules = ['routers', 'cameras', 'misc']
 
     target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
     port = exploits.Option(80, 'Target port')  # default port
@@ -37,15 +37,16 @@ class Exploit(exploits.Exploit):
     def __init__(self):
         self.vulnerabilities = []
         self.not_verified = []
-        self._exploits_directory = path.join(utils.EXPLOITS_DIR, self.vendor)
+        self._exploits_directories = [path.join(utils.EXPLOITS_DIR, module) for module in self.modules]
 
     def run(self):
         self.vulnerabilities = []
         self.not_verified = []
 
         with threads.ThreadPoolExecutor(self.threads) as executor:
-            for exploit in utils.iter_modules(self._exploits_directory):
-                executor.submit(self.target_function, exploit)
+            for directory in self._exploits_directories:
+                for exploit in utils.iter_modules(directory):
+                    executor.submit(self.target_function, exploit)
 
         print_info()
         if self.not_verified:

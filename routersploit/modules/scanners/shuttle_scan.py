@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Shuttle',
         ),
     }
-    vendor = 'shuttle'
+    modules = ['routers/shuttle', 'cameras/shuttle', 'misc/shuttle']

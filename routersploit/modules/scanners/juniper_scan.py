@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Juniper',
         ),
     }
-    vendor = 'juniper'
+    modules = ['routers/juniper', 'cameras/juniper', 'misc/juniper']

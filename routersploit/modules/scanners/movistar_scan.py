@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Movistar',
         ),
     }
-    vendor = 'movistar'
+    modules = ['routers/movistar', 'cameras/movistar', 'misc/movistar']

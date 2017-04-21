@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Belkin',
         ),
     }
-    vendor = 'belkin'
+    modules = ['routers/belkin', 'cameras/belkin', 'misc/belkin']

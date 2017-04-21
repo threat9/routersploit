@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Asus',
         ),
     }
-    vendor = 'asus'
+    modules = ['routers/asus', 'cameras/asus', 'misc/asus']

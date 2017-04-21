@@ -69,20 +69,21 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
     def test_complete_use_exploits_2(self):
         self.rsf.send("use exploits/\t\t")
         self.assertPrompt(
-            'exploits/dlink/'
+            "exploits/cameras/  exploits/misc/     exploits/routers/  \r\n",
+            self.raw_prompt
         )
 
     def test_complete_use_exploits_3(self):
-        self.rsf.send("use exploits/dli\t")
+        self.rsf.send("use exploits/routers/dli\t")
         self.assertPrompt(
             self.raw_prompt,
-            'use exploits/dlink/'
+            'use exploits/routers/dlink/'
         )
 
     def test_complete_use_exploits_4(self):
-        self.rsf.send("use exploits/dlink/dir_300_320_\t\t\t")
+        self.rsf.send("use exploits/routers/dlink/dir_300_320_\t\t\t")
         self.assertPrompt(
-            'exploits/dlink/dir_300_320_615_auth_bypass'
+            'exploits/routers/dlink/dir_300_320_615_auth_bypass'
         )
 
     def test_raw_commands_with_module(self):

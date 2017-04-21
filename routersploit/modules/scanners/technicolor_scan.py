@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Technicolor',
         ),
     }
-    vendor = 'technicolor'
+    modules = ['routers/technicolor', 'cameras/technicolor', 'misc/technicolor']

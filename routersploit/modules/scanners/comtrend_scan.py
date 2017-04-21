@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Comtrend',
         ),
     }
-    vendor = 'comtrend'
+    modules = ['routers/comtrend', 'cameras/comtrend', 'misc/comtrend']

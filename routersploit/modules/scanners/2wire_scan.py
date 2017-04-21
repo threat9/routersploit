@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             '2wire',
         ),
     }
-    vendor = '2wire'
+    modules = ['routers/2wire', 'cameras/2wire', 'misc/2wire']
