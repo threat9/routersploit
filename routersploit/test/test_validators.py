@@ -136,6 +136,25 @@ class ValidatorsTest(RoutersploitTestCase):
         value = "t"
         self.assertEqual(validators.boolify(value), True)
 
+    def test_choice_1(self):
+        valid_values = ["test1", "test2"]
+        selected_value = "test1"
+        self.assertEqual(validators.choice(valid_values)(selected_value), selected_value)
+
+    def test_choice_2(self):
+        valid_values = ["test1", "test2"]
+        selected_value = "t"
+
+        with self.assertRaises(OptionValidationError):
+            validators.choice(valid_values)(selected_value)
+
+    def test_choice_3(self):
+        valid_values = ["test1", "test2"]
+        selected_value = "Test1"
+
+        with self.assertRaises(OptionValidationError):
+            validators.choice(valid_values)(selected_value)
+
     def test_integer_1(self):
         self.assertEqual(validators.integer('1'), 1)
 
