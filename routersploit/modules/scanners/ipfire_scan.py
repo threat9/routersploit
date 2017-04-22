@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Ipfire',
         ),
     }
-    vendor = 'ipfire'
+    vendor = ['routers/ipfire', 'cameras/ipfire', 'misc/ipfire']

@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Cisco',
         ),
     }
-    vendor = 'cisco'
+    vendor = ['routers/cisco', 'cameras/cisco', 'misc/cisco']

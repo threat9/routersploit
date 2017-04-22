@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Ubiquiti',
         ),
     }
-    vendor = 'ubiquiti'
+    vendor = ['routers/ubiquiti', 'cameras/ubiquiti', 'misc/ubiquiti']

@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Netcore',
         ),
     }
-    vendor = 'netcore'
+    vendor = ['routers/netcore', 'cameras/netcore', 'misc/netcore']

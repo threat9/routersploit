@@ -20,4 +20,4 @@ class Exploit(BaseScanner):
             'Asmax',
         ),
     }
-    vendor = 'asmax'
+    vendor = ['routers/asmax', 'cameras/asmax', 'misc/asmax']
