@@ -99,6 +99,7 @@ MGR:XLSERVER
 MICRO:RSX
 Manager:Manager
 Manager:friend
+Mroot:cat1029
 NAU:NAU
 NETWORK:NETWORK
 NICONEX:NICONEX
@@ -124,6 +125,7 @@ User:Password
 VNC:winterm
 VTech:VTech
 WP:HPOFFICE
+Wproot:cat1029
 ZXDSL:ZXDSL
 aaa:often blank
 abarco:mistral5885
