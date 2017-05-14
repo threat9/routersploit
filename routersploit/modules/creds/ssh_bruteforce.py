@@ -102,7 +102,7 @@ class Exploit(exploits.Exploit):
                 ssh.connect(self.target, int(self.port), timeout=5, username=user, password=password)
             except StopIteration:
                 break
-            except paramiko.ssh_exception.SSHException as err:
+            except (socket.timeout, paramiko.ssh_exception.SSHException) as err:
                 ssh.close()
                 print_error("Target: {}:{} {}: {} Username: '{}' Password: '{}'".format(self.target, self.port, name, err, user, password), verbose=module_verbosity)
             else:
