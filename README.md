@@ -38,6 +38,12 @@ It consists of various modules that aids penetration testing operations:
 	pip install -r requirements.txt
 	./rsf.py
 
+## Installation on Centos 7
+
+	sudo yum install python-devel python2-pip ncurses-devel git
+        git clone https://github.com/reverse-shell/routersploit
+	pip install -r requirements.txt
+
 ## Installation on OSX
 
 	git clone https://github.com/reverse-shell/routersploit
