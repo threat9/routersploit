@@ -4,8 +4,6 @@
 from Crypto.Cipher import DES
 
 
-
-
 def decrypt_authKey(authKey):
     matrix = [[0 for i in xrange(15)] for i in range(15)]
     passwdLen = 0
@@ -37,13 +35,9 @@ def decrypt_authKey(authKey):
 
 
 def parse(data):
-
     l = data.split('\r\n')
-
     del l[0]
     for item in l:
-
-
         try:
             if 'authKey' in item:
                 authKey = item.split()[1]
