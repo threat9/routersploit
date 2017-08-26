@@ -35,7 +35,7 @@ It consists of various modules that aids penetration testing operations:
 	sudo apt-get install python-dev python-pip libncurses5-dev git
 	git clone https://github.com/reverse-shell/routersploit
 	cd routersploit
-	pip install -r requirements.txt
+	sudo pip install -r requirements.txt
 	./rsf.py
 
 ## Installation on Centos 7
