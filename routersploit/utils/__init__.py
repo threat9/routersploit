@@ -386,6 +386,7 @@ def pprint_dict_in_order(dictionary, order=None):
 
     def prettyprint(title, body):
         print_info("\n{}:".format(title.capitalize()))
+        value = dictionary[title]
         if not isinstance(body, str):
             for value_element in value:
                 print_info('- ', value_element)
