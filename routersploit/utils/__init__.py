@@ -387,10 +387,10 @@ def pprint_dict_in_order(dictionary, order=None):
     def prettyprint(title, body):
         print_info("\n{}:".format(title.capitalize()))
         if not isinstance(body, str):
-            for value_element in value:
+            for value_element in body:
                 print_info('- ', value_element)
         else:
-            print_info(value)
+            print_info(body)
 
     keys = dictionary.keys()
     for element in order:
