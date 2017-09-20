@@ -1,0 +1,3 @@
+recursive-include * *.txt *.py
+include README.md
+include rsf.py
