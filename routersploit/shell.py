@@ -23,7 +23,7 @@ import routersploit.modules.payloads as payloads
 def bind_tcp(arch, rport):
     print_status("Generating bind shell binary")
 
-    if arch == 'arm':
+    if arch == 'armle':
         payload = payloads.armle_bind_tcp.Exploit()
     elif arch == 'mipsle':
         payload = payloads.mipsle_bind_tcp.Exploit()
@@ -40,7 +40,7 @@ def bind_tcp(arch, rport):
 def reverse_tcp(arch, lhost, lport):
     print_status("Generating reverse shell binary")
 
-    if arch == 'arm':
+    if arch == 'armle':
         payload = payloads.armle_reverse_tcp.Exploit()
     elif arch == 'mipsle':
         payload = payloads.mipsle_reverse_tcp.Exploit()
