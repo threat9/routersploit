@@ -344,6 +344,7 @@ class reverse_shell(object):
     lport = None
     binary_name = None
     revshell = None
+    concat = None
 
     def __init__(self, exploit, arch, lhost, lport):
         self.exploit = exploit
@@ -405,7 +406,7 @@ class reverse_shell(object):
 
         # execute binary
         sock = self.listen(self.lhost, self.lport)
-        self.execute_binary(location, self.binary_name, concat)
+        self.execute_binary(location, self.binary_name, self.concat)
 
         # waiting for shell
         self.shell(sock)
