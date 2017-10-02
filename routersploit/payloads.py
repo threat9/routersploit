@@ -16,8 +16,7 @@ class Payload(exploits.Exploit):
     filepath = exploits.Option('', 'Output file to write')
 
     def __init__(self):
-        self.filepath = "/tmp/{}".format(random_text(8))
-
+        # elf headers
         if self.architecture == "armle": 
             self.bigendian = False
             self.header = (
@@ -48,16 +47,27 @@ class Payload(exploits.Exploit):
                 "\x00\x00\x40\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
                 "\x00\x10\x00\x00"
             )
+        else:
+            print_error("Define architecture. Supported architectures: armle, mipsbe, mipsle")
+            return None
+
+        # random output filename
+        self.filepath = "/tmp/{}".format(random_text(8))
 
     def run(self):
-        print_status("Generating payload")
-
         args = {}
         for arg in inspect.getargspec(self.generate)[0]:
             if arg in self.exploit_attributes.keys():
                 value = getattr(self, arg)
-                print_status("{}: {}".format(self.exploit_attributes[arg], value))
-                args[arg] = value
+                if value:
+                    args[arg] = value
+                else:
+                    print_error("You have to set: {}".format(arg))
+                    return
+
+        print_status("Generating payload")
+        for key in args.keys():
+            print_status("{}: {}".format(self.exploit_attributes[key], args[key]))
 
         self.generate(**args)
 
@@ -106,5 +116,4 @@ class Payload(exploits.Exploit):
             res += "\\x%02x" % ord(x)
         res += "\"\n)"
         return res
-
 
