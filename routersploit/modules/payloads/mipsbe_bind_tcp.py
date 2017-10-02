@@ -18,8 +18,8 @@ class Exploit(payloads.Payload):
     architecture = "mipsbe"
     port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
-    def generate(self, port):
-        bind_port = self.convert_port(port)
+    def generate(self):
+        bind_port = self.convert_port(self.port)
 
         self.payload = (
             # socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = 3

