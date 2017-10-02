@@ -17,11 +17,8 @@ from routersploit.utils import (
 )
 
 from routersploit import exploits
+from routersploit import payloads
 from routersploit import wordlists
 from routersploit import validators
 from routersploit.shell import shell
 
-from routersploit import armle
-from routersploit import mipsle
-from routersploit import mipsbe
-from routersploit import payload

