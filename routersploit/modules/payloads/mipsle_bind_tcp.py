@@ -13,6 +13,8 @@ class Exploit(payloads.Payload):
         'description': '',
         'references': [
         ],
+        'devices': [
+        ],
     }
 
     architecture = "mipsle"
