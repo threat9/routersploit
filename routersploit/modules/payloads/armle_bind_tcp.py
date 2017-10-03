@@ -4,12 +4,13 @@ from routersploit import (
     validators
 )
 
+
 class Exploit(payloads.Payload):
     __info__ = {
         'name': 'ARMLE Bind TCP',
         'authors': [
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }
@@ -87,4 +88,3 @@ class Exploit(payloads.Payload):
             "\x04\x20\x8d\xe2" +
             "\x0b\x00\x90\xef"
         )
-

