@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Readme_Gentoo</title>
+  </head>
+  <body>
+    <h1>Routersploit:<img src="art/routersploit.png" alt="" width="531"
+        height="102"><!--?xml version="1.0" encoding="UTF-8" standalone="no"?--></h1>
+    <h1>&nbsp;<img
+        src="https://avatars2.githubusercontent.com/u/6411603?v=4&amp;s=200"
+        alt="" width="150" height="150">Pentoo / Gentoo Linux/ <img
+src="https://lh3.googleusercontent.com/-mK-lUfPecfc/AAAAAAAAAAI/AAAAAAAAAAo/GTUeGe3baLE/photo.jpg"
+        alt="" width="101" height="102">&nbsp;&nbsp; "Unoffical" Install
+      Guide <br>
+    </h1>
+    <p><b>TO Do: make a Working Ebuild 9999 (live ebuild)&nbsp; to
+        automate the git-clone and install &amp; Depends but <u>for now
+          this is a work arround...</u><i><u> </u><br>
+          <br>
+        </i>
+        IE </b>(includes Sabayon Linux , FUNTOO and other Gentoo
+      Variant's) <br>
+    </p>
+    <h1>&nbsp; <iframe src="http://me.me/embed/i/13726455"
+        class="meme-embed" style="max-width:25%;" allowfullscreen=""
+        width="25%" height="250" frameborder="0"></iframe></h1>
+    <p><a
+href="http://me.me/i/ill-protect-you-ill-keep-you-warm-until-youre-ready-13726455">via
+
+        me.me</a></p>
+    <b>Pentoo </b>Is a Live Cd based on Gentoo Linux for Pen-testing
+    &nbsp; <a href="www.Pentoo.ch"><b>www.Pentoo.ch</b></a>&nbsp;&nbsp;
+    <a href="https://github.com/pentoo"><b>github.com/pentoo</b></a> <br>
+    <hr width="100%" size="2">
+    <address><b><font size="+1"><a
+            href="https://wiki.gentoo.org/wiki/Pip" style="box-sizing:
+            border-box; background-color: rgb(255, 255, 255); color:
+            rgb(3, 102, 214); text-decoration: underline; outline-width:
+            0px; font-family: -apple-system, BlinkMacSystemFont,
+            &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif,
+            &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;,
+            &quot;Segoe UI Symbol&quot;; font-size: 14px; font-style:
+            normal; font-variant-ligatures: normal; font-variant-caps:
+            normal; font-weight: normal; letter-spacing: normal;
+            orphans: 2; text-align: start; text-indent: 0px;
+            text-transform: none; white-space: normal; widows: 2;
+            word-spacing: 0px; -webkit-text-stroke-width: 0px;">https://wiki.gentoo.org/wiki/Pip</a></font></b>
+      <strong style="box-sizing: border-box; font-weight: 600; color:
+        rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+        &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+        Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+        Symbol&quot;; font-size: 14px; font-style: normal;
+        font-variant-ligatures: normal; font-variant-caps: normal;
+        letter-spacing: normal; orphans: 2; text-align: start;
+        text-indent: 0px; text-transform: none; white-space: normal;
+        widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+        background-color: rgb(255, 255, 255); text-decoration-style:
+        initial; text-decoration-color: initial;"><font size="+2"
+          color="#ff0000"><br>
+          &nbsp;&nbsp;&nbsp; Warning</font></strong></address>
+    <pre><strong style="box-sizing: border-box; font-weight: 600; color:
+      rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;">
+      <font size="+1">Running pip as root is not advised. It can render
+        important system tools like emerge useless.</font></strong></pre>
+    <pre><strong style="box-sizing: border-box; font-weight: 600; color:
+      rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;"><font size="+1">
+        </font></strong></pre>
+    <pre><strong style="box-sizing: border-box; font-weight: 600; color:
+      rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;"><font size="+1">
+        That Being said .... now on to installing depends... </font></strong></pre>
+    <h5><strong style="box-sizing: border-box; font-weight: 600; color:
+        rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+        &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+        Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+        Symbol&quot;; font-size: 14px; font-style: normal;
+        font-variant-ligatures: normal; font-variant-caps: normal;
+        letter-spacing: normal; orphans: 2; text-align: start;
+        text-indent: 0px; text-transform: none; white-space: normal;
+        widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+        background-color: rgb(255, 255, 255); text-decoration-style:
+        initial; text-decoration-color: initial;"><font size="+1"> </font></strong>
+    </h5>
+    <hr width="100%" size="2"><b><span style="box-sizing: border-box;
+        color: rgb(36, 41, 46); font-family:
+        -apple-system,BlinkMacSystemFont,&quot;Segoe
+        UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color
+        Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI
+        Symbol&quot;; font-size: 14px; font-style: normal;
+        font-variant-ligatures: normal; font-variant-caps: normal;
+        letter-spacing: normal; text-align: start; text-indent: 0px;
+        text-transform: none; white-space: normal; word-spacing: 0px;
+        -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+        255); text-decoration-style: initial; text-decoration-color:
+        initial;"><font size="+1">ADDING the Pentoo overlay&nbsp;&nbsp;
+          is Highly Recommended..</font></span></b><strong
+      style="box-sizing: border-box; font-weight: 600; color: rgb(36,
+      41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;"><font size="+1">&nbsp;&nbsp;&nbsp;
+        <br>
+      </font></strong><br>
+    <strong style="box-sizing: border-box; font-weight: 600; color:
+      rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;">(</strong><i><span
+        style="box-sizing: border-box; color: rgb(36, 41, 46);
+        font-variant-caps: normal; letter-spacing: normal; text-align:
+        start; text-indent: 0px; text-transform: none; white-space:
+        normal; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+        background-color: rgb(255, 255, 255); text-decoration-style:
+        initial; text-decoration-color: initial;">as the Routersploit
+        team may add modules or plugins to use other tools ie
+        metasploit, bettercap, </span></i><i><span style="box-sizing:
+        border-box; color: rgb(36, 41, 46); font-variant-caps: normal;
+        letter-spacing: normal; text-align: start; text-indent: 0px;
+        text-transform: none; white-space: normal; word-spacing: 0px;
+        -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+        255); text-decoration-style: initial; text-decoration-color:
+        initial;"><i><span style="box-sizing: border-box; color: rgb(36,
+            41, 46); font-variant-caps: normal; letter-spacing: normal;
+            text-align: start; text-indent: 0px; text-transform: none;
+            white-space: normal; word-spacing: 0px;
+            -webkit-text-stroke-width: 0px; background-color: rgb(255,
+            255, 255); text-decoration-style: initial;
+            text-decoration-color: initial;">wifi-pumpkin etc.&nbsp;</span></i>
+        , or have interrogations at any given time in the future.. </span></i><br>
+    <i><span style="box-sizing: border-box; color: rgb(36, 41, 46);
+        font-variant-caps: normal; letter-spacing: normal; text-align:
+        start; text-indent: 0px; text-transform: none; white-space:
+        normal; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+        background-color: rgb(255, 255, 255); text-decoration-style:
+        initial; text-decoration-color: initial;">&nbsp;that are in
+        Pentoo overlay&nbsp;</span></i><strong style="box-sizing:
+      border-box; font-weight: 600; color: rgb(36, 41, 46); font-family:
+      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+      Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;,
+      &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;
+      font-size: 14px; font-style: normal; font-variant-ligatures:
+      normal; font-variant-caps: normal; letter-spacing: normal;
+      orphans: 2; text-align: start; text-indent: 0px; text-transform:
+      none; white-space: normal; widows: 2; word-spacing: 0px;
+      -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+      255); text-decoration-style: initial; text-decoration-color:
+      initial;">&nbsp; )</strong><br>
+    <strong style="box-sizing: border-box; font-weight: 600; color:
+      rgb(36, 41, 46); font-family: -apple-system, BlinkMacSystemFont,
+      &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple
+      Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI
+      Symbol&quot;; font-size: 14px; font-style: normal;
+      font-variant-ligatures: normal; font-variant-caps: normal;
+      letter-spacing: normal; orphans: 2; text-align: start;
+      text-indent: 0px; text-transform: none; white-space: normal;
+      widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;"></strong><br>
+    <i><span style="box-sizing: border-box; color: rgb(36, 41, 46);
+        font-variant-caps: normal; letter-spacing: normal; text-align:
+        start; text-indent: 0px; text-transform: none; white-space:
+        normal; word-spacing: 0px; -webkit-text-stroke-width: 0px;
+        background-color: rgb(255, 255, 255); text-decoration-style:
+        initial; text-decoration-color: initial;">if layman/git&nbsp; is
+        not installed </span></i><i><br>
+    </i><i> </i><i><span style="box-sizing: border-box; color: rgb(36,
+        41, 46); font-variant-caps: normal; letter-spacing: normal;
+        text-align: start; text-indent: 0px; text-transform: none;
+        white-space: normal; word-spacing: 0px;
+        -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+        255); text-decoration-style: initial; text-decoration-color:
+        initial;">emerge -av app-portage/layman&nbsp;&nbsp; dev-vcs/git
+        &nbsp; </span></i><i><br>
+    </i><i> </i><i><span style="box-sizing: border-box; color: rgb(36,
+        41, 46); font-variant-caps: normal; letter-spacing: normal;
+        text-align: start; text-indent: 0px; text-transform: none;
+        white-space: normal; word-spacing: 0px;
+        -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+        255); text-decoration-style: initial; text-decoration-color:
+        initial;"></span></i><i><br>
+    </i><i> </i><span style="box-sizing: border-box; color: rgb(36, 41,
+      46); font-variant-caps: normal; letter-spacing: normal;
+      text-align: start; text-indent: 0px; text-transform: none;
+      white-space: normal; word-spacing: 0px; -webkit-text-stroke-width:
+      0px; background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial;"><i>layman -S &amp;&amp;
+        layman -a pentoo</i></span><strong style="box-sizing:
+      border-box; font-weight: 600; color: rgb(36, 41, 46); font-family:
+      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+      Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;,
+      &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;
+      font-size: 14px; font-style: normal; font-variant-ligatures:
+      normal; font-variant-caps: normal; letter-spacing: normal;
+      orphans: 2; text-align: start; text-indent: 0px; text-transform:
+      none; white-space: normal; widows: 2; word-spacing: 0px;
+      -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+      255); text-decoration-style: initial; text-decoration-color:
+      initial;"><i><br>
+        <br>
+      </i></strong><strong style="box-sizing: border-box; font-weight:
+      600; color: rgb(36, 41, 46); font-family: -apple-system,
+      BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial,
+      sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI
+      Emoji&quot;, &quot;Segoe UI Symbol&quot;; font-size: 14px;
+      font-style: normal; font-variant-ligatures: normal;
+      font-variant-caps: normal; letter-spacing: normal; orphans: 2;
+      text-align: start; text-indent: 0px; text-transform: none;
+      white-space: normal; widows: 2; word-spacing: 0px;
+      -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+      255); text-decoration-style: initial; text-decoration-color:
+      initial;"></strong>
+    <hr width="100%" size="2"><strong style="box-sizing: border-box;
+      font-weight: 600; color: rgb(36, 41, 46); font-family:
+      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+      Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;,
+      &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;
+      font-size: 14px; font-style: normal; font-variant-ligatures:
+      normal; font-variant-caps: normal; letter-spacing: normal;
+      orphans: 2; text-align: start; text-indent: 0px; text-transform:
+      none; white-space: normal; widows: 2; word-spacing: 0px;
+      -webkit-text-stroke-width: 0px; background-color: rgb(255, 255,
+      255); text-decoration-style: initial; text-decoration-color:
+      initial;"><font size="+1">&nbsp;Based on requirements text
+        files&nbsp; and lookups&nbsp;&nbsp; for Deps:&nbsp; <br>
+      </font></strong><b>Overlay : </b><a
+      href="https://gpo.zugaina.org/">https://gpo.zugaina.org/</a>&nbsp;&nbsp;
+
+
+
+
+    --search overlays etc ... <br>
+    <b>Mainline:</b>, <a href="https://packages.gentoo.org/">https://packages.gentoo.org/</a><br>
+    both can be use to find many python /other packages and map them to
+    Gentoo ,&nbsp;&nbsp; Gentoo uses this to deal with packages of
+    similar ambiguous&nbsp; names same names but differing
+    use...&nbsp;&nbsp; as some common utils dev-go/some-cool-lib..
+    dev-python/cool-lib2&nbsp; are ported over to go-lang ruby etc... or
+    have been named the same but are totally different.. <br>
+    <br>
+    #https://github.com/reverse-shell/routersploit/blob/master/requirements.txt
+
+
+
+
+
+
+    <br>
+    <br>
+    <hr width="100%" size="2"><b>Dependencies Install:</b><br>
+    <a href="https://sabayon.org"><img
+src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIye9zLSQatF850iMME3TtEfozZ5F7c5R66aT3gcAqnuGYuTMqXA"
+        alt="" width="56" height="56" border="0"></a><a
+      href="https://sabayon.org">Sabayon Linux</a> ,&nbsp;&nbsp; using
+    entropy PM is offten best.&nbsp; , you may need ENMAN installed and
+    <b>pen-testing</b>&nbsp; (often built from Pentoo/Gentoo ) or other
+    binary overlays... and will save on build times... <br>
+    however some packages may not be avalible pre-built , you will have
+    to use <b><u>emerge</u></b> ... its wise to read... <a
+href="https://wiki.sabayon.org/index.php?title=HOWTO:_Safely_mix_Entropy_and_Portage">https://wiki.sabayon.org/index.php?title=HOWTO:_Safely_mix_Entropy_and_Portage</a><br>
+    <br>
+    <i>EQUO UP &amp;&amp; EQUO </i><i>i dev-python/beautifulsoup
+      dev-python/requests dev-python/pysnmp dev-python/pexpect </i><br>
+    <br>
+    <i><b>&nbsp; </b></i><br>
+    <h3>
+      <i><b>For: </b></i>
+      <i><b>Gentoo</b></i><img
+src="https://lh3.googleusercontent.com/-mK-lUfPecfc/AAAAAAAAAAI/AAAAAAAAAAo/GTUeGe3baLE/photo.jpg"
+        alt="" width="61" height="63"><i><b>, Pento</b></i><i><b>o , </b></i><img
+src="https://avatars2.githubusercontent.com/u/6411603?v=4&amp;s=200"
+        alt="" width="93" height="63">
+      <i><b>Funtoo <img
+src="https://d2.alternativeto.net/dist/icons/funtoo-linux_94434.png?width=200&amp;height=200&amp;mode=crop&amp;upscale=false"
+            alt="" width="117" height="56">, Calculate etc Chrome-OS
+          Core-OS , Zentoo , etc...&nbsp; (or Sabayon doing manual
+          package builds)&nbsp;</b></i></h3>
+    &nbsp; <br>
+    &nbsp;Emerge -av package-name....&nbsp; , --buildpkg to build
+    packages also ,&nbsp; often a good idea if you run into trouble ..
+    as a backup. &amp; or you can emerge binary-tarball-name.bz2 .... on
+    other systems.. <br>
+    <br>
+    <ul>
+    </ul>
+    <i>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <b>emerge -av --buildpkg
+        dev-python/beautifulsoup dev-python/requests dev-python/pysnmp
+        dev-python/pexpect </b><br>
+      <br>
+      <br>
+      (<b>advanced users/control freaks..... </b>&nbsp; USE sets use
+      flags with pyqt5 &nbsp; -pyqt5 (disable) ) <br>
+      <br>
+      <b>&nbsp;</b></i><b><i><i>python_targets="&nbsp; "</i> </i></b><i><b>USE="+item&nbsp;
+
+
+
+
+        -unwanted-feature" emerge -av --buildpkg
+        dev-python/beautifulsoup dev-python/requests dev-python/pysnmp
+        dev-python/pexpect</b><br>
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; <br>
+      (python_targets="python3_5"&nbsp; , 3_6 2_7 , pypy pypy3 ...
+      jython .... etc )&nbsp;&nbsp; just note if other machines dont
+      have python-3.6.x &nbsp; pypy etc it will add more depends on
+      binary packages you share. ...&nbsp;&nbsp; likewise&nbsp;&nbsp;
+      pypy&nbsp;&nbsp; or -pypy&nbsp;&nbsp; ) <br>
+      <br>
+    </i>
+    <hr width="100%" size="2"> <b>Test&nbsp; </b><b><b>Dependencies
+        install:<br>
+        <br>
+      </b>Routersploit TEST kit...&nbsp;&nbsp; optional... </b><br>
+    <font size="-1">###
+      https://github.com/reverse-shell/routersploit/blob/master/requirements-dev.txt&nbsp;
+
+
+
+
+
+      (yes theirs more in it this is the test bits... however rsf wont
+      run&nbsp; ) <br>
+      ( Sabayon or sabayon varients...)&nbsp; <b><i>EQUO UP &amp;&amp;
+          EQUO </i></b></font><i><font size="-1"><b>i&nbsp; .....&nbsp;
+        </b><b>instead</b><b> of emerge of packages.....</b> </font><br>
+    </i>
+    <ul>
+      <li>&nbsp;&nbsp;<b> </b><b><i>emerge -av --buildpkg</i></b><b>&nbsp;
+
+
+
+
+
+          virtual/python-mock&nbsp;&nbsp; dev-python/flake8&nbsp;
+          app-emulation/docker </b><br>
+      </li>
+    </ul>
+    <br>
+    &nbsp;&nbsp;&nbsp; <b>Make will Spawn docker&nbsp;</b>&nbsp; if the
+    daemon is running and you will need to install ...... more...&nbsp;
+    will fail if not... <br>
+    at your option to run make&nbsp;&nbsp; , can so any new deps added
+    etc...&nbsp; , <br>
+    <hr width="100%" size="2"><b>Manual Install:</b><br>
+    <ol>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; su -s&nbsp; &nbsp;
+            &nbsp;&nbsp; &lt; for root term/xterm....&gt;</i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; cd /usr/src</i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; git clone
+            https://github.com/reverse-shell/routersploit.git</i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; cd /usr/src</i><i>/routersploit&nbsp;
+          </i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; mkdir -p
+            /opt/routersploit&nbsp; </i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; cp&nbsp; &nbsp; </i><i>/usr/src/routersploit/rsf.py&nbsp;&nbsp;
+
+
+
+
+          </i><i>/opt/routersploit/</i><i>rsf.py </i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; cp -r
+            /usr/src/routersploit/routersploit</i><i>&nbsp;&nbsp;
+            /opt/routersploit</i></font></li>
+      <font size="+1"> </font>
+      <li><font size="+1"><i>&nbsp;&nbsp;&nbsp; ln -s
+            /opt/routersploit/rsf.py&nbsp; /usr/bin/rsf/&nbsp; </i></font><br>
+        <font size="+1"><i>&nbsp;# Quick lazy alias... <br>
+          </i></font></li>
+    </ol>
+    <i><br>
+      <b>----------&nbsp; optional .. </b></i><i><b><i>## ICON i made
+          ... quick and dirty...&nbsp; I also made a desktop skell to
+          launch RSF in XTERM form desktop if your lazy etc..&nbsp; ,
+          however officaly ... artwork etc may not stay... <br>
+          anyhow , should give a menu icon for your xfce etc.. or
+          desktop to abuse as often as needed... <br>
+        </i></b></i>
+    <ol>
+      <li><i><font size="+1">&nbsp;&nbsp;&nbsp;&nbsp; mkdir - p
+            /usr/share/icons/routerspliot/&nbsp; <br>
+          </font></i> </li>
+      <i><font size="+1"> </font></i>
+      <li><i><font size="+1">&nbsp;&nbsp;&nbsp;&nbsp; cp&nbsp; &nbsp;
+            /usr/src/routersploit/art/routersploit.png&nbsp;
+            /usr/share/icons/routerspliot/ <br>
+          </font></i> </li>
+      <i><font size="+1"> </font></i>
+      <li><i><font size="+1">&nbsp;&nbsp;&nbsp;&nbsp; mkdir - p
+            /usr/share/applications/routerspliot/</font></i></li>
+      <i><font size="+1"> </font></i>
+      <li><i><font size="+1">&nbsp;&nbsp;&nbsp;&nbsp; cp
+            /usr/src/routersploit/art/*.desktop&nbsp;
+            /usr/share/applications/routerspliot/&nbsp;</font></i><i> </i><br>
+      </li>
+    </ol>
+    <b><br>
+      TO Do make a Working Ebuild 9999 (live ebuild)&nbsp; to automate
+      the git-clone and install &amp; Depends but for now this is a work
+      arround... <br>
+      IE <br>
+      pentoo&nbsp;&nbsp; overlay , emerge
+      app-exploit/routersploit&nbsp;&nbsp; or simular is on list of
+      to-do's.... <br>
+      <br>
+    </b><br>
+    <br>
+  </body>
+</html>
