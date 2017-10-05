@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Routersploit
+GenericName=rsf-cli
+Exec=xterm -e launch /usr/bin/rsf
+#/opt/routersploit/rsf.py @ SYM /usr/bin/rsf/
+StartupNotify=false
+X-Enlightenment-WaitExit=false
+Icon=/usr/share/icons/routerspliot/routersploit.png
+Type=Application
+Comment=Routersploit RSF Framework
+Path=
+Terminal=false
