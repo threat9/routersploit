@@ -1,0 +1,81 @@
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=6
+
+PYTHON_COMPAT=( python2_7 )
+# PYTHON_COMPAT=( python{3_3,3_4,3_5} )  ## not yet.
+inherit python-single-r1 distutils-r1
+
+DESCRIPTION="An open-source exploitation framework dedicated to embedded devices."
+HOMEPAGE="https://github.com/reverse-shell/routersploit/wiki"
+SRC_URI="https://github.com/reverse-shell/routersploit/archive/v${PV}.tar.gz"
+PYTHON_COMPAT=( python2_7 )
+[[ ${PV} == *9999 ]] && SCM="git-r3"
+# Please ensure note this is a live ebuild @9999  it will fetch the latest 
+# may have bugs use a stable release when posible... 
+EGIT_REPO_URI="https://github.com/reverse-shell/routersploit.git"
+LICENSE="BSD"
+SLOT="0"
+KEYWORDS=""
+## skip ARCH keywords should run on any python2.7.x platform  ~x86 ~amd64 ~arm ~arm64 
+
+IUSE="-test -doc"
+DEPEND="~dev-python/beautifulsoup 
+			dev-python/requests 
+			dev-python/pysnmp 
+			dev-python/pexpect "
+RDEPEND="${DEPEND}"
+#TESTDEPEND="virtual/python-mock   
+			dev-python/flake8  
+			app-emulation/docker"
+
+S=${WORKDIR}/routersploit-${PV}/routersploit
+
+# tests_install() { ## todo... 
+if ! use test; then
+cd S=${WORKDIR}/routersploit-${PV}/routersploit
+# emake makefile is portage sanbox.
+emake 
+}
+
+src_prepare() {
+### clean up
+	rm  {Makefile,*.sh,Dockerfile,Makefile}
+	rm -r {/.git,/.travis)
+}
+src_install() {
+	dodir /opt/${PN}
+	doins -r "${S}"/opt/${PN} 
+	dobin /opt/${PN}/rsf.py } || die "Copy rsf.py failed to install"
+	dosym /opt/${PN}/rsf.py /usr/bin/rsf
+	chown -R root:root "/opt/${PN}"
+	
+		if use doc; then
+		docinto /usr/share/doc/${PN}/
+		dodoc -r /{README.md,LICENSE}
+
+		fi
+	fi
+	}
+	
+desktop_install() {	
+## If Pull request goes else ${FILESDIR}/
+	 dodir /usr/share/icons/${PN}/   
+     cp  /usr/src/routersploit/art/routersploit.png  /usr/share/icons/${PN}/ 
+     dodir  /usr/share/applications/${PN}/
+     cp /usr/src/routersploit/art/*.desktop  /usr/share/applications/${PN}/ 
+
+
+
+	#add desktop etc. 
+	insinto 
+	newins ""
+
+	
+}
+
+pkg_postinst(){
+	einfo "routersploit-${PV} has installed enjoy..  "
+	einfo "more info @ WIKI https://github.com/reverse-shell/routersploit/wiki"
+}
