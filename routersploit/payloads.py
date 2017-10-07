@@ -33,39 +33,46 @@ ARCH_ELF_HEADERS = {
 
 
 class Payload(exploits.Exploit):
-    output = exploits.Option('python', 'Output type: elf/python')
-    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
-
     def __init__(self):
-        if self.architecture == "armle":
-            self.bigendian = False
-            self.header = ARCH_ELF_HEADERS['armle']
-        elif self.architecture == "mipsbe":
-            self.bigendian = True
-            self.header = ARCH_ELF_HEADERS['mipsbe']
-        elif self.architecture == "mipsle":
-            self.bigendian = False
-            self.header = ARCH_ELF_HEADERS['mipsle']
+        if self.architecture == "generic":
+            self.bigendian = None
+            self.header = None
         else:
-            print_error("Define architecture. Supported architectures: armle, mipsbe, mipsle")
-            return None
+            if self.architecture == "armle":
+                self.bigendian = False
+                self.header = ARCH_ELF_HEADERS['armle']
+            elif self.architecture == "mipsbe":
+                self.bigendian = True
+                self.header = ARCH_ELF_HEADERS['mipsbe']
+            elif self.architecture == "mipsle":
+                self.bigendian = False
+                self.header = ARCH_ELF_HEADERS['mipsle']
 
     def run(self):
         print_status("Generating payload")
         self.generate()
 
-        if self.output == "elf":
-            with open(self.filepath, 'w+') as f:
-                print_status("Building ELF payload")
-                content = self.generate_elf()
+        if self.architecture == "generic":
+            print_info(self.payload)
 
-                print_success("Saving file {}".format(self.filepath))
-                f.write(content)
+        else:    
+            if self.output == "elf":
+                with open(self.filepath, 'w+') as f:
+                    print_status("Building ELF payload")
+                    content = self.generate_elf()
 
-        elif self.output == "python":
-            print_success("Building payload for python")
-            content = self.generate_python()
-            print_info(content)
+                    print_success("Saving file {}".format(self.filepath))
+                    f.write(content)
+
+            elif self.output == "c":
+                print_success("Bulding payload for C")
+                content = self.generate_c()
+                print_info(content)
+
+            elif self.output == "python":
+                print_success("Building payload for python")
+                content = self.generate_python()
+                print_info(content)
 
     def convert_ip(self, addr):
         res = ""
@@ -90,12 +97,21 @@ class Payload(exploits.Exploit):
         content = elf[:0x44] + p_filesz + p_memsz + elf[0x4c:]
         return content
 
+    def generate_c(self):
+        res = "unsigned char sh[] = {\n    \""
+        for idx, x in enumerate(self.payload):
+            if idx % 15 == 0 and idx != 0:
+                res += "\"\n    \""
+            res += "\\x%02x" % ord(x)
+        res += "\"\n};"
+        return res
+
     def generate_python(self):
         res = "payload = (\n    \""
         for idx, x in enumerate(self.payload):
             if idx % 15 == 0 and idx != 0:
                 res += "\"\n    \""
-
+    
             res += "\\x%02x" % ord(x)
         res += "\"\n)"
         return res
