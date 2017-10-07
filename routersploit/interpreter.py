@@ -211,16 +211,17 @@ class RoutersploitInterpreter(BaseInterpreter):
  | |\ \ (_) | |_| | ||  __/ |  /\__/ / |_) | | (_) | | |_
  \_| \_\___/ \__,_|\__\___|_|  \____/| .__/|_|\___/|_|\__|
                                      | |
-     Router Exploitation Framework   |_|
+        IoT Exploitation Framework   |_|
 
  Dev Team : Marcin Bury (lucyoa) & Mariusz Kupidura (fwkz)
  Codename : Bad Blood
  Version  : 2.2.1
 
- Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count}
+ Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Payloads: {payloads_count}
 """.format(exploits_count=self.modules_count['exploits'],
            scanners_count=self.modules_count['scanners'],
-           creds_count=self.modules_count['creds'])
+           creds_count=self.modules_count['creds'],
+           payloads_count=self.modules_count['payloads'])
 
     def __parse_prompt(self):
         raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "
@@ -396,7 +397,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def _show_options(self, *args, **kwargs):
-        target_opts = ['target', 'port']
+        target_opts = ['target', 'port', 'rhost', 'rport', 'lhost', 'lport']
         module_opts = [opt for opt in self.current_module.options if opt not in target_opts]
         headers = ("Name", "Current settings", "Description")
 
