@@ -49,8 +49,8 @@ def shell(exploit, architecture="", method="", **params):
 
         elif cmd.startswith("set payload "):
             c = cmd.split(" ")
-            
-            payload_path = path.replace("/",".") + c[2]
+
+            payload_path = path.replace("/", ".") + c[2]
             payload = getattr(importlib.import_module(payload_path), 'Exploit')()
 
             options = []
@@ -64,21 +64,14 @@ def shell(exploit, architecture="", method="", **params):
                 if method == "wget":
                     options.append(["lhost", "", ""])
                     options.append(["lport", 4545, ""])
-        
+
         elif payload is not None:
             if cmd == "show options":
                 headers = ("Name", "Current settings", "Description")
 
                 print_info('\nPayload Options:')
                 print_table(headers, *options)
-                
                 print_info()
-
-                """
-                print_status("Payload options:")
-                for key in options.keys():
-                    print_info("- {}: {}".format(key, options[key]))
-                """
 
             elif cmd.startswith("set "):
                 c = cmd.split(" ")
@@ -90,7 +83,7 @@ def shell(exploit, architecture="", method="", **params):
                             print_success("{'" + c[1] + "': '" + c[2] + "'}")
                             option[1] = c[2]
                             setattr(payload, c[1], c[2])
-        
+
             elif cmd == "run":
                 exec_binary_str = ""
                 data = payload.generate()
@@ -172,7 +165,6 @@ class Communication(object):
 
         self.exploit.execute(cmd)
 
-        
     def echo(self):
         print_status("Using echo method")
 

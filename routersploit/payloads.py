@@ -6,8 +6,6 @@ from utils import (
     print_success,
     print_status,
     print_info,
-    print_error,
-    random_text
 )
 
 ARCH_ELF_HEADERS = {
@@ -55,7 +53,7 @@ class Payload(exploits.Exploit):
         if self.architecture == "generic":
             print_info(data)
 
-        else:    
+        else:
             if self.output == "elf":
                 with open(self.filepath, 'w+') as f:
                     print_status("Building ELF payload")
@@ -101,7 +99,6 @@ class Payload(exploits.Exploit):
         for idx, x in enumerate(data):
             if idx % 15 == 0 and idx != 0:
                 res += "\"\n    \""
-    
             res += "\\x%02x" % ord(x)
         res += "\"\n)"
         return res

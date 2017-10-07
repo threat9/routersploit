@@ -10,7 +10,6 @@ from collections import Counter
 from routersploit import utils
 from routersploit.exceptions import RoutersploitException
 from routersploit.exploits import GLOBAL_OPTS
-from routersploit.payloads import Payload
 from routersploit.printer import PrinterThread, printer_queue
 
 if sys.platform == "darwin":
@@ -283,6 +282,8 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         :return: list of most accurate command suggestions
         """
+        from routersploit.exploits import Exploit
+        from routersploit.payloads import Payload
         if self.current_module and GLOBAL_OPTS:
             return sorted(itertools.chain(self.module_commands, ('unsetg ',)))
         elif self.current_module and isinstance(self.current_module, Exploit):

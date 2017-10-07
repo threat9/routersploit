@@ -93,7 +93,7 @@ def convert_ip(address):
     return res
 
 
-def convert_port(port): 
+def convert_port(port):
     """ Convert Port to bytes"""
     res = "%.4x" % int(port)
     return res.decode('hex')
