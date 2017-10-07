@@ -5,7 +5,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ######### For Routersploit RSF install for Gentoo 
-### Alpha... Quality Script..   
+### Alpha... Quality Script..   still needs work ... 
+### icon and desktop thingy also needs tweaking.. 
 echo "Routersploit RSF install for Gentoo, ebuild soon-ish... " 
 
  
