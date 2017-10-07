@@ -26,7 +26,10 @@ def choice(valid_values):
 
     def _enum(value):
         if value not in valid_values:
-            raise OptionValidationError("Selected '{}' value isn't correct. Possible values are: {}".format(value, valid_values))
+            raise OptionValidationError(
+                "Selected '{}' value isn't correct. "
+                "Possible values are: {}".format(value, valid_values)
+            )
 
         return value
 
@@ -60,7 +63,8 @@ def boolify(value):
     True -> "True", "t", "yes", "y", "on", "1"
     False -> any other string
 
-    Objects other than string will be transformed using built-in bool() function.
+    Objects other than string will be transformed
+    using built-in bool() function.
     """
     if isinstance(value, basestring):
         try:
@@ -76,4 +80,18 @@ def integer(number):
     try:
         return int(number)
     except ValueError:
-        raise OptionValidationError("Invalid option. can't cast '{}' to integer.".format(number))
+        raise OptionValidationError(
+            "Invalid option. can't cast '{}' to integer.".format(number)
+        )
+
+
+def convert_ip(address):  # TODO: lucyos convert from what to what?
+    res = ""
+    for i in address.split("."):
+        res += chr(int(i))
+    return res
+
+
+def convert_port(port):  # TODO: lucyos convert from what to what?
+    res = "%.4x" % int(port)
+    return res.decode('hex')

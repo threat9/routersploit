@@ -34,8 +34,8 @@ def bind_tcp(arch, rport):
 
     payload.port = rport
 
-    payload.generate()
-    return payload.generate_elf()
+    data = payload.generate()
+    return payload.generate_elf(data)
 
 
 def reverse_tcp(arch, lhost, lport):
@@ -54,8 +54,8 @@ def reverse_tcp(arch, lhost, lport):
     payload.target = lhost
     payload.port = lport
 
-    payload.generate()
-    return payload.generate_elf()
+    data = payload.generate()
+    return payload.generate_elf(data)
 
 
 def shell(exploit, architecture="", method="", **params):
