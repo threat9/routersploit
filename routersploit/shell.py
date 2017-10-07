@@ -241,4 +241,3 @@ class Communication(object):
         tn = telnetlib.Telnet()
         tn.sock = sock
         tn.interact()
-
