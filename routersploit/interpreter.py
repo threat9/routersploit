@@ -180,12 +180,20 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = 'rsf'
-        self.show_sub_commands = ('info', 'options', 'devices', 'all', 'creds', 'exploits', 'scanners')
+        self.show_sub_commands = (
+            'info', 'options', 'devices', 'all',
+            'creds', 'exploits', 'scanners'
+        )
 
-        self.global_commands = sorted(['use ', 'exec ', 'help', 'exit', 'show ', 'search '])
-        self.module_commands = ['run', 'back', 'set ', 'setg ', 'check']
-        self.module_commands.extend(self.global_commands)
-        self.module_commands.sort()
+        self.global_commands = sorted(
+            ['use ', 'exec ', 'help', 'exit', 'show ', 'search ']
+        )
+        self.module_commands = self._extend_with_global_commands(
+            ['run', 'back', 'set ', 'setg ', 'check']
+        )
+        self.payload_commands = self._extend_with_global_commands(
+            ['run', 'back', 'set ', 'setg ']
+        )
 
         self.modules = utils.index_modules()
         self.modules_count = Counter()
@@ -220,6 +228,12 @@ class RoutersploitInterpreter(BaseInterpreter):
         module_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 (\001\033[91m\002{module}\001\033[0m\002) > "
         module_prompt_template = os.getenv("RSF_MODULE_PROMPT", module_prompt_default_template).replace('\\033', '\033')
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
+
+    def _extend_with_global_commands(self, sequence):
+        """ Extend specific command suggestion with global commands """
+        sequence.extend(self.global_commands)
+        sequence.sort()
+        return sequence
 
     @property
     def module_metadata(self):
@@ -266,10 +280,14 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         :return: list of most accurate command suggestions
         """
+        from routersploit.exploits import Exploit
+        from routersploit.payloads import Payload
         if self.current_module and GLOBAL_OPTS:
             return sorted(itertools.chain(self.module_commands, ('unsetg ',)))
-        elif self.current_module:
+        elif self.current_module and isinstance(self.current_module, Exploit):
             return self.module_commands
+        elif self.current_module and isinstance(self.current_module, Payload):
+            return self.payload_commands
         else:
             return self.global_commands
 
