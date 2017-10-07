@@ -50,65 +50,55 @@ class Payload(exploits.Exploit):
 
     def run(self):
         print_status("Generating payload")
-        self.generate()
+        data = self.generate()
 
         if self.architecture == "generic":
-            print_info(self.payload)
+            print_info(data)
 
         else:    
             if self.output == "elf":
                 with open(self.filepath, 'w+') as f:
                     print_status("Building ELF payload")
-                    content = self.generate_elf()
+                    content = self.generate_elf(data)
 
                     print_success("Saving file {}".format(self.filepath))
                     f.write(content)
 
             elif self.output == "c":
                 print_success("Bulding payload for C")
-                content = self.generate_c()
+                content = self.generate_c(data)
                 print_info(content)
 
             elif self.output == "python":
                 print_success("Building payload for python")
-                content = self.generate_python()
+                content = self.generate_python(data)
                 print_info(content)
 
-    def convert_ip(self, addr):
-        res = ""
-        for i in addr.split("."):
-            res += chr(int(i))
-        return res
-
-    def convert_port(self, p):
-        res = "%.4x" % int(p)
-        return res.decode('hex')
-
-    def generate_elf(self):
-        elf = self.header + self.payload
+    def generate_elf(self, data):
+        elf = self.header + data
 
         if self.bigendian:
             p_filesz = pack(">L", len(elf))
-            p_memsz = pack(">L", len(elf) + len(self.payload))
+            p_memsz = pack(">L", len(elf) + len(data))
         else:
             p_filesz = pack("<L", len(elf))
-            p_memsz = pack("<L", len(elf) + len(self.payload))
+            p_memsz = pack("<L", len(elf) + len(data))
 
         content = elf[:0x44] + p_filesz + p_memsz + elf[0x4c:]
         return content
 
-    def generate_c(self):
+    def generate_c(self, data):
         res = "unsigned char sh[] = {\n    \""
-        for idx, x in enumerate(self.payload):
+        for idx, x in enumerate(data):
             if idx % 15 == 0 and idx != 0:
                 res += "\"\n    \""
             res += "\\x%02x" % ord(x)
         res += "\"\n};"
         return res
 
-    def generate_python(self):
+    def generate_python(self, data):
         res = "payload = (\n    \""
-        for idx, x in enumerate(self.payload):
+        for idx, x in enumerate(data):
             if idx % 15 == 0 and idx != 0:
                 res += "\"\n    \""
     

