@@ -56,6 +56,9 @@ class Payload(exploits.BaseExploit):
     def generate(self):
         raise NotImplementedError("Please implement payload generation.")
 
+    def check(self):
+        raise NotImplementedError("Check method is not available")
+
     def run(self):
         print_status("Generating payload")
         payload = self.generate()
