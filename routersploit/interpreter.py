@@ -1,15 +1,17 @@
 from __future__ import print_function
+
+import atexit
+import itertools
 import os
 import sys
-import itertools
 import traceback
-import atexit
 from collections import Counter
 
-from routersploit.printer import PrinterThread, printer_queue
+from routersploit import utils
 from routersploit.exceptions import RoutersploitException
 from routersploit.exploits import GLOBAL_OPTS
-from routersploit import utils
+from routersploit.payloads import Payload
+from routersploit.printer import PrinterThread, printer_queue
 
 if sys.platform == "darwin":
     import gnureadline as readline
@@ -280,14 +282,12 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         :return: list of most accurate command suggestions
         """
-        from routersploit.exploits import Exploit
-        from routersploit.payloads import Payload
         if self.current_module and GLOBAL_OPTS:
             return sorted(itertools.chain(self.module_commands, ('unsetg ',)))
-        elif self.current_module and isinstance(self.current_module, Exploit):
-            return self.module_commands
         elif self.current_module and isinstance(self.current_module, Payload):
             return self.payload_commands
+        elif self.current_module:
+            return self.module_commands
         else:
             return self.global_commands
 
