@@ -1,6 +1,6 @@
 .PHONY: build run test lint lint-modules clean prune help
 
-MODULE=''
+MODULES=""
 RSF_IMAGE=routersploit
 
 build:
@@ -15,8 +15,12 @@ lint:
 lint-modules:
 	./run_linter.sh modules
 
-test: clean
-	./run_tests.sh $(MODULE)
+tests: clean
+ifeq ($(MODULES), "")
+		python -m unittest discover
+else
+		python -m unittest $(MODULES)
+endif
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} +
