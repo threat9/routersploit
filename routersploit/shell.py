@@ -26,14 +26,20 @@ def shell(exploit, architecture="", method="", **params):
     payload = None
     options = []
 
+    print_info()
+    print_success("Welcome to cmd. Commands are sent to the target via the execute method.")
+    print_status("Depending on the vulnerability, command's results might not be available.")
+    print_status("For further exploitation use 'show payloads' and 'set payload <payload>' commands.")
+    print_info()
+
     while 1:
         while not printer_queue.empty():
             pass
 
         if payload is None:
-            cmd_str = "cmd > "
+            cmd_str = "\001\033[4m\002cmd\001\033[0m\002 > "
         else:
-            cmd_str = "cmd (\033[92m{}\033[0m) > ".format(payload._Exploit__info__['name'])
+            cmd_str = "\001\033[4m\002cmd\001\033[0m\002 (\033[92m{}\033[0m) > ".format(payload._Exploit__info__['name'])
 
         cmd = raw_input(cmd_str)
 
@@ -43,7 +49,7 @@ def shell(exploit, architecture="", method="", **params):
         elif cmd == "show payloads":
             payloads = [f.split(".")[0] for f in listdir(path) if isfile(join(path, f)) and f.endswith(".py") and f != "__init__.py"]
 
-            print_info("Available payloads:")
+            print_status("Available payloads:")
             for payload_name in payloads:
                 print_info("- {}".format(payload_name))
 
@@ -59,11 +65,11 @@ def shell(exploit, architecture="", method="", **params):
                     options.append([option, getattr(payload, option), payload.exploit_attributes[option]])
 
             if payload.handler == "bind_tcp":
-                options.append(["rhost", validators.ipv4(exploit.target), "Remote IP"])
+                options.append(["rhost", validators.ipv4(exploit.target), "Target IP address"])
 
                 if method == "wget":
-                    options.append(["lhost", "", ""])
-                    options.append(["lport", 4545, ""])
+                    options.append(["lhost", "", "Connect-back IP address for wget"])
+                    options.append(["lport", 4545, "Connect-back Port for wget"])
 
         elif payload is not None:
             if cmd == "show options":
@@ -103,7 +109,12 @@ def shell(exploit, architecture="", method="", **params):
                     communication.bind_tcp(exec_binary_str)
                 elif payload.handler == "reverse_tcp":
                     communication.reverse_tcp(exec_binary_str)
+
+            elif cmd == "back":
+                payload = None
+
         else:
+            print_status("Executing '{}' on the device...".format(cmd))
             exploit.execute(cmd)
 
 

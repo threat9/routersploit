@@ -20,8 +20,8 @@ class Exploit(payloads.Payload):
 
     architecture = "armle"
     handler = "reverse_tcp"
-    lhost = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    lport = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
+    lhost = exploits.Option('', 'Connect-back IP address', validators=validators.ipv4)
+    lport = exploits.Option(5555, 'Connect-back TCP Port', validators=validators.integer)
 
     output = exploits.Option('python', 'Output type: elf/c/python')
     filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
