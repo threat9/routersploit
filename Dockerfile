@@ -1,8 +1,9 @@
 FROM python:2.7
 
-WORKDIR /routersploit
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
-RUN git clone https://github.com/reverse-shell/routersploit/ .
-RUN pip install -r requirements.txt
+WORKDIR /routersploit
+COPY . .
 
 CMD ["python", "rsf.py"]
