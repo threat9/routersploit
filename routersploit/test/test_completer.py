@@ -41,7 +41,7 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
     def test_complete_use(self):
         self.rsf.send("use \t\t")
         self.assertPrompt(
-            'creds     exploits  scanners  \r\n',
+            'creds     exploits  payloads  scanners  \r\n',
             self.raw_prompt,
             'use '
         )

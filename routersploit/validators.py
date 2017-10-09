@@ -34,6 +34,8 @@ def choice(valid_values):
 
 
 def ipv4(address):
+    address = address.replace("http://", "").replace("https://", "")
+
     try:
         socket.inet_pton(socket.AF_INET, address)
     except AttributeError:
