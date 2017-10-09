@@ -4,6 +4,7 @@ from struct import pack
 import exploits
 from utils import (
     print_success,
+    print_error,
     print_status,
     print_info,
 )
@@ -46,7 +47,17 @@ class Payload(exploits.Exploit):
                 self.bigendian = False
                 self.header = ARCH_ELF_HEADERS['mipsle']
 
+    def validate_params(self):
+        for option in self.exploit_attributes.keys():
+            if not getattr(self, option):
+                print_error("Invalid value for {}".format(option))
+                return None
+        return True
+        
     def run(self):
+        if not self.validate_params():
+            return
+        
         print_status("Generating payload")
         data = self.generate()
 

