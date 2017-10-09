@@ -47,7 +47,7 @@ class Exploit(exploits.Exploit):
             if self.test_auth():
                 print_status("Invoking command loop...")
                 print_status("This is blind command injection. Response is not available.")
-                shell(self, architecture="mipsle")
+                shell(self, architecture="mipsel")
         else:
             print_error("Target is not vulnerable")
 

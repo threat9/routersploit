@@ -97,10 +97,7 @@ class Exploit(exploits.Exploit):
         if response is None:
             response = http_request(method="GET", url=url)
 
-        if response is not None \
-                and response.status_code == 200 \
-                and "<html>" not in response.text \
-                and len(response.text) > 500:
+        if response is not None and response.status_code == 200:
             return True
 
         return False

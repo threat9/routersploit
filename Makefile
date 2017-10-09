@@ -1,44 +1,40 @@
-.PHONY: build run test lint lint-modules clean prune help
+# Makefile that aggregates common chores before commit
 
-MODULES=routersploit
-RSF_IMAGE=routersploit
-FLAKE8_IGNORED_RULES=E501,W503
+.PHONY: all clean lint lint-modules test build update run help
 
-build:
-	docker build -t $(RSF_IMAGE) .
+MODULE=''
 
-run:
-	docker run -it --rm $(RSF_IMAGE)
-
-lint:
-	flake8 --exclude=__init__.py --ignore=$(FLAKE8_IGNORED_RULES) $(MODULES)
-
-tests: clean
-ifeq ($(MODULES), routersploit)
-	python -m unittest discover
-else
-	python -m unittest $(MODULES)
-endif
+all: lint test
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f  {} +
 
-prune:
-	docker images -q -f dangling=true | xargs docker rmi
-	docker ps -q -f status=exited | xargs docker rm
+lint:
+	./run_linter.sh
+
+lint-modules:
+	./run_linter.sh modules
+
+test: clean
+	./run_tests.sh $(MODULE)
+
+build:
+	docker build -t routersploit:latest -f Dockerfile .
+
+update:
+	./run_docker.sh git pull
+
+run:
+	./run_docker.sh
 
 help:
-	@echo "    run"
-	@echo "        Run Routersploit in docker container"
+	@echo "    clean"
+	@echo "        Remove python artifacts."
 	@echo "    lint"
 	@echo "        Check style with flake8."
 	@echo "    lint-modules"
 	@echo "        Check modules style with flake8."
 	@echo "    test"
 	@echo "        Run test suite"
-	@echo "    clean"
-	@echo "        Remove python artifacts."
-	@echo "    prune"
-	@echo "        Remove dangling docker images and exited containers."

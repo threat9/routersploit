@@ -52,7 +52,7 @@ class Exploit(exploits.Exploit):
             print_status("Target might be vulnerable - it is hard to verify")
             print_status("Invoking command loop...")
             print_status("It is blind command injection, response is not available")
-            shell(self, architecture="mipsle")
+            shell(self, architecture="mipsel")
         else:
             print_error("Exploit failed - target seems to be not vulnerable")
 

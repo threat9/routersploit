@@ -48,7 +48,7 @@ class Exploit(exploits.Exploit):
             print_success("Target is probably vulnerable")
             print_status("Invoking command loop...")
             print_status("It is blind command injection. Try to start telnet with telnet telnetd -p '4445'")
-            shell(self, architecture="armle")
+            shell(self, architecture="arm")
         else:
             print_error("Target is not vulnerable")
 
