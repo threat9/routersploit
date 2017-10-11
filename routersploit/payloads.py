@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from struct import pack
-import exploits
-from utils import (
+from . import exploits
+from .utils import (
     print_success,
     print_status,
     print_info,

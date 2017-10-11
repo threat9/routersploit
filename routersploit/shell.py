@@ -114,7 +114,7 @@ def shell(exploit, architecture="", method="", **params):
             print_info(exploit.execute(cmd))
 
 
-class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class HttpRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -127,7 +127,7 @@ class HttpRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         return
 
 
-class HttpServer(BaseHTTPServer.HTTPServer):
+class HttpServer(HTTPServer):
     def serve_forever(self, content):
         self.stop = False
         self.content = content
