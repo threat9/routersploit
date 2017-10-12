@@ -5,7 +5,7 @@ from routersploit import exploits, validators
 from routersploit.exceptions import OptionValidationError
 from utils import print_info, print_status, print_success, random_text
 
-ArchitectureHeader = namedtuple("ArchitectureHeader", ["header", "bigendian"])
+
 architectures = namedtuple("ArchitectureType", ["ARMLE", "MIPSBE", "MIPSLE"])
 payload_handlers = namedtuple("PayloadHandlers", ["BIND_TCP", "REVERSE_TCP"])
 
@@ -21,38 +21,29 @@ PayloadHandlers = payload_handlers(
 )
 
 ARCH_ELF_HEADERS = {
-    Architectures.ARMLE: ArchitectureHeader(
-        bigendian=False,
-        header=(
+    Architectures.ARMLE: (
             "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
             "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x80\x00\x00\x34\x00\x00\x00"
             "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
             "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00"
             "\x00\x80\x00\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
             "\x00\x10\x00\x00"
-        ),
     ),
-    Architectures.MIPSBE: ArchitectureHeader(
-        bigendian=True,
-        header=(
+    Architectures.MIPSBE: (
             "\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
             "\x00\x02\x00\x08\x00\x00\x00\x01\x00\x40\x00\x54\x00\x00\x00\x34"
             "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00"
             "\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x40\x00\x00"
             "\x00\x40\x00\x00\xde\xad\xbe\xef\xde\xad\xbe\xef\x00\x00\x00\x07"
             "\x00\x00\x10\x00"
-        )
     ),
-    Architectures.MIPSLE: ArchitectureHeader(
-        bigendian=False,
-        header=(
+    Architectures.MIPSLE: (
             "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
             "\x02\x00\x08\x00\x01\x00\x00\x00\x54\x00\x40\x00\x34\x00\x00\x00"
             "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
             "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x40\x00"
             "\x00\x00\x40\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
             "\x00\x10\x00\x00"
-        )
     ),
 }
 
@@ -103,7 +94,8 @@ class ArchitectureSpecificPayload(BasePayload):
                 "payload architecture. {}".format(Architectures)
             )
 
-        self.header, self.bigendian = ARCH_ELF_HEADERS[self.architecture]
+        self.header = ARCH_ELF_HEADERS[self.architecture]
+        self.bigendian = True if self.architecture.endswith("be") else False
 
     def run(self):
         print_status("Generating payload")
