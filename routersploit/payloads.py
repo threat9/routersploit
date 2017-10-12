@@ -1,87 +1,132 @@
-#!/usr/bin/env python
-
+from collections import namedtuple
 from struct import pack
-import exploits
-from utils import (
-    print_success,
-    print_error,
-    print_status,
-    print_info,
+
+from routersploit import exploits, validators
+from routersploit.exceptions import OptionValidationError
+from utils import print_info, print_status, print_success, random_text
+
+ArchitectureHeader = namedtuple("ArchitectureHeader", ["header", "bigendian"])
+architectures = namedtuple("ArchitectureType", ["ARMLE", "MIPSBE", "MIPSLE"])
+payload_handlers = namedtuple("PayloadHandlers", ["BIND_TCP", "REVERSE_TCP"])
+
+Architectures = architectures(
+    ARMLE="armle",
+    MIPSBE="mipsbe",
+    MIPSLE="mipsle",
+)
+
+PayloadHandlers = payload_handlers(
+    BIND_TCP="bind_tcp",
+    REVERSE_TCP="reverse_tcp",
 )
 
 ARCH_ELF_HEADERS = {
-    "armle": ("\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-              "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x80\x00\x00\x34\x00\x00\x00"
-              "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
-              "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00"
-              "\x00\x80\x00\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
-              "\x00\x10\x00\x00"),
-    "mipsbe": ("\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-               "\x00\x02\x00\x08\x00\x00\x00\x01\x00\x40\x00\x54\x00\x00\x00\x34"
-               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00"
-               "\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x40\x00\x00"
-               "\x00\x40\x00\x00\xde\xad\xbe\xef\xde\xad\xbe\xef\x00\x00\x00\x07"
-               "\x00\x00\x10\x00"),
-    "mipsle": ("\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-               "\x02\x00\x08\x00\x01\x00\x00\x00\x54\x00\x40\x00\x34\x00\x00\x00"
-               "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
-               "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x40\x00"
-               "\x00\x00\x40\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
-               "\x00\x10\x00\x00")
+    Architectures.ARMLE: ArchitectureHeader(
+        bigendian=False,
+        header=(
+            "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x80\x00\x00\x34\x00\x00\x00"
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
+            "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00"
+            "\x00\x80\x00\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
+            "\x00\x10\x00\x00"
+        ),
+    ),
+    Architectures.MIPSBE: ArchitectureHeader(
+        bigendian=True,
+        header=(
+            "\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            "\x00\x02\x00\x08\x00\x00\x00\x01\x00\x40\x00\x54\x00\x00\x00\x34"
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00"
+            "\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x40\x00\x00"
+            "\x00\x40\x00\x00\xde\xad\xbe\xef\xde\xad\xbe\xef\x00\x00\x00\x07"
+            "\x00\x00\x10\x00"
+        )
+    ),
+    Architectures.MIPSLE: ArchitectureHeader(
+        bigendian=False,
+        header=(
+            "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            "\x02\x00\x08\x00\x01\x00\x00\x00\x54\x00\x40\x00\x34\x00\x00\x00"
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x20\x00\x01\x00\x00\x00"
+            "\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x40\x00"
+            "\x00\x00\x40\x00\xef\xbe\xad\xde\xef\xbe\xad\xde\x07\x00\x00\x00"
+            "\x00\x10\x00\x00"
+        )
+    ),
 }
 
 
-class Payload(exploits.Exploit):
-    def __init__(self):
-        if self.architecture == "generic":
-            self.bigendian = None
-            self.header = None
-        else:
-            if self.architecture == "armle":
-                self.bigendian = False
-                self.header = ARCH_ELF_HEADERS['armle']
-            elif self.architecture == "mipsbe":
-                self.bigendian = True
-                self.header = ARCH_ELF_HEADERS['mipsbe']
-            elif self.architecture == "mipsle":
-                self.bigendian = False
-                self.header = ARCH_ELF_HEADERS['mipsle']
+class ReverseTCPPayloadMixin(object):
+    handler = PayloadHandlers.REVERSE_TCP
+    lhost = exploits.Option('', 'Connect-back IP address',
+                            validators=validators.ipv4)
+    lport = exploits.Option(5555, 'Connect-back TCP Port',
+                            validators=validators.integer)
 
-    def validate_params(self):
-        for option in self.exploit_attributes.keys():
-            if not getattr(self, option):
-                print_error("Invalid value for {}".format(option))
-                return None
-        return True
-        
+
+class BindTCPPayloadMixin(object):
+    handler = PayloadHandlers.BIND_TCP
+    rport = exploits.Option(5555, 'Bind Port',
+                            validators=validators.integer)
+
+
+class BasePayload(exploits.BaseExploit):
+    handler = None
+
+    def __init__(self):
+        if self.handler not in PayloadHandlers:
+            raise OptionValidationError(  # TODO better copy not use word 'set'
+                "Please set valid payload handler. {}".format(PayloadHandlers)
+            )
+
+    def generate(self):
+        raise NotImplementedError("Please implement 'generate()' method")
+
     def run(self):
-        if not self.validate_params():
-            return
-        
+        raise NotImplementedError()
+
+
+class ArchitectureSpecificPayload(BasePayload):
+    architecture = None
+
+    output = exploits.Option('python', 'Output type: elf/c/python')
+    filepath = exploits.Option(
+        "/tmp/{}".format(random_text(8)), 'Output file to write'
+    )
+
+    def __init__(self):
+        super(ArchitectureSpecificPayload, self).__init__()
+        if self.architecture not in Architectures:
+            raise OptionValidationError(  # TODO better copy not use word 'set'
+                "Please set valid "
+                "payload architecture. {}".format(Architectures)
+            )
+
+        self.header, self.bigendian = ARCH_ELF_HEADERS[self.architecture]
+
+    def run(self):
         print_status("Generating payload")
         data = self.generate()
 
-        if self.architecture == "generic":
-            print_info(data)
-
+        if self.output == "elf":
+            with open(self.filepath, 'w+') as f:
+                print_status("Building ELF payload")
+                content = self.generate_elf(data)
+                print_success("Saving file {}".format(self.filepath))
+                f.write(content)
+        elif self.output == "c":
+            print_success("Bulding payload for C")
+            content = self.generate_c(data)
+            print_info(content)
+        elif self.output == "python":
+            print_success("Building payload for python")
+            content = self.generate_python(data)
+            print_info(content)
         else:
-            if self.output == "elf":
-                with open(self.filepath, 'w+') as f:
-                    print_status("Building ELF payload")
-                    content = self.generate_elf(data)
-
-                    print_success("Saving file {}".format(self.filepath))
-                    f.write(content)
-
-            elif self.output == "c":
-                print_success("Bulding payload for C")
-                content = self.generate_c(data)
-                print_info(content)
-
-            elif self.output == "python":
-                print_success("Building payload for python")
-                content = self.generate_python(data)
-                print_info(content)
+            raise OptionValidationError(
+                "No such option as {}".format(self.output)
+            )
 
     def generate_elf(self, data):
         elf = self.header + data
@@ -96,7 +141,8 @@ class Payload(exploits.Exploit):
         content = elf[:0x44] + p_filesz + p_memsz + elf[0x4c:]
         return content
 
-    def generate_c(self, data):
+    @staticmethod
+    def generate_c(data):
         res = "unsigned char sh[] = {\n    \""
         for idx, x in enumerate(data):
             if idx % 15 == 0 and idx != 0:
@@ -105,7 +151,8 @@ class Payload(exploits.Exploit):
         res += "\"\n};"
         return res
 
-    def generate_python(self, data):
+    @staticmethod
+    def generate_python(data):
         res = "payload = (\n    \""
         for idx, x in enumerate(data):
             if idx % 15 == 0 and idx != 0:
@@ -113,3 +160,11 @@ class Payload(exploits.Exploit):
             res += "\\x%02x" % ord(x)
         res += "\"\n)"
         return res
+
+
+class GenericPayload(BasePayload):
+    def run(self):
+        print_status("Generating payload")
+        print_info(
+            self.generate()
+        )

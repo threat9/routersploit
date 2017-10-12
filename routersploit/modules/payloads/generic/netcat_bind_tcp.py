@@ -1,11 +1,8 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators
-)
+from routersploit import exploits
+from routersploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 
-class Exploit(payloads.Payload):
+class Exploit(GenericPayload, BindTCPPayloadMixin):
     __info__ = {
         'name': 'Netcat Bind TCP',
         'authors': [
@@ -17,10 +14,6 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "generic"
-    handler = "bind_tcp"
-
-    rport = exploits.Option(5555, 'Bind Port', validators=validators.integer)
     netcat_binary = exploits.Option('/bin/nc', 'Netcat binary')
     shell_binary = exploits.Option('/bin/sh', 'Shell')
 

