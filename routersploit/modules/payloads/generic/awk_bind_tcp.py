@@ -2,7 +2,7 @@ from routersploit import exploits
 from routersploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 
-class Exploit(GenericPayload, BindTCPPayloadMixin):
+class Exploit(BindTCPPayloadMixin, GenericPayload):
     __info__ = {
         'name': 'Awk Bind TCP',
         'authors': [

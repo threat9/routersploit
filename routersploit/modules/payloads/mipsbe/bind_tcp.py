@@ -6,7 +6,7 @@ from routersploit.payloads import (
 )
 
 
-class Exploit(ArchitectureSpecificPayload, BindTCPPayloadMixin):
+class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         'name': 'MIPSBE Bind TCP',
         'authors': [

@@ -2,7 +2,7 @@ from routersploit import exploits
 from routersploit.payloads import GenericPayload, ReverseTCPPayloadMixin
 
 
-class Exploit(GenericPayload, ReverseTCPPayloadMixin):
+class Exploit(ReverseTCPPayloadMixin, GenericPayload):
     __info__ = {
         'name': 'Netcat Reverse TCP',
         'authors': [
