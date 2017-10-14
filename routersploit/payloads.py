@@ -49,6 +49,8 @@ ARCH_ELF_HEADERS = {
 
 
 class ReverseTCPPayloadMixin(object):
+    __metaclass__ = exploits.ExploitOptionsAggregator
+
     handler = PayloadHandlers.REVERSE_TCP
     lhost = exploits.Option('', 'Connect-back IP address',
                             validators=validators.ipv4)
@@ -57,6 +59,8 @@ class ReverseTCPPayloadMixin(object):
 
 
 class BindTCPPayloadMixin(object):
+    __metaclass__ = exploits.ExploitOptionsAggregator
+
     handler = PayloadHandlers.BIND_TCP
     rport = exploits.Option(5555, 'Bind Port',
                             validators=validators.integer)
