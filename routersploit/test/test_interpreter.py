@@ -598,6 +598,11 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
         with self.assertRaises(EOFError):
             self.interpreter.command_exit()
 
+    def test_parse_line(self):
+        cmd, args = self.interpreter.parse_line("show options")
+        self.assertEqual(cmd, "show")
+        self.assertEqual(args, "options")
+
     @mock.patch('os.system')
     def test_command_exec(self, mock_system):
         self.interpreter.command_exec("foo -bar")
