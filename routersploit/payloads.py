@@ -71,8 +71,10 @@ class BasePayload(exploits.BaseExploit):
 
     def __init__(self):
         if self.handler not in PayloadHandlers:
-            raise OptionValidationError(  # TODO better copy not use word 'set'
-                "Please set valid payload handler. {}".format(PayloadHandlers)
+            raise OptionValidationError(
+                "Please use one of valid payload handlers: {}".format(
+                    PayloadHandlers._fields
+                )
             )
 
     def generate(self):
@@ -93,9 +95,10 @@ class ArchitectureSpecificPayload(BasePayload):
     def __init__(self):
         super(ArchitectureSpecificPayload, self).__init__()
         if self.architecture not in Architectures:
-            raise OptionValidationError(  # TODO better copy not use word 'set'
-                "Please set valid "
-                "payload architecture. {}".format(Architectures)
+            raise OptionValidationError(
+                "Please use one of valid payload architectures: {}".format(
+                    Architectures._fields
+                )
             )
 
         self.header = ARCH_ELF_HEADERS[self.architecture]
