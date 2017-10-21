@@ -152,7 +152,7 @@ class HttpServer(BaseHTTPServer.HTTPServer):
 
 
 class Communication(object):
-    def __init__(self, exploit, payload, options, location, wget_options={}, echo_options={}, exec_binary=None):
+    def __init__(self, exploit, payload, options, location="", wget_options={}, echo_options={}, exec_binary=None):
         self.exploit = exploit
         self.payload = payload
         self.options = {option[0]: option[1] for option in options}
