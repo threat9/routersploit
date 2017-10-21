@@ -100,9 +100,6 @@ def shell(exploit, architecture="", method="", payloads=None, **params):
                             print_success("{'" + c[1] + "': '" + c[2] + "'}")
 
             elif cmd == "run":
-                if not payload.validate_params():
-                    continue
-
                 data = payload.generate()
 
                 if method == "wget":
