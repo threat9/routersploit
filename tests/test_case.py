@@ -1,8 +1,7 @@
-import unittest
 import logging
+import unittest
 
 from routersploit.utils import NonStringIterable
-
 
 logging.getLogger().addHandler(logging.NullHandler())
 
@@ -17,7 +16,8 @@ class RoutersploitTestCase(unittest.TestCase):
         self.assertIn(
             decorator_name,
             decorator_list,
-            msg="'{}' method should be decorated with 'module_required'".format(function.__name__)
+            msg="'{}' method should be decorated "
+                "with 'module_required'".format(function.__name__)
         )
 
     def assertIsSubset(self, subset, container):

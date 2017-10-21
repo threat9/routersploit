@@ -1,18 +1,20 @@
-import unittest
 import os
+import unittest
 
 import pexpect
 
-from routersploit.test import RoutersploitTestCase
+from tests.test_case import RoutersploitTestCase
 
 
 class RoutersploitCompleterTest(RoutersploitTestCase):
-
     def __init__(self, methodName='runTest'):
         super(RoutersploitCompleterTest, self).__init__(methodName)
-        self.cli_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'rsf.py'))
+        self.cli_path = os.path.abspath(
+            os.path.join(__file__, os.pardir, os.pardir, 'rsf.py')
+        )
         self.raw_prompt = "\033[4mrsf\033[0m > "
-        self.module_prompt = lambda x: "\033[4mrsf\033[0m (\033[91m{}\033[0m) > ".format(x)
+        self.module_prompt = lambda \
+            x: "\033[4mrsf\033[0m (\033[91m{}\033[0m) > ".format(x)
 
     def setUp(self):
         self.rsf = pexpect.spawn('python {}'.format(self.cli_path))
@@ -32,7 +34,9 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
 
     def test_raw_commands_no_module(self):
         self.rsf.send("\t\t")
-        self.assertPrompt('exec     exit     help     search   show     use      \r\n', self.raw_prompt)
+        self.assertPrompt(
+            'exec     exit     help     search   show     use      \r\n',
+            self.raw_prompt)
 
     def test_complete_use_raw(self):
         self.rsf.send("u\t\t")
@@ -249,7 +253,8 @@ class RoutersploitCompleterTest(RoutersploitTestCase):
         self.set_module()
         self.rsf.send("show \t\t")
         self.assertPrompt(
-            'all       creds     devices   exploits  info      options   scanners\r\n',
+            'all       creds     devices   exploits  '
+            'info      options   scanners\r\n',
             self.module_prompt('FTP Bruteforce')
         )
 
