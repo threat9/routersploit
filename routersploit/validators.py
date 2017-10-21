@@ -87,13 +87,23 @@ def integer(number):
 
 def convert_ip(address):
     """ Convert IP to bytes"""
-    res = ""
-    for i in address.split("."):
-        res += chr(int(i))
-    return res
+    try:
+        res = ""
+        for i in address.split("."):
+            res += chr(int(i))
+        return res
+    except:
+        raise OptionValidationError(
+            "Invalid option. '{}' is not a valid IP address".format(address)
+        )
 
 
 def convert_port(port):
     """ Convert Port to bytes"""
-    res = "%.4x" % int(port)
-    return res.decode('hex')
+    try:
+        res = "%.4x" % int(port)
+        return res.decode('hex')
+    except:
+        raise OptionValidationError(
+            "Invalid option. '{}' is not a valid port number".format(port)
+        )

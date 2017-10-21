@@ -3,7 +3,7 @@ from struct import pack
 
 from routersploit import exploits, validators
 from routersploit.exceptions import OptionValidationError
-from utils import print_info, print_status, print_success, random_text
+from utils import print_info, print_status, print_success, print_error, random_text
 
 
 architectures = namedtuple("ArchitectureType", ["ARMLE", "MIPSBE", "MIPSLE"])
@@ -103,7 +103,11 @@ class ArchitectureSpecificPayload(BasePayload):
 
     def run(self):
         print_status("Generating payload")
-        data = self.generate()
+        try:
+            data = self.generate()
+        except OptionValidationError as e:
+            print_error(e)
+            return
 
         if self.output == "elf":
             with open(self.filepath, 'w+') as f:
