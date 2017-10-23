@@ -322,7 +322,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         except KeyboardInterrupt:
             utils.print_info()
             utils.print_error("Operation cancelled by user")
-        except:
+        except Exception:
             utils.print_error(traceback.format_exc(sys.exc_info()))
 
     def command_exploit(self, *args, **kwargs):
