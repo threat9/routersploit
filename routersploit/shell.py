@@ -92,7 +92,7 @@ def shell(exploit, architecture="", method="", payloads=None, **params):
                         if option[0] == c[1]:
                             try:
                                 setattr(payload, c[1], c[2])
-                            except:
+                            except Exception:
                                 print_error("Invalid value for {}".format(c[1]))
                                 break
 

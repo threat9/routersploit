@@ -56,7 +56,7 @@ class Exploit(exploits.Exploit):
             tn = telnetlib.Telnet(self.target, self.port, timeout=10)
             tn.expect(["login: ", "Login: "], 5)
             tn.close()
-        except:
+        except Exception:
             print_error("Connection error {}:{}".format(self.target, self.port))
             return
 
