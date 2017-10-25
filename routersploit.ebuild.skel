@@ -3,79 +3,105 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 )
-# PYTHON_COMPAT=( python{3_3,3_4,3_5} )  ## not yet.
-inherit python-single-r1 distutils-r1
+PYTHON_COMPAT=( python2_7 ) ## 3.x seems in the works. 
 
+inherit python-single-r1 distutils-r1
+## wise to build the old basterd, 9999 may work or other days break 
+## lots of pulls /adds... 
+
+if [[ ${PV} == "9999" ]] ; then
+	MY_P=${P}
+	EGIT_REPO_URI="git://github.com/reverse-shell/routersploit.git"
+	inherit git-r3
+else
+	MY_P=${PN}-${PV/_/-}
+	SRC_URI="https://github.com/reverse-shell/routersploit/archive/v${PV}.tar.gz"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~arm-linux ~x86-linux"
+fi
+ 
 DESCRIPTION="An open-source exploitation framework dedicated to embedded devices."
+Ex_DESCRIPTION=" makes swiss cheaze full of 12 gauge buckshot of week home/Small biz routers Like Linksys, & other popular bands that are poorly maintained
+anod not patched including poor firmware maininance of even popular firmware replacemnt kits. tomato  dd-wrt
+can reset admin passwords to rotuersploit /etc.. whatever  pentester desires.. then get down to more recon on target"
 HOMEPAGE="https://github.com/reverse-shell/routersploit/wiki"
-SRC_URI="https://github.com/reverse-shell/routersploit/archive/v${PV}.tar.gz"
-PYTHON_COMPAT=( python2_7 )
-[[ ${PV} == *9999 ]] && SCM="git-r3"
-# Please ensure note this is a live ebuild @9999  it will fetch the latest 
-# may have bugs use a stable release when posible... 
-EGIT_REPO_URI="https://github.com/reverse-shell/routersploit.git"
-LICENSE="BSD"
+LICENSE="BSD
+## else  deb_pkg in kahli repos..
 SLOT="0"
 KEYWORDS=""
-## skip ARCH keywords should run on any python2.7.x platform  ~x86 ~amd64 ~arm ~arm64 
 
-IUSE="-test -doc"
+IUSE="-doc -desktopicons"  # icons nice but testable.. 
 DEPEND="~dev-python/beautifulsoup 
 			dev-python/requests 
 			dev-python/pysnmp 
-			dev-python/pexpect "
+			dev-python/pexpect 
+			dev-python/paramiko
+			dev-python/future"
 RDEPEND="${DEPEND}"
+
 #TESTDEPEND="virtual/python-mock   
 			dev-python/flake8  
 			app-emulation/docker"
 
 S=${WORKDIR}/routersploit-${PV}/routersploit
 
-# tests_install() { ## todo... 
-if ! use test; then
-cd S=${WORKDIR}/routersploit-${PV}/routersploit
-# emake makefile is portage sanbox.
-emake 
+ewarn " live version may at time break or not recevies pulls frequently may work may bork, the stale version tends too." 
+
+##test_prepair() {  #use docker to build and run prety bullshitsness..
+if use test ; then TESTDEPEND emake 
+## oh prety .... some devs love prety wizbang q/a .. ok documental bs moment over.. 
+## But this IS (-sparta) +PENTOO !!!!! we q/a the shit for realz.. in the field of battle.. 
+#if it fu'won't  work in real pentesting... to the /dev/null with ye.. 
 }
 
 src_prepare() {
-### clean up
-	rm  {Makefile,*.sh,Dockerfile,Makefile}
-	rm -r {/.git,/.travis)
+### clean up  makefile and friends apear to be nothing but docker linting Q/A testing  & invoking pretty q/a SUITE test wizbangs.
+## taking out the trash.... @ /dev/null
+	rm -f {Makefile,*.sh,Dockerfile,.travis.yml, .git* ,req*.txt}
+	rm -r {./.git*,}  ## drop git dir trash.. so as to not cp into install dirs. 
 }
+
 src_install() {
-	dodir /opt/${PN}
+    # Tasks 
+	# mkdir -m 0755 -p /opt/routersploit
+	# chuck/cp  in /opt/routersploit/rsy.py & /opt/routersploit/routersploit submodules...
+	# chmod +X +R fixperms recursively..
+	## add docs if user give 2 rats to read them , have a nice day... 
+	dodir -m 0755 -p  /opt/${PN}
 	doins -r "${S}"/opt/${PN} 
-	dobin /opt/${PN}/rsf.py } || die "Copy rsf.py failed to install"
+	dobin /opt/${PN}/rsf.py } || die "Copy rsf.py & or modules failed to install"
 	dosym /opt/${PN}/rsf.py /usr/bin/rsf
 	chown -R root:root "/opt/${PN}"
+	fixpersm -R +x +r {*.py,*.pyc} /opt/${PN}"
 	
 		if use doc; then
-		docinto /usr/share/doc/${PN}/
+		einstalldocs /usr/share/doc/${PN}/
 		dodoc -r /{README.md,LICENSE}
-
 		fi
 	fi
 	}
 	
+##  Necrose99 	https://github.com/necrose99/routersploit.git  /artwork desktop and pics for icons n crap.. 
+## for Pentoo this is a nice to have , but not key .. can be enabled latter on. ie exploits/other menu @ebuild /files.... 
+## need to fix desktop so it works in pentoo via xterm & starts rsf...  70/30 in testing in my pentoo vit'l'box-vm ... 
+## for now this can be a use and 
+## push to pentoo  to unfuggly-fi  anything my dislexic hide .. missed. 
+## collapse in src_install when stablelized. ..
+
 desktop_install() {	
-## If Pull request goes else ${FILESDIR}/
+
+if use desktopicons; then
 	 dodir /usr/share/icons/${PN}/   
-     cp  /usr/src/routersploit/art/routersploit.png  /usr/share/icons/${PN}/ 
+     cp  ${FILES}/{routersploit.png,routersploit.svg}  /usr/share/icons/${PN}/
      dodir  /usr/share/applications/${PN}/
-     cp /usr/src/routersploit/art/*.desktop  /usr/share/applications/${PN}/ 
-
-
-
-	#add desktop etc. 
-	insinto 
-	newins ""
-
-	
+     cp ${FILES}*.desktop  /usr/share/applications/${PN}/  
+	 fixperms +r +x /usr/share/applications/${PN}/*.desktop 
+		fi
+	fi
 }
 
 pkg_postinst(){
-	einfo "routersploit-${PV} has installed enjoy..  "
+	elog "routersploit-${PV} has installed enjoy.. "
 	einfo "more info @ WIKI https://github.com/reverse-shell/routersploit/wiki"
+	einfo "video demo also on wiki made with asciinema showing some of the basic features."
+	einfo "for more than your Home or Small biz routers I'd see the wiki, CLI takes some getting aqaunted with"
 }
