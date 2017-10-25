@@ -283,7 +283,7 @@ class Communication(object):
                 if isinstance(item_exec_binary, str):
                     try:
                         commands.append(item_exec_binary.format(path))
-                    except KeyError,ValueError:
+                    except (KeyError, ValueError):
                         commands.append(item_exec_binary)
                 elif callable(item_exec_binary):
                     commands.append(item_exec_binary(path))
@@ -292,7 +292,7 @@ class Communication(object):
         elif isinstance(self.exec_binary, str):
             try:
                 commands.append(self.exec_binary.format(path))
-            except KeyError,ValueError:
+            except (KeyError, ValueError):
                 commands.append(self.exec_binary)
 
         # default way of executing payload
