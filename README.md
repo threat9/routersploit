@@ -44,6 +44,14 @@ It consists of various modules that aids penetration testing operations:
 	git clone https://github.com/reverse-shell/routersploit
 	pip install -r requirements.txt
 	./rsf.py
+	
+## Installation on OpenSUSE Tumbleweed
+
+	sudo zypper install python-devel python2-pip ncurses-devel git-core
+	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
+	sudo pip install -r requirements.txt
+	./rsf.py
 
 ## Installation on OSX
 
