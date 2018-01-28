@@ -7,6 +7,7 @@ ADMINISTRATOR:ADMINISTRATOR
 ADMN:admn
 ADVMAIL:HP
 ADVMAIL:HPOFFICE
+admin:abc123
 admin:cciadmin
 admin:zhone
 Admin:admin
@@ -348,6 +349,7 @@ root:3ep5w2u
 root:Cisco
 root:Mau'dib
 root:ROOT500
+root:abc132
 root:admin
 root:admin_1
 root:alpine
