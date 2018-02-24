@@ -6,7 +6,10 @@ import traceback
 from collections import Counter
 
 from routersploit import utils
-from routersploit.exceptions import RoutersploitException
+from routersploit.exceptions import (
+    RoutersploitException,
+    OptionValidationError,
+)
 from routersploit.exploits import Exploit, GLOBAL_OPTS
 from routersploit.payloads import BasePayload
 from routersploit.printer import PrinterThread, printer_queue
@@ -328,12 +331,15 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @utils.module_required
     def command_run(self, *args, **kwargs):
-        utils.print_status("Running module...")
         try:
+            self.current_module.validate_setup()
+            utils.print_status("Running module...")
             self.current_module.run()
         except KeyboardInterrupt:
             utils.print_info()
             utils.print_error("Operation cancelled by user")
+        except OptionValidationError as err:
+            utils.print_error(err)
         except Exception:
             utils.print_error(traceback.format_exc(sys.exc_info()))
 
@@ -477,6 +483,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     @utils.module_required
     def command_check(self, *args, **kwargs):
         try:
+            self.current_module.validate_setup()
             result = self.current_module.check()
         except Exception as error:
             utils.print_error(error)
