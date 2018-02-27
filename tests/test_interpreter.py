@@ -154,59 +154,80 @@ class RoutersploitInterpreterTest(RoutersploitTestCase):
 
     @mock.patch('routersploit.utils.print_status')
     def test_command_run(self, mock_print_status):
-        with mock.patch.object(self.interpreter.current_module,
-                               'run') as mock_run:
-            self.interpreter.command_run()
-            mock_run.assert_called_once_with()
-            mock_print_status.assert_called_once_with('Running module...')
+        mock_run = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.run = mock_run
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+
+        self.interpreter.command_run()
+        mock_validate_setup.assert_called_once()
+        mock_run.assert_called_once_with()
+        mock_print_status.assert_called_once_with('Running module...')
 
     @mock.patch('routersploit.utils.print_success')
     def test_command_check_target_vulnerable(self, mock_print_success):
-        with mock.patch.object(self.interpreter.current_module,
-                               'check') as mock_check:
-            mock_check.return_value = True
-            self.interpreter.command_check()
-            mock_check.assert_called_once_with()
-            mock_print_success.assert_called_once_with('Target is vulnerable')
+        mock_check = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.check = mock_check
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+        mock_check.return_value = True
+
+        self.interpreter.command_check()
+        mock_validate_setup.assert_called_once()
+        mock_check.assert_called_once_with()
+        mock_print_success.assert_called_once_with('Target is vulnerable')
 
     @mock.patch('routersploit.utils.print_error')
     def test_command_check_target_not_vulnerable(self, print_error):
-        with mock.patch.object(self.interpreter.current_module,
-                               'check') as mock_check:
-            mock_check.return_value = False
-            self.interpreter.command_check()
-            mock_check.assert_called_once_with()
-            print_error.assert_called_once_with('Target is not vulnerable')
+        mock_check = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.check = mock_check
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+        mock_check.return_value = False
+
+        self.interpreter.command_check()
+        mock_validate_setup.assert_called_once()
+        mock_check.assert_called_once_with()
+        print_error.assert_called_once_with('Target is not vulnerable')
 
     @mock.patch('routersploit.utils.print_status')
     def test_command_check_target_could_not_be_verified_1(self, print_status):
-        with mock.patch.object(self.interpreter.current_module,
-                               'check') as mock_check:
-            mock_check.return_value = "something"
-            self.interpreter.command_check()
-            mock_check.assert_called_once_with()
-            print_status.assert_called_once_with(
-                'Target could not be verified')
+        mock_check = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.check = mock_check
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+        mock_check.return_value = "something"
+
+        self.interpreter.command_check()
+        mock_validate_setup.assert_called_once()
+        mock_check.assert_called_once_with()
+        print_status.assert_called_once_with('Target could not be verified')
 
     @mock.patch('routersploit.utils.print_status')
     def test_command_check_target_could_not_be_verified_2(self, print_status):
-        with mock.patch.object(self.interpreter.current_module,
-                               'check') as mock_check:
-            mock_check.return_value = None
-            self.interpreter.command_check()
-            mock_check.assert_called_once_with()
-            print_status.assert_called_once_with(
-                'Target could not be verified')
+        mock_check = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.check = mock_check
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+        mock_check.return_value = None
+
+        self.interpreter.command_check()
+        mock_validate_setup.assert_called_once()
+        mock_check.assert_called_once_with()
+        print_status.assert_called_once_with('Target could not be verified')
 
     @mock.patch('routersploit.utils.print_error')
     def test_command_check_not_supported_by_module(self, print_error):
-        with mock.patch.object(self.interpreter.current_module,
-                               'check') as mock_check:
-            exception = NotImplementedError("Not available")
-            mock_check.side_effect = exception
-            self.interpreter.command_check()
-            mock_check.assert_called_once_with()
-            print_error.assert_called_once_with(exception)
+        mock_check = mock.Mock()
+        mock_validate_setup = mock.Mock()
+        self.interpreter.current_module.check = mock_check
+        self.interpreter.current_module.validate_setup = mock_validate_setup
+        exception = NotImplementedError("Not available")
+        mock_check.side_effect = exception
+
+        self.interpreter.command_check()
+        mock_check.assert_called_once_with()
+        print_error.assert_called_once_with(exception)
 
     @mock.patch('sys.exc_info')
     @mock.patch('traceback.format_exc')
