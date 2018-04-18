@@ -1,7 +1,7 @@
 import unittest
 
 from routersploit.utils import iter_modules
-from routersploit.test import RoutersploitTestCase
+from tests.test_case import RoutersploitTestCase
 
 
 class ModuleTest(RoutersploitTestCase):
@@ -17,7 +17,8 @@ class ModuleTest(RoutersploitTestCase):
         self.module = module
 
     def __str__(self):
-        return " ".join([super(ModuleTest, self).__str__(), self.module.__module__])
+        return " ".join(
+            [super(ModuleTest, self).__str__(), self.module.__module__])
 
     @property
     def module_metadata(self):

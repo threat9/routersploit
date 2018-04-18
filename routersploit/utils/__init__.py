@@ -311,6 +311,7 @@ def print_table(headers, *args, **kwargs):
     """
     extra_fill = kwargs.get("extra_fill", 5)
     header_separator = kwargs.get("header_separator", '-')
+    max_column_length = kwargs.get("max_column_length", 60)
 
     if not all(map(lambda x: len(x) == len(headers), args)):
         print_error("Headers and table rows tuples should be the same length.")
@@ -329,7 +330,10 @@ def print_table(headers, *args, **kwargs):
         column = [custom_len(arg[idx]) for arg in args]
         column.append(len(header))
 
-        current_line_fill = max(column) + extra_fill
+        if max(column) > max_column_length:
+            current_line_fill = max_column_length + extra_fill
+        else:
+            current_line_fill = max(column) + extra_fill
         fill.append(current_line_fill)
         headers_line = "".join((headers_line, "{header:<{fill}}".format(header=header, fill=current_line_fill)))
         headers_separator_line = "".join((
@@ -340,15 +344,22 @@ def print_table(headers, *args, **kwargs):
     print_info()
     print_info(headers_line)
     print_info(headers_separator_line)
-    for arg in args:
-        content_line = '   '
-        for idx, element in enumerate(arg):
-            content_line = "".join((
-                content_line,
-                '{:<{}}'.format(element, fill[idx])
-            ))
-        print_info(content_line)
 
+    for arg in args:
+        content_line_data = {}
+        for idx, element in enumerate(arg):
+            content_line_data[idx] = str(element)
+
+        while not all(map(lambda x: len(content_line_data[x]) == 0, content_line_data.keys())):
+            content_line = '   '
+            for idx in content_line_data.keys():
+                element = content_line_data[idx][:max_column_length]
+                content_line = "".join((
+                    content_line,
+                    '{:<{}}'.format(element, fill[idx])
+                ))
+                content_line_data[idx] = content_line_data[idx][max_column_length:]
+            print_info(content_line)
     print_info()
 
 

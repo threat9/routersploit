@@ -10,5 +10,4 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     source ~/.venv/bin/activate
 fi
 
-source run_tests.sh
-source run_linter.sh
+make lint tests

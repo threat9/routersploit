@@ -1,13 +1,10 @@
 import unittest
 
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import mock
 
-from routersploit.test import RoutersploitTestCase
 from routersploit import validators
 from routersploit.exceptions import OptionValidationError
+from tests.test_case import RoutersploitTestCase
 
 
 class ValidatorsTest(RoutersploitTestCase):
@@ -15,10 +12,12 @@ class ValidatorsTest(RoutersploitTestCase):
         self.assertEqual(validators.url("127.0.0.1"), "http://127.0.0.1")
 
     def test_url_already_with_http_prefix(self):
-        self.assertEqual(validators.url("http://127.0.0.1"), "http://127.0.0.1")
+        self.assertEqual(validators.url("http://127.0.0.1"),
+                         "http://127.0.0.1")
 
     def test_url_already_with_https_prefix(self):
-        self.assertEqual(validators.url("https://127.0.0.1"), "https://127.0.0.1")
+        self.assertEqual(validators.url("https://127.0.0.1"),
+                         "https://127.0.0.1")
 
     def test_ipv4_valid_address(self):
         address = "127.0.0.1"
@@ -139,7 +138,8 @@ class ValidatorsTest(RoutersploitTestCase):
     def test_choice_1(self):
         valid_values = ["test1", "test2"]
         selected_value = "test1"
-        self.assertEqual(validators.choice(valid_values)(selected_value), selected_value)
+        self.assertEqual(validators.choice(valid_values)(selected_value),
+                         selected_value)
 
     def test_choice_2(self):
         valid_values = ["test1", "test2"]

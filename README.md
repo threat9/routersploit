@@ -18,7 +18,6 @@ It consists of various modules that aids penetration testing operations:
 
 ## Requirements
 
-* gnureadline (OSX only)
 * requests
 * paramiko
 * beautifulsoup4
@@ -42,7 +41,16 @@ It consists of various modules that aids penetration testing operations:
 
 	sudo yum install python-devel python2-pip ncurses-devel git
 	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
 	pip install -r requirements.txt
+	./rsf.py
+	
+## Installation on OpenSUSE Tumbleweed
+
+	sudo zypper install python-devel python2-pip ncurses-devel git-core
+	git clone https://github.com/reverse-shell/routersploit
+	cd routersploit
+	sudo pip install -r requirements.txt
 	./rsf.py
 
 ## Installation on OSX
@@ -57,8 +65,8 @@ It consists of various modules that aids penetration testing operations:
 
     git clone https://github.com/reverse-shell/routersploit
     cd routersploit
-    docker build -t routersploit:latest -f Dockerfile .
-    ./run_docker.sh
+    docker build -t routersploit .
+    docker run -it --rm routersploit
 
 # Update
 

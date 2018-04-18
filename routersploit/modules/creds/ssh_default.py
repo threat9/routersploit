@@ -58,7 +58,7 @@ class Exploit(exploits.Exploit):
             print_error("Connection error: %s:%s" % (self.target, str(self.port)))
             ssh.close()
             return
-        except:
+        except Exception:
             pass
 
         ssh.close()

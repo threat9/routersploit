@@ -60,7 +60,7 @@ class Exploit(exploits.Exploit):
             print_error("Connection error: %s:%s" % (self.target, str(self.port)))
             ftp.close()
             return
-        except:
+        except Exception:
             pass
         ftp.close()
 
@@ -121,7 +121,7 @@ class Exploit(exploits.Exploit):
 
                     print_success("Target: {}:{} {}: Authentication succeed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
                     self.credentials.append((self.target, self.port, user, password))
-                except:
+                except Exception:
                     print_error("Target: {}:{} {}: Authentication Failed - Username: '{}' Password: '{}'".format(self.target, self.port, name, user, password), verbose=module_verbosity)
 
                 ftp.close()

