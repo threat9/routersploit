@@ -25,14 +25,14 @@ It consists of various modules that aids penetration testing operations:
 
 ## Installation on Kali
 
-	git clone https://github.com/reverse-shell/routersploit
+	git clone https://github.com/threat9/routersploit
 	cd routersploit
 	./rsf.py
 
 ## Installation on Ubuntu 16.04
 
 	sudo apt-get install python-dev python-pip libncurses5-dev git
-	git clone https://github.com/reverse-shell/routersploit
+	git clone https://github.com/threat9/routersploit
 	cd routersploit
 	sudo pip install -r requirements.txt
 	./rsf.py
@@ -40,7 +40,7 @@ It consists of various modules that aids penetration testing operations:
 ## Installation on Centos 7
 
 	sudo yum install python-devel python2-pip ncurses-devel git
-	git clone https://github.com/reverse-shell/routersploit
+	git clone https://github.com/threat9/routersploit
 	cd routersploit
 	pip install -r requirements.txt
 	./rsf.py
@@ -48,14 +48,14 @@ It consists of various modules that aids penetration testing operations:
 ## Installation on OpenSUSE Tumbleweed
 
 	sudo zypper install python-devel python2-pip ncurses-devel git-core
-	git clone https://github.com/reverse-shell/routersploit
+	git clone https://github.com/threat9/routersploit
 	cd routersploit
 	sudo pip install -r requirements.txt
 	./rsf.py
 
 ## Installation on OSX
 
-	git clone https://github.com/reverse-shell/routersploit
+	git clone https://github.com/threat9/routersploit
 	cd routersploit
 	sudo easy_install pip
 	sudo pip install -r requirements.txt
@@ -63,7 +63,7 @@ It consists of various modules that aids penetration testing operations:
 
 ## Running on Docker
 
-    git clone https://github.com/reverse-shell/routersploit
+    git clone https://github.com/threat9/routersploit
     cd routersploit
     docker build -t routersploit .
     docker run -it --rm routersploit
