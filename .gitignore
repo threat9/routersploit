@@ -20,7 +20,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -45,6 +44,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.pytest_cache
 nosetests.xml
 coverage.xml
 *,cover
@@ -71,3 +71,7 @@ venv/
 # macOS
 .DS_Store
 .DS_Store?
+
+# vim
+*.swp
+*.swo
