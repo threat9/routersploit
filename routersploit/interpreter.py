@@ -234,7 +234,7 @@ class RoutersploitInterpreter(BaseInterpreter):
  Codename   : I Knew You Were Trouble
  Version    : 3.0.0
  Homepage   : https://www.threat9.com - @threatnine
- Join Slack : routersploit.slack.com
+ Join Slack : https://www.threat9.com/slack
 
  Join Threat9 Beta Program - https://www.threat9.com
 
