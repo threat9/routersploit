@@ -1,16 +1,12 @@
 from os import path
 from routersploit.core.exploit import *
 from routersploit.core.exploit.exploit import Protocol
-from routersploit.core.http.http_client import HTTPClient
-from routersploit.core.ftp.ftp_client import FTPClient
-from routersploit.core.ssh.ssh_client import SSHClient
-from routersploit.core.telnet.telnet_client import TelnetClient
 
 
 class Exploit(Exploit):
     __info__ = {
         "name": "AutoPwn",
-        "description": "Scanner module for all vulnerabilities.",
+        "description": "Module scans for all vulnerablities and weaknesses.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
@@ -141,7 +137,13 @@ class Exploit(Exploit):
                 module = data.next()
                 exploit = module()
     
-                generic = exploit.__module__.startswith("routersploit.modules.creds.generic") and exploit.__module__.endswith("default")
+                generic = False
+                if exploit.__module__.startswith("routersploit.modules.creds.generic"):
+                    if exploit.__module__.endswith("default"):
+                        generic = True
+                    else:
+                        continue
+
             except StopIteration:
                 break
             else:
