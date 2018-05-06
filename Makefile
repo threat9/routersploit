@@ -11,7 +11,7 @@ run:
 	docker run -it --rm $(RSF_IMAGE)
 
 lint:
-	flake8 --exclude=__init__.py --ignore=$(FLAKE8_IGNORED_RULES) tests $(MODULES)
+	flake8 --exclude=__init__.py --ignore=$(FLAKE8_IGNORED_RULES) $(MODULES)
 
 tests: clean
 ifeq ($(MODULES), routersploit)

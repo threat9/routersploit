@@ -1,83 +1,187 @@
 from os import path
-
-from routersploit import (
-    exploits,
-    print_error,
-    print_success,
-    print_status,
-    print_info,
-    utils,
-    threads,
-)
+from routersploit.core.exploit import *
+from routersploit.core.exploit.exploit import Protocol
+from routersploit.core.http.http_client import HTTPClient
+from routersploit.core.ftp.ftp_client import FTPClient
+from routersploit.core.ssh.ssh_client import SSHClient
+from routersploit.core.telnet.telnet_client import TelnetClient
 
 
-class Exploit(exploits.Exploit):
-    """
-    Scanner implementation for all vulnerabilities.
-    """
+class Exploit(Exploit):
     __info__ = {
-        'name': 'AutoPwn',
-        'description': 'Scanner module for all vulnerabilities.',
-        'authors': [
-            'Marcin Bury <marcin.bury[at]reverse-shell.com>',  # routersploit module
-        ],
-        'references': (
-            '',
+        "name": "AutoPwn",
+        "description": "Scanner module for all vulnerabilities.",
+        "authors": (
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
-        'devices': (
-            'Multi',
+        "devices": (
+            "Multi",
         ),
     }
-    modules = ['routers', 'cameras', 'misc']
 
-    target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
-    port = exploits.Option(80, 'Target port')  # default port
-    threads = exploits.Option(8, "Number of threads")
+    modules = ["generic", "routers", "cameras", "misc"]
+
+    target = OptIP("", "Target IPv4 or IPv6 address")
+
+    http_port = OptPort(80, "Target Web Interface Port")
+    http_ssl = OptBool("false", "HTTPS enabled: true/false")
+
+    ftp_port = OptPort(21, "Target FTP port (default: 21)")
+    ftp_ssl = OptBool("false", "FTPS enabled: true/false")
+
+    ssh_port = OptPort(22, "Target SSH port (default: 22)")
+    telnet_port = OptPort(23, "Target Telnet port (default: 23)")
+
+    threads = OptInteger(8, "Number of threads")
 
     def __init__(self):
         self.vulnerabilities = []
+        self.creds = []
         self.not_verified = []
-        self._exploits_directories = [path.join(utils.EXPLOITS_DIR, module) for module in self.modules]
+        self._exploits_directories = [path.join("routersploit/modules/exploits/", module) for module in self.modules]
+        self._creds_directories = [path.join("routersploit/modules/creds/", module) for module in self.modules]
 
     def run(self):
         self.vulnerabilities = []
+        self.creds = []
         self.not_verified = []
 
-        with threads.ThreadPoolExecutor(self.threads) as executor:
-            for directory in self._exploits_directories:
-                for exploit in utils.iter_modules(directory):
-                    executor.submit(self.target_function, exploit)
+        # vulnerabilities
+        print_info()
+        print_info("\033[94m[*]\033[0m", "Starting vulnerablity check...".format(self.target))
 
+        modules = []
+        for directory in self._exploits_directories:
+            for module in utils.iter_modules(directory):
+                modules.append(module)
+
+        data = LockedIterator(modules)
+        self.run_threads(self.threads, self.exploits_target_function, data)
+
+        # default creds
+        print_info()
+        print_info("\033[94m[*]\033[0m", "{} Starting default credentials check...".format(self.target))
+        modules = []
+        for directory in self._creds_directories:
+            for module in utils.iter_modules(directory):
+                modules.append(module)
+
+        data = LockedIterator(modules)
+        self.run_threads(self.threads, self.creds_target_function, data)
+
+        # results:
         print_info()
         if self.not_verified:
-            print_status("Could not verify exploitability:")
+            print_info("\033[94m[*]\033[0m", "{} Could not verify exploitability:".format(self.target))
             for v in self.not_verified:
-                print_info(" - {}".format(v))
+                print_info(" - {}:{} {} {}".format(*v))
+            print_info()
 
-        print_info()
         if self.vulnerabilities:
-            print_success("Device is vulnerable:")
-            for v in self.vulnerabilities:
-                print_info(" - {}".format(v))
+            print_info("\033[92m[+]\033[0m", "{} Device is vulnerable:".format(self.target))
+            headers = ("Target", "Port", "Service", "Exploit")
+            print_table(headers, *self.vulnerabilities)
             print_info()
         else:
-            print_error("Could not confirm any vulnerablity\n")
+            print_info("\033[91m[-]\033[0m", "{} Could not confirm any vulnerablity\n".format(self.target))
 
-    def check(self):
-        raise NotImplementedError("Check method is not available")
-
-    def target_function(self, exploit):
-        exploit = exploit()
-        exploit.target = self.target
-        exploit.port = self.port
-
-        response = exploit.check()
-
-        if response is True:
-            print_success("{} is vulnerable".format(exploit))
-            self.vulnerabilities.append(exploit)
-        elif response is False:
-            print_error("{} is not vulnerable".format(exploit))
+        if self.creds:
+            print_info("\033[92m[+]\033[0m", "{} Found default credentials:".format(self.target))
+            headers = ("Target", "Port", "Service", "Username", "Password")
+            print_table(headers, *self.creds)
+            print_info()
         else:
-            print_status("{} could not be verified".format(exploit))
-            self.not_verified.append(exploit)
+            print_info("\033[91m[-]\033[0m", "{} Could not find default credentials".format(self.target))
+
+    def exploits_target_function(self, running, data):
+        while running.is_set():
+            try:
+                module = data.next()
+                exploit = module()
+            except StopIteration:
+                break
+            else:
+                exploit.target = self.target
+        
+                if exploit.target_protocol == Protocol.HTTP:
+                    exploit.port = self.http_port
+                    if self.http_ssl:
+                        exploit.ssl = "true"
+                        exploit.target_protocol = Protocol.HTTPS
+        
+                elif exploit.target_protocol is Protocol.FTP:
+                    exploit.port = self.ftp_port
+                    if self.ftp_ssl:
+                        exploit.ssl = "true"
+                        exploit.target_protocol = Protocol.FTPS
+        
+                elif exploit.target_protocol is Protocol.TELNET:
+                    exploit.port = self.telnet_port
+        
+        #        elif exploit.target_protocol not in ["tcp", "udp"]:
+        #            exploit.target_protocol = "custom"
+        
+                response = exploit.check()
+        
+                if response is True:
+                    print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
+                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    self.vulnerabilities.append((exploit.target, exploit.port, exploit.target_protocol, str(exploit)))
+                elif response is False:
+                    print_info("\033[91m[-]\033[0m", "{}:{} {} {} is not vulnerable".format(
+                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                else:
+                    print_info("\033[94m[*]\033[0m", "{}:{} {} {} Could not be verified".format(
+                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    self.not_verified.append((exploit.target, exploit.port, exploit.target_protocol, str(exploit)))
+
+    def creds_target_function(self, running, data):
+        while running.is_set():
+            try:
+                module = data.next()
+                exploit = module()
+    
+                generic = exploit.__module__.startswith("routersploit.modules.creds.generic") and exploit.__module__.endswith("default")
+            except StopIteration:
+                break
+            else:
+                exploit.target = self.target
+                exploit.verbosity = "false"
+                exploit.stop_on_success = "false"
+                exploit.threads = self.threads
+    
+                if exploit.target_protocol == Protocol.HTTP:
+                    exploit.port = self.http_port
+                    if self.http_ssl:
+                        exploit.ssl = "true"
+                        exploit.target_protocol = Protocol.HTTPS
+    
+                elif generic:
+                    if exploit.target_protocol is Protocol.HTTP:
+                        exploit.port = self.http_port
+                        if self.http_ssl:
+                            exploit.ssl = "true"
+                            exploit.target_protocol = Protocol.HTTPS
+                    elif exploit.target_protocol == Protocol.SSH:
+                        exploit.port = self.ssh_port
+                    elif exploit.target_protocol == Protocol.FTP:
+                        exploit.port = self.ftp_port
+                        if self.ftp_ssl:
+                            exploit.ssl = "true"
+                            exploit.target_protocol = Protocol.FTPS
+    
+                    elif exploit.target_protocol == Protocol.TELNET:
+                        exploit.port = self.telnet_port
+                else:
+                    continue
+    
+                response = exploit.check_default()
+                if response:
+                    print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
+                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+    
+                    for creds in response:
+                        self.creds.append(creds)
+                else:
+                    print_info("\033[91m[-]\033[0m", "{}:{} {} {} is not vulnerable".format(
+                               exploit.target, exploit.port, exploit.target_protocol, exploit))

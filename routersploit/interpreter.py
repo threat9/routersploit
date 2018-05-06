@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import atexit
 import itertools
 import os
@@ -5,14 +7,30 @@ import sys
 import traceback
 from collections import Counter
 
-from routersploit import utils
-from routersploit.exceptions import (
-    RoutersploitException,
-    OptionValidationError,
+from future.builtins import input
+
+from routersploit.core.exploit.exceptions import RoutersploitException
+from routersploit.core.exploit.utils import (
+    index_modules,
+    pythonize_path,
+    humanize_path,
+    import_exploit,
+    stop_after,
+    module_required,
+    MODULES_DIR,
+    WORDLISTS_DIR,
 )
-from routersploit.exploits import Exploit, GLOBAL_OPTS
-from routersploit.payloads import BasePayload
-from routersploit.printer import PrinterThread, printer_queue
+from routersploit.core.exploit.printer import (
+    print_info,
+    print_success,
+    print_error,
+    print_status,
+    print_table,
+    pprint_dict_in_order,
+    PrinterThread,
+    printer_queue
+)
+from routersploit.core.exploit.exploit import GLOBAL_OPTS
 
 import readline
 
@@ -39,7 +57,7 @@ class BaseInterpreter(object):
         :return:
         """
         if not os.path.exists(self.history_file):
-            with open(self.history_file, 'a+') as history:
+            with open(self.history_file, "a+") as history:
                 if is_libedit():
                     history.write("_HiStOrY_V2_\n\n")
 
@@ -47,10 +65,10 @@ class BaseInterpreter(object):
         readline.set_history_length(self.history_length)
         atexit.register(readline.write_history_file, self.history_file)
 
-        readline.parse_and_bind('set enable-keypad on')
-
+        readline.parse_and_bind("set enable-keypad on")
+  
         readline.set_completer(self.complete)
-        readline.set_completer_delims(' \t\n;')
+        readline.set_completer_delims(" \t\n;")
         if is_libedit():
             readline.parse_and_bind("bind ^I rl_complete")
         else:
@@ -86,23 +104,23 @@ class BaseInterpreter(object):
     def start(self):
         """ Routersploit main entry point. Starting interpreter loop. """
 
-        utils.print_info(self.banner)
+        print_info(self.banner)
         printer_queue.join()
         while True:
             try:
-                command, args = self.parse_line(raw_input(self.prompt))
+                command, args = self.parse_line(input(self.prompt))
                 if not command:
                     continue
                 command_handler = self.get_command_handler(command)
                 command_handler(args)
             except RoutersploitException as err:
-                utils.print_error(err)
+                print_error(err)
             except EOFError:
-                utils.print_info()
-                utils.print_status("routersploit stopped")
+                print_info()
+                print_status("routersploit stopped")
                 break
             except KeyboardInterrupt:
-                utils.print_info()
+                print_info()
             finally:
                 printer_queue.join()
 
@@ -121,19 +139,17 @@ class BaseInterpreter(object):
 
             if start_index > 0:
                 cmd, args = self.parse_line(line)
-                if cmd == '':
+                if cmd == "":
                     complete_function = self.default_completer
                 else:
                     try:
-                        complete_function = getattr(self, 'complete_' + cmd)
+                        complete_function = getattr(self, "complete_" + cmd)
                     except AttributeError:
                         complete_function = self.default_completer
             else:
                 complete_function = self.raw_command_completer
 
-            self.completion_matches = complete_function(
-                text, line, start_index, end_index
-            )
+            self.completion_matches = complete_function(text, line, start_index, end_index)
 
         try:
             return self.completion_matches[state]
@@ -146,17 +162,11 @@ class BaseInterpreter(object):
         :param ignored:
         :return: full list of interpreter commands
         """
-        return [
-            command.rsplit("_").pop() for command in dir(self)
-            if command.startswith("command_")
-        ]
+        return [command.rsplit("_").pop() for command in dir(self) if command.startswith("command_")]
 
     def raw_command_completer(self, text, line, start_index, end_index):
         """ Complete command w/o any argument """
-        return [
-            command for command in self.suggested_commands()
-            if command.startswith(text)
-        ]
+        return [command for command in self.suggested_commands() if command.startswith(text)]
 
     def default_completer(self, *ignored):
         return []
@@ -196,26 +206,18 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.current_module = None
         self.raw_prompt_template = None
         self.module_prompt_template = None
-        self.prompt_hostname = 'rsf'
-        self.show_sub_commands = (
-            'info', 'options', 'devices', 'all',
-            'creds', 'exploits', 'scanners'
-        )
+        self.prompt_hostname = "rsf"
+        self.show_sub_commands = ("info", "options", "devices", "all", "creds", "exploits", "scanners", "wordlists")
 
-        self.global_commands = sorted(
-            ['use ', 'exec ', 'help', 'exit', 'show ', 'search ']
-        )
-        self.module_commands = self._extend_with_global_commands(
-            ['run', 'back', 'set ', 'setg ', 'check']
-        )
-        self.payload_commands = self._extend_with_global_commands(
-            ['run', 'back', 'set ', 'setg ']
-        )
+        self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
+        self.module_commands = ["run", "back", "set ", "setg ", "check"]
+        self.module_commands.extend(self.global_commands)
+        self.module_commands.sort()
 
-        self.modules = utils.index_modules()
+        self.modules = index_modules()
         self.modules_count = Counter()
-        [self.modules_count.update(module.split('.')) for module in self.modules]
-        self.main_modules_dirs = [module for module in os.listdir(utils.MODULES_DIR) if not module.startswith("__")]
+        self.modules_count.update([module.split('.')[0] for module in self.modules])
+        self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
 
         self.__parse_prompt()
 
@@ -226,17 +228,22 @@ class RoutersploitInterpreter(BaseInterpreter):
  | |\ \ (_) | |_| | ||  __/ |  /\__/ / |_) | | (_) | | |_
  \_| \_\___/ \__,_|\__\___|_|  \____/| .__/|_|\___/|_|\__|
                                      | |
-        IoT Exploitation Framework   |_|
+       Exploitation Framework for    |_|    by Threat9
+            Embedded Devices
 
- Dev Team : Marcin Bury (lucyoa) & Mariusz Kupidura (fwkz)
- Codename : Bad Blood
- Version  : 2.2.1
+ Codename   : I Knew You Were Trouble
+ Version    : 3.0.0
+ Homepage   : https://www.threat9.com - @threatnine
+ Join Slack : https://www.threat9.com/slack
 
- Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Payloads: {payloads_count}
-""".format(exploits_count=self.modules_count['exploits'],
-           scanners_count=self.modules_count['scanners'],
-           creds_count=self.modules_count['creds'],
-           payloads_count=self.modules_count['payloads'])
+ Join Threat9 Beta Program - https://www.threat9.com
+
+ Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Generic: {generic_count} Payloads: {payloads_count}
+""".format(exploits_count=self.modules_count["exploits"],
+           scanners_count=self.modules_count["scanners"],
+           creds_count=self.modules_count["creds"],
+           generic_count=self.modules_count["generic"],
+           payloads_count=self.modules_count["payloads"])
 
     def __parse_prompt(self):
         raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "
@@ -246,12 +253,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         module_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 (\001\033[91m\002{module}\001\033[0m\002) > "
         module_prompt_template = os.getenv("RSF_MODULE_PROMPT", module_prompt_default_template).replace('\\033', '\033')
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
-
-    def _extend_with_global_commands(self, sequence):
-        """ Extend specific command suggestion with global commands """
-        sequence.extend(self.global_commands)
-        sequence.sort()
-        return sequence
 
     @property
     def module_metadata(self):
@@ -281,7 +282,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         :param text: argument of 'use' command
         :return: list of tab completion hints
         """
-        text = utils.pythonize_path(text)
+        text = pythonize_path(text)
         all_possible_matches = filter(lambda x: x.startswith(text), self.modules)
         matches = set()
         for match in all_possible_matches:
@@ -289,7 +290,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             if not tail:
                 sep = ""
             matches.add("".join((text, head, sep)))
-        return list(map(utils.humanize_path, matches))  # humanize output, replace dots to forward slashes
+        return list(map(humanize_path, matches))  # humanize output, replace dots to forward slashes
 
     def suggested_commands(self):
         """ Entry point for intelligent tab completion.
@@ -299,12 +300,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         :return: list of most accurate command suggestions
         """
         if self.current_module and GLOBAL_OPTS:
-            return sorted(itertools.chain(self.module_commands, ('unsetg ',)))
-        elif self.current_module and isinstance(self.current_module, Exploit):
-            return self.module_commands
-        elif self.current_module and isinstance(self.current_module,
-                                                BasePayload):
-            return self.payload_commands
+            return sorted(itertools.chain(self.module_commands, ("unsetg ",)))
         elif self.current_module:
             return self.module_commands
         else:
@@ -314,85 +310,84 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.current_module = None
 
     def command_use(self, module_path, *args, **kwargs):
-        module_path = utils.pythonize_path(module_path)
-        module_path = '.'.join(('routersploit', 'modules', module_path))
+        module_path = pythonize_path(module_path)
+        module_path = ".".join(("routersploit", "modules", module_path))
         # module_path, _, exploit_name = module_path.rpartition('.')
         try:
-            self.current_module = utils.import_exploit(module_path)()
+            self.current_module = import_exploit(module_path)()
         except RoutersploitException as err:
-            utils.print_error(err.message)
+            print_error(str(err))
 
-    @utils.stop_after(2)
+    @stop_after(2)
     def complete_use(self, text, *args, **kwargs):
         if text:
             return self.available_modules_completion(text)
         else:
             return self.main_modules_dirs
 
-    @utils.module_required
+    @module_required
     def command_run(self, *args, **kwargs):
+        print_status("Running module...")
         try:
-            self.current_module.validate_setup()
-            utils.print_status("Running module...")
             self.current_module.run()
         except KeyboardInterrupt:
-            utils.print_info()
-            utils.print_error("Operation cancelled by user")
-        except OptionValidationError as err:
-            utils.print_error(err)
-        except Exception:
-            utils.print_error(traceback.format_exc(sys.exc_info()))
+            print_info()
+            print_error("Operation cancelled by user")
+        except:
+            print_error(traceback.format_exc(sys.exc_info()))
 
     def command_exploit(self, *args, **kwargs):
         self.command_run()
 
-    @utils.module_required
+    @module_required
     def command_set(self, *args, **kwargs):
-        key, _, value = args[0].partition(' ')
+        key, _, value = args[0].partition(" ")
         if key in self.current_module.options:
             setattr(self.current_module, key, value)
+            self.current_module.exploit_attributes[key][0] = value
+
             if kwargs.get("glob", False):
                 GLOBAL_OPTS[key] = value
-            utils.print_success({key: value})
+            print_success("{} => {}".format(key, value))
         else:
-            utils.print_error("You can't set option '{}'.\n"
-                              "Available options: {}".format(key, self.current_module.options))
+            print_error("You can't set option '{}'.\n"
+                        "Available options: {}".format(key, self.current_module.options))
 
-    @utils.stop_after(2)
+    @stop_after(2)
     def complete_set(self, text, *args, **kwargs):
         if text:
-            return [' '.join((attr, "")) for attr in self.current_module.options if attr.startswith(text)]
+            return [" ".join((attr, "")) for attr in self.current_module.options if attr.startswith(text)]
         else:
             return self.current_module.options
 
-    @utils.module_required
+    @module_required
     def command_setg(self, *args, **kwargs):
         kwargs['glob'] = True
         self.command_set(*args, **kwargs)
 
-    @utils.stop_after(2)
+    @stop_after(2)
     def complete_setg(self, text, *args, **kwargs):
         return self.complete_set(text, *args, **kwargs)
 
-    @utils.module_required
+    @module_required
     def command_unsetg(self, *args, **kwargs):
         key, _, value = args[0].partition(' ')
         try:
             del GLOBAL_OPTS[key]
         except KeyError:
-            utils.print_error("You can't unset global option '{}'.\n"
-                              "Available global options: {}".format(key, GLOBAL_OPTS.keys()))
+            print_error("You can't unset global option '{}'.\n"
+                        "Available global options: {}".format(key, list(GLOBAL_OPTS.keys())))
         else:
-            utils.print_success({key: value})
+            print_success({key: value})
 
-    @utils.stop_after(2)
+    @stop_after(2)
     def complete_unsetg(self, text, *args, **kwargs):
         if text:
             return [' '.join((attr, "")) for attr in GLOBAL_OPTS.keys() if attr.startswith(text)]
         else:
-            return GLOBAL_OPTS.keys()
+            return list(GLOBAL_OPTS.keys())
 
-    @utils.module_required
+    @module_required
     def get_opts(self, *args):
         """ Generator returning module's Option attributes (option_name, option_value, option_description)
 
@@ -401,56 +396,64 @@ class RoutersploitInterpreter(BaseInterpreter):
         """
         for opt_key in args:
             try:
-                opt_description = self.current_module.exploit_attributes[opt_key]
-                opt_value = getattr(self.current_module, opt_key)
+                opt_description = self.current_module.exploit_attributes[opt_key][1]
+                opt_display_value = self.current_module.exploit_attributes[opt_key][0]
             except (KeyError, AttributeError):
                 pass
             else:
-                yield opt_key, opt_value, opt_description
+                yield opt_key, opt_display_value, opt_description
 
-    @utils.module_required
+    @module_required
     def _show_info(self, *args, **kwargs):
-        utils.pprint_dict_in_order(
+        pprint_dict_in_order(
             self.module_metadata,
             ("name", "description", "devices", "authors", "references"),
         )
-        utils.print_info()
+        print_info()
 
-    @utils.module_required
+    @module_required
     def _show_options(self, *args, **kwargs):
-        target_opts = ['target', 'port', 'rhost', 'rport', 'lhost', 'lport']
+        target_names = ["target", "port", "ssl", "rhost", "rport", "lhost", "lport"]
+        target_opts = [opt for opt in self.current_module.options if opt in target_names]
         module_opts = [opt for opt in self.current_module.options if opt not in target_opts]
         headers = ("Name", "Current settings", "Description")
 
-        utils.print_info('\nTarget options:')
-        utils.print_table(headers, *self.get_opts(*target_opts))
+        print_info("\nTarget options:")
+        print_table(headers, *self.get_opts(*target_opts))
 
         if module_opts:
-            utils.print_info('\nModule options:')
-            utils.print_table(headers, *self.get_opts(*module_opts))
+            print_info("\nModule options:")
+            print_table(headers, *self.get_opts(*module_opts))
 
-        utils.print_info()
+        print_info()
 
-    @utils.module_required
+    @module_required
     def _show_devices(self, *args, **kwargs):  # TODO: cover with tests
         try:
             devices = self.current_module._Exploit__info__['devices']
 
-            utils.print_info("\nTarget devices:")
+            print_info("\nTarget devices:")
             i = 0
             for device in devices:
                 if isinstance(device, dict):
-                    utils.print_info("   {} - {}".format(i, device['name']))
+                    print_info("   {} - {}".format(i, device['name']))
                 else:
-                    utils.print_info("   {} - {}".format(i, device))
+                    print_info("   {} - {}".format(i, device))
                 i += 1
-            utils.print_info()
+            print_info()
         except KeyError:
-            utils.print_info("\nTarget devices are not defined")
+            print_info("\nTarget devices are not defined")
+
+    @module_required
+    def _show_wordlists(self, *args, **kwargs):
+        headers = ("Wordlist", "Path")
+        wordlists = [(f, "file://{}/{}".format(WORDLISTS_DIR, f)) for f in os.listdir(WORDLISTS_DIR) if f.endswith(".txt")]
+
+        print_table(headers, *wordlists, max_column_length=100)
 
     def __show_modules(self, root=''):
         for module in [module for module in self.modules if module.startswith(root)]:
-            utils.print_info(module.replace('.', os.sep))
+            print_info(module.replace('.', os.sep))
 
     def _show_all(self, *args, **kwargs):
         self.__show_modules()
@@ -469,36 +472,35 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             getattr(self, "_show_{}".format(sub_command))(*args, **kwargs)
         except AttributeError:
-            utils.print_error("Unknown 'show' sub-command '{}'. "
-                              "What do you want to show?\n"
-                              "Possible choices are: {}".format(sub_command, self.show_sub_commands))
+            print_error("Unknown 'show' sub-command '{}'. "
+                        "What do you want to show?\n"
+                        "Possible choices are: {}".format(sub_command, self.show_sub_commands))
 
-    @utils.stop_after(2)
+    @stop_after(2)
     def complete_show(self, text, *args, **kwargs):
         if text:
             return [command for command in self.show_sub_commands if command.startswith(text)]
         else:
             return self.show_sub_commands
 
-    @utils.module_required
+    @module_required
     def command_check(self, *args, **kwargs):
         try:
-            self.current_module.validate_setup()
             result = self.current_module.check()
         except Exception as error:
-            utils.print_error(error)
+            print_error(error)
         else:
             if result is True:
-                utils.print_success("Target is vulnerable")
+                print_success("Target is vulnerable")
             elif result is False:
-                utils.print_error("Target is not vulnerable")
+                print_error("Target is not vulnerable")
             else:
-                utils.print_status("Target could not be verified")
+                print_status("Target could not be verified")
 
     def command_help(self, *args, **kwargs):
-        utils.print_info(self.global_help)
+        print_info(self.global_help)
         if self.current_module:
-            utils.print_info("\n", self.module_help)
+            print_info("\n", self.module_help)
 
     def command_exec(self, *args, **kwargs):
         os.system(args[0])
@@ -507,13 +509,13 @@ class RoutersploitInterpreter(BaseInterpreter):
         keyword = args[0]
 
         if not keyword:
-            utils.print_error("Please specify search keyword. e.g. 'search cisco'")
+            print_error("Please specify search keyword. e.g. 'search cisco'")
             return
 
         for module in self.modules:
             if keyword in module:
-                module = utils.humanize_path(module)
-                utils.print_info(
+                module = humanize_path(module)
+                print_info(
                     "{}\033[31m{}\033[0m{}".format(*module.partition(keyword))
                 )
 

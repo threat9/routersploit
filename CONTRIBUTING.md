@@ -21,11 +21,13 @@ It is hard to test modules in all possible scenarios. If you would like to help:
 1. Check what device you have - identify vendor and version.
 2. Check if routersploit contains exploits for the device you posses.
 3. If exploit does not work but it should, check "show info" for more information. References should provide you with links to proof of concept exploits.
+
 Example:
 ```
 References:
 -  https://www.exploit-db.com/exploits/24975/
 ```
+
 4. Try to use proof of concept exploit and check if it works properly. If it does, feel free to create new issue bug with explanation that the routersploit's module does not work properly.
 
 ## Development
