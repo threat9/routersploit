@@ -62,11 +62,14 @@ class SSHClient(Exploit):
 
         for _ in range(retries):
             try:
-                ssh_client.connect(self.target, self.port, timouet=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key)
+                ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key, look_for_keys=False)
             except paramiko.AuthenticationException:
                 print_error("Authentication Failed - Username: '{}' auth with private key".format(username), verbose=self.verbosity)
             except Exception as err:
                 print_error("Err: {}".format(err), verbose=self.verbosity)
+            else:
+                print_success("SSH Authentication Successful - Username: '{}' with private key".format(username), verbose=self.verbosity)
+                return ssh_client
 
             ssh_client.close()
 
@@ -76,7 +79,7 @@ class SSHClient(Exploit):
         ssh_client = self.ssh_create()
 
         try:
-            ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, username="root", password=random_text(12))
+            ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, username="root", password=random_text(12), look_for_keys=False)
         except paramiko.AuthenticationException:
             ssh_client.close()
             return True
@@ -119,7 +122,7 @@ class SSHClient(Exploit):
     def ssh_interactive(self, ssh):
         chan = ssh.invoke_shell()
         if os.name == "posix":
-            self._postix_shell(chan)
+            self._posix_shell(chan)
         else:
             self._windows_shell(chan)
  
@@ -137,7 +140,7 @@ class SSHClient(Exploit):
                 r, w, e = select.select([chan, sys.stdin], [], [])
                 if chan in r:
                     try:
-                        x = unicode(chan.recv(1024))
+                        x = str(chan.recv(1024), "utf-8")
                         if len(x) == 0:
                             break
 
@@ -151,7 +154,6 @@ class SSHClient(Exploit):
                     if len(x) == 0:
                         break
                     chan.send(x)
-
         finally:
             termios.tcsetattr(sys.stdin,termios.TCSADRAIN, oldtty)
             return
