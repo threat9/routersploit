@@ -1,0 +1,8 @@
+future>=0.16.0
+requests>=2.9.1
+paramiko>=1.16.0
+pysnmp>=4.3.2
+pycrypto==2.6.1
+pytest==3.5.1
+pytest-forked==0.2
+pytest-xdist==1.22.2
