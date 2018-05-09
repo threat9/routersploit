@@ -1,11 +1,14 @@
 import socket
 import requests
+import urllib3
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
 from routersploit.core.exploit.option import OptBool
 from routersploit.core.exploit.printer import print_error
 
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 HTTP_TIMEOUT = 30.0
 
@@ -17,6 +20,7 @@ class HTTPClient(Exploit):
 
     verbosity = OptBool("true", "Verbosity enabled: true/false")
     ssl = OptBool("false", "SSL enabled: true/false")
+
 
     def http_request(self, method, path, session=requests, **kwargs):
         if self.ssl:
