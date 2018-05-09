@@ -7,15 +7,12 @@ Please search on the [issue track](https://github.com/threat9/routersploit/label
 ---
 
 ## Your Environment
-<!--- Include as many relevant details about the environment you experienced the bug in -->
 * RouterSploit Version used:
 * Operating System and version:
 * Python Version: ( `python3 --version` )
 * Python Environment: ( `python3 -m pip freeze` )
 
 ## Steps to Reproduce (for bugs)
-<!--- Provide a link to a live example, or an unambiguous set of steps to -->
-<!--- reproduce this bug. Include code to reproduce, if relevant -->
 1.
 2.
 3.
