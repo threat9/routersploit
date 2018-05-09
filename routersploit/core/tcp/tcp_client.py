@@ -36,8 +36,9 @@ class TCPClient(Exploit):
             print_status("Connection established")
             return tcp_client
 
-        except Exception:
+        except Exception as err:
             print_error("Could not connect")
+            print_error(err)
 
         return None
 
@@ -45,18 +46,22 @@ class TCPClient(Exploit):
         if tcp_client:
             if type(data) is bytes:
                 return tcp_client.send(data)
-            elif type(data) is str:
-                return tcp_client.send(bytes(data, "utf-8"))
             else:
-                print_error("Data to send is not type of bytes or string")
+                print_error("Data to send is not type of bytes")
 
         return None
 
     def tcp_recv(self, tcp_client, num):
         if tcp_client:
             try:
-                response = tcp_client.recv(num)
-                return str(response, "utf-8")
+                response = b""
+                received = 0
+                while received < num:
+                    tmp = tcp_client.recv(num - received)
+                    received += len(tmp)
+                    response += tmp
+
+                return response
             except socket.timeout:
                 print_error("Socket did timeout")
 
