@@ -1,5 +1,6 @@
 import socket
 import ftplib
+import io
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
@@ -62,3 +63,11 @@ class FTPClient(Exploit):
             return True
 
         return False
+
+    def ftp_get_content(self, ftp_client, remote_file):
+        if ftp_client:
+            fp_content = io.BytesIO()
+            ftp_client.retrbinary("RETR {}".format(remote_file), fp_content.write)
+            return fp_content.getvalue()
+
+        return None
