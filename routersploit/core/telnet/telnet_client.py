@@ -81,7 +81,8 @@ class TelnetClient(Exploit):
             if type(data) is str:
                 data = bytes(data, "utf-8") 
 
-            return telnet_client.read_until(data, 5)
+            response = telnet_client.read_until(data, 5)
+            return str(response, "utf-8")
  
         return None
 
