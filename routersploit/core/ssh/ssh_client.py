@@ -120,11 +120,12 @@ class SSHClient(Exploit):
         sftp.putfo(fp_content, dest_file)
 
     def ssh_interactive(self, ssh):
-        chan = ssh.invoke_shell()
-        if os.name == "posix":
-            self._posix_shell(chan)
-        else:
-            self._windows_shell(chan)
+        if ssh:
+            chan = ssh.invoke_shell()
+            if os.name == "posix":
+                self._posix_shell(chan)
+            else:
+                self._windows_shell(chan)
  
     def _posix_shell(self, chan):
         import termios
