@@ -64,6 +64,8 @@ class TCPClient(Exploit):
                 return response
             except socket.timeout:
                 print_error("Socket did timeout")
+            except socket.error:
+                print_error("Socket error")
 
         return None
 
