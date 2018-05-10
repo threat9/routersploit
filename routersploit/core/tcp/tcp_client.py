@@ -58,8 +58,12 @@ class TCPClient(Exploit):
                 received = 0
                 while received < num:
                     tmp = tcp_client.recv(num - received)
-                    received += len(tmp)
-                    response += tmp
+
+                    if tmp:
+                        received += len(tmp)
+                        response += tmp
+                    else:
+                        break
 
                 return response
             except socket.timeout:
