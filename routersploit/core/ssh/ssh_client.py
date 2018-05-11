@@ -14,7 +14,7 @@ from routersploit.core.exploit.printer import print_error
 from routersploit.core.exploit.utils import random_text
 
 
-SSH_TIMEOUT = 30.0
+SSH_TIMEOUT = 8.0
 
 
 class SSHClient(Exploit):
