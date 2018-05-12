@@ -183,3 +183,9 @@ class SSHClient(Exploit):
 
         except Exception as err:
             print_error("Err: {}".format(err))
+
+    def ssh_close(self, ssh_client):
+        if ssh_client:
+            ssh_client.close()
+
+        return None
