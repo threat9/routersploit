@@ -8,7 +8,7 @@ from routersploit.core.exploit.option import OptBool
 from routersploit.core.exploit.printer import print_error
 
 
-FTP_TIMEOUT = 30.0
+FTP_TIMEOUT = 8.0
 
 
 class FTPClient(Exploit):
@@ -69,5 +69,11 @@ class FTPClient(Exploit):
             fp_content = io.BytesIO()
             ftp_client.retrbinary("RETR {}".format(remote_file), fp_content.write)
             return fp_content.getvalue()
+
+        return None
+
+    def ftp_close(self, ftp_client):
+        if ftp_client:
+            ftp_client.close()
 
         return None

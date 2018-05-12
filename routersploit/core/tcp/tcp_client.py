@@ -76,3 +76,5 @@ class TCPClient(Exploit):
     def tcp_close(self, tcp_client):
         if tcp_client:
             tcp_client.close()
+
+        return None

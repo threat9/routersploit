@@ -45,9 +45,13 @@ class UDPClient(Exploit):
                 return str(response, "utf-8")
             except socket.timeout:
                 print_error("Socket did timeout")
+            except socket.error:
+                print_error("Socket err")
 
         return None
 
     def udp_close(self, udp_client):
         if udp_client:
             udp_client.close()
+
+        return None

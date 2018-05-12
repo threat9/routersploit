@@ -94,3 +94,9 @@ class TelnetClient(Exploit):
             return telnet_client.write(data, 5)
 
         return None
+
+    def telnet_close(self, telnete_client):
+        if telnet_client:
+            telnet_client.close()
+
+        return None

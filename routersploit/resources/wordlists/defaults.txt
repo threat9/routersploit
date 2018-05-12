@@ -135,6 +135,7 @@ acc:acc
 adfexc:adfexc
 admin2:changeme
 admin:
+admin:<<< %s(un='%s') = %u
 admin:0
 admin:0000
 admin:1111
