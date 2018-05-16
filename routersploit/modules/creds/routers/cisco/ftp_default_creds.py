@@ -11,7 +11,7 @@ class Exploit(FTPDefault):
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
         "devices": (
-            "Cisc Router",
+            "Cisco Router",
         ),
     }
 

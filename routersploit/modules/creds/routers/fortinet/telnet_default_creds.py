@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.telne_default import Exploit as TelnetDefault
+from routersploit.modules.creds.generic.telnet_default import Exploit as TelnetDefault
 
 
 class Exploit(TelnetDefault):

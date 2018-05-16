@@ -12,9 +12,13 @@ def apply_response(*args, **kwargs):
 def test_check_success(target):
     """ Test scenario - successful check """
 
-    cgi_mock = target.get_route_mock("/video.htm", methods=["GET", "POST"])
-    cgi_mock.side_effect = apply_response
+    route_mock = target.get_route_mock("/video.htm", methods=["GET", "POST"])
+    route_mock.side_effect = apply_response
 
     exploit = Exploit()
     exploit.target = target.host
     exploit.port = target.port
+
+    assert exploit.check() is True
+    assert exploit.check_default() is not None
+    assert exploit.run() is None

@@ -13,6 +13,9 @@ class Exploit(HTTPClient):
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
             "Alexander Yakovlev <https://github.com/toxydose>",  # upgrading to perform bruteforce attack against HTTP Digest Auth service
+        ),
+        "devices": (
+            "Multiple devices",
         )
     }
 

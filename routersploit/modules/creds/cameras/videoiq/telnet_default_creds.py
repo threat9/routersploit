@@ -7,12 +7,12 @@ class Exploit(TelnetDefault):
         "name": "VideoIQ Camera Default Telnet Creds",
         "description": "Module performs dictionary attack against VideoIQ Camera Telnet service. "
                        "If valid credentials are found, they ar displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
-            "VideoIQ Cameras",
-        ],
+        ),
+        "devices": (
+            "VideoIQ Camera",
+        ),
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

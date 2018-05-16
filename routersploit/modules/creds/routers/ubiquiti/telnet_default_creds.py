@@ -7,12 +7,12 @@ class Exploit(TelnetDefault):
         "name": "Ubiquiti Router Default Telnet Creds",
         "description": "Module performs dictionary attack against Ubiquiti Router Telnet service. "
                        "If valid credentials are found, they are displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Ubiquiti Router",
-        ],
+        ),
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

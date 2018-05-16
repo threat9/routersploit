@@ -10,8 +10,11 @@ class Exploit(FTPClient):
         "description": "Module performs bruteforce attack against FTP service."
                        "If valid credentials are found, the are displayed to the user.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
+        "devices": (
+            "Multiple devices",
+        )
     }
 
     target = OptIP("", "Target IPv4, IPv6 or file with ip:port (file://)")

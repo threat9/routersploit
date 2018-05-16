@@ -8,4 +8,6 @@ def test_check_success(generic_target):
     exploit.target = generic_target.host
     exploit.port = generic_target.port
 
-    assert exploit.check()
+    assert exploit.check() is True
+    assert exploit.check_default() is not None
+    assert exploit.run() is None
