@@ -10,6 +10,9 @@ class Exploit(SNMPClient):
                        "If valid community string is found, it is displayed to the user",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
+        ),
+        "devices": (
+            "Multiple devices",
         )
     }
 

@@ -7,12 +7,12 @@ class Exploit(FTPDefault):
         "name": "Hikvision Camera FTP Creds",
         "description": "Module performs dictionary attack against Hikvision Camera FTP service. "
                        "If valid credentials are found, they displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Hikvision Camera",
-        ],
+        ),
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

@@ -11,7 +11,7 @@ class Exploit(HTTPBasicDigestDefault):
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
         "devices": (
-            "Canon Camera"
+            "Canon Camera",
         )
     }
 

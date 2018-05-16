@@ -7,12 +7,12 @@ class Exploit(SSHDefault):
         "name": "Basler Camera Default SSH Creds",
         "description": "Module performs dictionary attack against Basler Camera SSH service. "
                        "If valid credentials are found, they are displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Basler Camera",
-        ]
+        )
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

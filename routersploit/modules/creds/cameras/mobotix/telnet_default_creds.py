@@ -7,12 +7,12 @@ class Exploit(TelnetDefault):
         "name": "Mobitix Camer Default Telnet Creds",
         "description": "Module performs dictionary attack against Mobitix Camera Telnet service. "
                        "If valid credentials are found, they are displayed tot he user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Mobotix Camera",
-        ]
+        )
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

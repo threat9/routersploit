@@ -7,12 +7,12 @@ class Exploit(FTPDefault):
         "name": "ZTE Router Default FTP Creds",
         "description": "Module performs dictioanry attack against ZTE Router FTP service. "
                        "If valid credentials are found, they are displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "ZTE Router",
-        ],
+        ),
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

