@@ -1,6 +1,6 @@
 from routersploit.core.exploit import *
 from routersploit.core.tcp.tcp_client import TCPClient
-from routersploit.lib.apiros.apiros_client import ApiRosClient
+from routersploit.libs.apiros.apiros_client import ApiRosClient
 
 
 class Exploit(TCPClient):
