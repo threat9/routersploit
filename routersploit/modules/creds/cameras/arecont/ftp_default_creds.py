@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.gtp_default import Exploit as FTPDefault
+from routersploit.modules.creds.generic.ftp_default import Exploit as FTPDefault
 
 
 class Exploit(FTPDefault):
