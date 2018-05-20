@@ -1,4 +1,4 @@
-from routerpsloit.core.exploit import *
+from routersploit.core.exploit import *
 from routersploit.modules.creds.generic.ftp_default import Exploit as FTPDefault
 
 
