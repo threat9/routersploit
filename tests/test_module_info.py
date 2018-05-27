@@ -11,7 +11,7 @@ def test_exploit_info(exploit):
     assert "name" in info
     assert isinstance(info["name"], str)
 
-    assert "description" in info 
+    assert "description" in info
     assert isinstance(info["description"], str)
 
     assert "authors" in info
@@ -25,7 +25,7 @@ def test_exploit_info(exploit):
 
 
 @pytest.mark.parametrize("creds", iter_modules("./routersploit/modules/creds"))
-def test_exploit_info(creds):
+def test_creds_info(creds):
     info = creds._Exploit__info__
 
     assert isinstance(info, dict)
@@ -33,7 +33,7 @@ def test_exploit_info(creds):
     assert "name" in info
     assert isinstance(info["name"], str)
 
-    assert "description" in info 
+    assert "description" in info
     assert isinstance(info["description"], str)
 
     assert "authors" in info
@@ -44,7 +44,7 @@ def test_exploit_info(creds):
 
 
 @pytest.mark.parametrize("scanner", iter_modules("./routersploit/modules/scanners"))
-def test_exploit_info(scanner):
+def test_scanner_info(scanner):
     info = scanner._Exploit__info__
 
     assert isinstance(info, dict)
@@ -52,7 +52,7 @@ def test_exploit_info(scanner):
     assert "name" in info
     assert isinstance(info["name"], str)
 
-    assert "description" in info 
+    assert "description" in info
     assert isinstance(info["description"], str)
 
     assert "authors" in info

@@ -14,7 +14,7 @@ TCP_SOCKET_TIMEOUT = 8.0
 class TCPClient(Exploit):
     """ TCP Client exploit """
 
-    target_protocol = Protocol.TCP 
+    target_protocol = Protocol.TCP
 
     def tcp_create(self):
         if is_ipv4(self.target):

@@ -1,4 +1,3 @@
-import re
 from routersploit.core.exploit import *
 from routersploit.core.http.http_client import HTTPClient
 
@@ -48,7 +47,6 @@ class Exploit(HTTPClient):
     def target_function(self, data):
         username, password = data.split(":")
 
-
     def check(self):
         response = self.http_request(
             method="GET",
@@ -57,9 +55,7 @@ class Exploit(HTTPClient):
         if response is None:
             return False
 
-        if all([x in response.text
-                for x in ['<script type="text/javascript" src="/themes/pfsense_ng/javascript/niftyjsCode.js"></script>',
-                'var csrfMagicToken =']]):
+        if all([x in response.text for x in ['<script type="text/javascript" src="/themes/pfsense_ng/javascript/niftyjsCode.js"></script>', 'var csrfMagicToken =']]):
             return True
 
         return False

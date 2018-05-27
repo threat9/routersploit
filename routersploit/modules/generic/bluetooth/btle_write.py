@@ -20,7 +20,6 @@ class Exploit(BTLEClient):
     data = OptString("41424344", "Data (in hex format)")
     buffering = OptBool("true", "Buffering enabled: true/false. Results in real time.")
 
-
     def run(self):
         try:
             data = bytes.fromhex(self.data)

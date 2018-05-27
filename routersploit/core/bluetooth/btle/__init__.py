@@ -5,3 +5,10 @@ from .btle_scanner import (
     BTLEScanner,
     ScanDelegate
 )
+
+
+__all__ = [
+    "Device",
+    "BTLEScanner",
+    "ScanDelegate",
+]

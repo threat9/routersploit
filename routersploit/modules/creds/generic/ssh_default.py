@@ -48,7 +48,7 @@ class Exploit(SSHClient):
             print_error("Credentials not found")
 
     def target_function(self, running, data):
-        while running.is_set():            
+        while running.is_set():
             try:
                 username, password = data.next().split(":")
                 ssh = self.ssh_login(username, password)

@@ -1,5 +1,4 @@
 from base64 import b64encode
-from routersploit.core.exploit import *
 from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 

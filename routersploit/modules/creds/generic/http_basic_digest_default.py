@@ -57,7 +57,7 @@ class Exploit(HTTPClient):
         while running.is_set():
             try:
                 username, password = data.next().split(":")
-        
+
                 if self.auth_type == "digest":
                     auth = HTTPDigestAuth(username, password)
                 else:

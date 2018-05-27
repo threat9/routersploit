@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.ssh_default import Exploit as SSHDefault 
+from routersploit.modules.creds.generic.ssh_default import Exploit as SSHDefault
 
 
 class Exploit(SSHDefault):
@@ -20,4 +20,3 @@ class Exploit(SSHDefault):
 
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:admin,root:ubnt,ubnt:ubnt", "User:Pass or file with default credentials (file://)")
-

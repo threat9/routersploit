@@ -20,4 +20,3 @@ class Exploit(TelnetDefault):
 
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:admin,support:support,user:user", "User:Pass or file with default credentials (file://)")
-

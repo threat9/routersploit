@@ -13,7 +13,7 @@ TELNET_TIMEOUT = 30.0
 class TelnetClient(Exploit):
     """ Telnet Client exploit """
 
-    target_protocol = Protocol.TELNET 
+    target_protocol = Protocol.TELNET
 
     verbosity = OptBool("true", "Enable verbose output: true/false")
 
@@ -79,11 +79,11 @@ class TelnetClient(Exploit):
     def telnet_read_until(self, telnet_client, data):
         if telnet_client:
             if type(data) is str:
-                data = bytes(data, "utf-8") 
+                data = bytes(data, "utf-8")
 
             response = telnet_client.read_until(data, 5)
             return str(response, "utf-8")
- 
+
         return None
 
     def telnet_write(self, telnet_client, data):

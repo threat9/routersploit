@@ -98,27 +98,27 @@ class Exploit(Exploit):
                 break
             else:
                 exploit.target = self.target
-        
+
                 if exploit.target_protocol == Protocol.HTTP:
                     exploit.port = self.http_port
                     if self.http_ssl:
                         exploit.ssl = "true"
                         exploit.target_protocol = Protocol.HTTPS
-        
+
                 elif exploit.target_protocol is Protocol.FTP:
                     exploit.port = self.ftp_port
                     if self.ftp_ssl:
                         exploit.ssl = "true"
                         exploit.target_protocol = Protocol.FTPS
-        
+
                 elif exploit.target_protocol is Protocol.TELNET:
                     exploit.port = self.telnet_port
-        
+
         #        elif exploit.target_protocol not in ["tcp", "udp"]:
         #            exploit.target_protocol = "custom"
-        
+
                 response = exploit.check()
-        
+
                 if response is True:
                     print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
                                exploit.target, exploit.port, exploit.target_protocol, exploit))
@@ -136,7 +136,7 @@ class Exploit(Exploit):
             try:
                 module = data.next()
                 exploit = module()
-    
+
                 generic = False
                 if exploit.__module__.startswith("routersploit.modules.creds.generic"):
                     if exploit.__module__.endswith("default"):
@@ -151,13 +151,13 @@ class Exploit(Exploit):
                 exploit.verbosity = "false"
                 exploit.stop_on_success = "false"
                 exploit.threads = self.threads
-    
+
                 if exploit.target_protocol == Protocol.HTTP:
                     exploit.port = self.http_port
                     if self.http_ssl:
                         exploit.ssl = "true"
                         exploit.target_protocol = Protocol.HTTPS
-    
+
                 elif generic:
                     if exploit.target_protocol is Protocol.HTTP:
                         exploit.port = self.http_port
@@ -171,17 +171,17 @@ class Exploit(Exploit):
                         if self.ftp_ssl:
                             exploit.ssl = "true"
                             exploit.target_protocol = Protocol.FTPS
-    
+
                     elif exploit.target_protocol == Protocol.TELNET:
                         exploit.port = self.telnet_port
                 else:
                     continue
-    
+
                 response = exploit.check_default()
                 if response:
                     print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
                                exploit.target, exploit.port, exploit.target_protocol, exploit))
-    
+
                     for creds in response:
                         self.creds.append(creds)
                 else:

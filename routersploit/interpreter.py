@@ -66,7 +66,7 @@ class BaseInterpreter(object):
         atexit.register(readline.write_history_file, self.history_file)
 
         readline.parse_and_bind("set enable-keypad on")
-  
+
         readline.set_completer(self.complete)
         readline.set_completer_delims(" \t\n;")
         if is_libedit():
@@ -333,7 +333,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         except KeyboardInterrupt:
             print_info()
             print_error("Operation cancelled by user")
-        except:
+        except Exception:
             print_error(traceback.format_exc(sys.exc_info()))
 
     def command_exploit(self, *args, **kwargs):

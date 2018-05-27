@@ -6,7 +6,7 @@ class Exploit(HTTPBasicDigestDefault):
     __info__ = {
         "name": "Canon Camera Default Web Interface Creds - HTTP Auth",
         "description": "Module performs dictionary attack against Canon Camera Web Interface. "
-                       "If valid credentials are found, they are displayed to the user.", 
+                       "If valid credentials are found, they are displayed to the user.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),

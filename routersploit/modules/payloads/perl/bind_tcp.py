@@ -1,4 +1,3 @@
-from routersploit.core.exploit import *
 from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 

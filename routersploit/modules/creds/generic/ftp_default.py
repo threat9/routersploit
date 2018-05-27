@@ -1,6 +1,6 @@
 from routersploit.core.exploit import *
 from routersploit.core.ftp.ftp_client import FTPClient
-from routersploit.resources import wordlists 
+from routersploit.resources import wordlists
 
 
 class Exploit(FTPClient):
@@ -37,7 +37,7 @@ class Exploit(FTPClient):
         print_status("Starting attack against FTP service")
 
         data = LockedIterator(self.defaults)
-        self.run_threads(self.threads, self.target_function, data) 
+        self.run_threads(self.threads, self.target_function, data)
 
         if self.credentials:
             print_success("Credentials found!")
@@ -49,7 +49,7 @@ class Exploit(FTPClient):
     def target_function(self, running, data):
         while running.is_set():
             try:
-               username, password = data.next().split(":")
+                username, password = data.next().split(":")
             except StopIteration:
                 break
             else:

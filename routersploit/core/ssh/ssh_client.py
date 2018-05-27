@@ -4,7 +4,7 @@ import os
 import select
 import sys
 import threading
-import io 
+import io
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
@@ -47,7 +47,7 @@ class SSHClient(Exploit):
                 return ssh_client
 
             ssh_client.close()
-                
+
         return
 
     def ssh_login_pkey(self, username, priv_key, retries=1):
@@ -126,7 +126,7 @@ class SSHClient(Exploit):
                 self._posix_shell(chan)
             else:
                 self._windows_shell(chan)
- 
+
     def _posix_shell(self, chan):
         import termios
         import tty
@@ -156,7 +156,7 @@ class SSHClient(Exploit):
                         break
                     chan.send(x)
         finally:
-            termios.tcsetattr(sys.stdin,termios.TCSADRAIN, oldtty)
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
             return
 
     def _windows_shell(self, chan):

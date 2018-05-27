@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.ssh_default import Exploit as SSHDefault 
+from routersploit.modules.creds.generic.ssh_default import Exploit as SSHDefault
 
 
 class Exploit(SSHDefault):

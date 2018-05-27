@@ -37,7 +37,7 @@ class Exploit(TelnetClient):
         if not self.check():
             return
 
-        print_status("Starting bruteforce attack against Telnet service") 
+        print_status("Starting bruteforce attack against Telnet service")
 
         data = LockedIterator(itertools.product(self.usernames, self.passwords))
         self.run_threads(self.threads, self.target_function, data)

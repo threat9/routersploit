@@ -120,7 +120,7 @@ class Device(ScanEntry):
 
                 for _, c in enumerate(service.getCharacteristics()):
                     if str(c.uuid) == characteristic:
-                        char =c
+                        char = c
                         break
 
             if char:
@@ -221,7 +221,7 @@ class Device(ScanEntry):
                     try:
                         string = color_blue(repr(data.decode("utf-8")))
                     except Exception:
-                        stirng = repr(data)
+                        string = repr(data)
 
             except Exception:
                 pass
