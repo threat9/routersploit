@@ -13,7 +13,7 @@ class BTLEScanner(Scanner):
 
     def _decode_address(self, resp):
         addr = binascii.b2a_hex(resp["addr"][0]).decode("utf-8")
-        return ":".join([addr[i : i + 2] for i in range(0, 12, 2)])
+        return ":".join([addr[i: i + 2] for i in range(0, 12, 2)])
 
     def _find_or_create(self, addr):
         if addr in self.scanned:
@@ -58,6 +58,7 @@ class BTLEScanner(Scanner):
 
                     if self.mac and dev.addr == self.mac:
                         break
+
 
 class ScanDelegate(DefaultDelegate):
     def __init__(self, options):

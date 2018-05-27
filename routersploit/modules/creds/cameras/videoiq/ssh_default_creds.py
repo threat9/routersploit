@@ -20,4 +20,3 @@ class Exploit(SSHDefault):
 
     threads = OptInteger(1, "Number of threads")
     default = OptWordlist("supervistor:supervisor", "User:Pass or file with default credentials (file://)")
-

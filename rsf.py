@@ -18,5 +18,6 @@ def routersploit():
     rsf = RoutersploitInterpreter()
     rsf.start()
 
+
 if __name__ == "__main__":
     routersploit()

@@ -58,7 +58,7 @@ class Exploit(SNMPClient):
 
             except StopIteration:
                 break
-        
+
     def check(self):
         raise NotImplementedError("Check method is not available")
 

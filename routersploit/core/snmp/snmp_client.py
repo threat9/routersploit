@@ -13,7 +13,7 @@ SNMP_TIMEOUT = 15.0
 class SNMPClient(Exploit):
     """ SNMP Client exploit """
 
-    target_protocol = Protocol.SNMP 
+    target_protocol = Protocol.SNMP
 
     verbosity = OptBool("true", "Enable verbose output: true/false")
 

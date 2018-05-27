@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.telnet_default import Exploit as TelnetDefault 
+from routersploit.modules.creds.generic.telnet_default import Exploit as TelnetDefault
 
 
 class Exploit(TelnetDefault):
@@ -14,7 +14,6 @@ class Exploit(TelnetDefault):
             "IPFire Router",
         ),
     }
-
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")
     port = OptPort(23, "Target Telnet port")

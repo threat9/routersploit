@@ -55,7 +55,7 @@ class FTPClient(Exploit):
             ftp_client.close()
 
         return None
-        
+
     def ftp_test_connect(self):
         ftp_client = self.ftp_connect()
         if ftp_client:

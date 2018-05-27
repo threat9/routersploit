@@ -13,7 +13,7 @@ UDP_SOCKET_TIMEOUT = 8.0
 class UDPClient(Exploit):
     """ UDP Client exploit """
 
-    target_protocol = Protocol.UDP 
+    target_protocol = Protocol.UDP
 
     def udp_create(self):
         if is_ipv4(self.target):

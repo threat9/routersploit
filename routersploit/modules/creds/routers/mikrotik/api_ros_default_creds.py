@@ -7,7 +7,7 @@ class Exploit(TCPClient):
     __info__ = {
         "name": "Mikrotik Default Creds - API ROS",
         "description": "",
-        "authors": ( 
+        "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
         "devices": (
@@ -64,7 +64,7 @@ class Exploit(TCPClient):
                     print_error("Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
                 tcp_client.close()
-                
+
             except StopIteration:
                 break
 

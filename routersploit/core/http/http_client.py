@@ -21,7 +21,6 @@ class HTTPClient(Exploit):
     verbosity = OptBool("true", "Verbosity enabled: true/false")
     ssl = OptBool("false", "SSL enabled: true/false")
 
-
     def http_request(self, method, path, session=requests, **kwargs):
         if self.ssl:
             url = "https://"

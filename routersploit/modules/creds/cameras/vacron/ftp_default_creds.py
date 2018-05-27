@@ -6,7 +6,7 @@ class Exploit(FTPDefault):
     __info__ = {
         "name": "Vacron Camera Default FTP Creds",
         "description": "Module performs dictionary attack against Vacron Camera FTP service. "
-                       "If valid credentials are found, they are displayed to the user.", 
+                       "If valid credentials are found, they are displayed to the user.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),

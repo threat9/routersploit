@@ -6,7 +6,7 @@ class Exploit(SSHDefault):
     __info__ = {
         "name": "Canon Camera Default SSH Creds",
         "description": "Module performs dictionary attack against Canon Camera SSH service. "
-                       "If valid credentials are found, they are displayed to the user.", 
+                       "If valid credentials are found, they are displayed to the user.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),

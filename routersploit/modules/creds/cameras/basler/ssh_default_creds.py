@@ -2,7 +2,7 @@ from routersploit.core.exploit import *
 from routersploit.modules.creds.generic.ssh_default import Exploit as SSHDefault
 
 
-class Exploit(SSHDefault):  
+class Exploit(SSHDefault):
     __info__ = {
         "name": "Basler Camera Default SSH Creds",
         "description": "Module performs dictionary attack against Basler Camera SSH service. "
