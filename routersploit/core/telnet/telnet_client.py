@@ -95,7 +95,7 @@ class TelnetClient(Exploit):
 
         return None
 
-    def telnet_close(self, telnete_client):
+    def telnet_close(self, telnet_client):
         if telnet_client:
             telnet_client.close()
 
