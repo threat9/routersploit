@@ -10,4 +10,4 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     source ~/.venv/bin/activate
 fi
 
-python -m pytest -n16 tests/
+make lint tests
