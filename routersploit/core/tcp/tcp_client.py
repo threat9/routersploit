@@ -2,6 +2,7 @@ import socket
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
+from routersploit.core.exploit.option import OptBool
 from routersploit.core.exploit.printer import print_status
 from routersploit.core.exploit.printer import print_error
 from routersploit.core.exploit.utils import is_ipv4
@@ -16,13 +17,15 @@ class TCPClient(Exploit):
 
     target_protocol = Protocol.TCP
 
+    verbosity = OptBool("true", "Enable verbose output: true/false")
+
     def tcp_create(self):
         if is_ipv4(self.target):
             tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         elif is_ipv6(self.target):
             tcp_client = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         else:
-            print_error("Target address is not valid IPv4 nor IPv6 address")
+            print_error("Target address is not valid IPv4 nor IPv6 address", verbose=self.verbosity)
             return None
 
         tcp_client.settimeout(TCP_SOCKET_TIMEOUT)
@@ -33,12 +36,12 @@ class TCPClient(Exploit):
             tcp_client = self.tcp_create()
             tcp_client.connect((self.target, self.port))
 
-            print_status("Connection established")
+            print_status("Connection established", verbose=self.verbosity)
             return tcp_client
 
         except Exception as err:
-            print_error("Could not connect")
-            print_error(err)
+            print_error("Could not connect", verbose=self.verbosity)
+            print_error(err, verbose=self.verbosity)
 
         return None
 
@@ -47,7 +50,7 @@ class TCPClient(Exploit):
             if type(data) is bytes:
                 return tcp_client.send(data)
             else:
-                print_error("Data to send is not type of bytes")
+                print_error("Data to send is not type of bytes", verbose=self.verbosity)
 
         return None
 
@@ -67,9 +70,9 @@ class TCPClient(Exploit):
 
                 return response
             except socket.timeout:
-                print_error("Socket did timeout")
+                print_error("Socket did timeout", verbose=self.verbosity)
             except socket.error:
-                print_error("Socket error")
+                print_error("Socket error", verbose=self.verbosity)
 
         return None
 

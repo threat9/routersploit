@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 from __future__ import print_function
+import logging.handlers
 import sys
 if sys.version_info.major < 3:
     print("RouterSploit supports only Python3. Rerun application in Python3 environment.")
     exit(0)
 
-import logging.handlers
 from routersploit.interpreter import RoutersploitInterpreter
 
 log_handler = logging.handlers.RotatingFileHandler(filename="routersploit.log", maxBytes=500000)

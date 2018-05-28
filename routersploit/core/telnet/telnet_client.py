@@ -55,9 +55,9 @@ class TelnetClient(Exploit):
                     print_error("Telnet Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     break
             except EOFError:
-                print_error("Telnet connection error")
+                print_error("Telnet connection error", verbose=self.verbosity)
             except Exception as err:
-                print_error(err)
+                print_error(err, verbose=self.verbosity)
 
         return None
 

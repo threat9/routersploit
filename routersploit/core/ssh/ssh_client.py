@@ -85,12 +85,12 @@ class SSHClient(Exploit):
             return True
 
         except socket.error:
-            print_error("Connection error")
+            print_error("Connection error", verbose=self.verbosity)
             ssh_client.close()
             return False
 
         except Exception as err:
-            print_error("Err: {}".format(err))
+            print_error("Err: {}".format(err), verbose=self.verbosity)
 
         ssh_client.close()
         return False
@@ -182,7 +182,7 @@ class SSHClient(Exploit):
                 chan.send(d)
 
         except Exception as err:
-            print_error("Err: {}".format(err))
+            print_error("Err: {}".format(err), verbose=self.verbosity)
 
     def ssh_close(self, ssh_client):
         if ssh_client:

@@ -34,9 +34,9 @@ class FTPClient(Exploit):
             try:
                 ftp_client.connect(self.target, self.port, timeout=FTP_TIMEOUT)
             except (socket.error, socket.timeout):
-                print_error("Connection error")
+                print_error("Connection error", verbose=self.verbosity)
             except Exception as err:
-                print_error(err)
+                print_error(err, verbose=self.verbosity)
             else:
                 return ftp_client
 
