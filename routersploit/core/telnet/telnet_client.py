@@ -40,6 +40,9 @@ class TelnetClient(Exploit):
         for _ in range(retries):
             try:
                 telnet_client = self.telnet_connect(target=target, port=port)
+                if not telnet_client:
+                    continue
+
                 telnet_client.expect([b"Login: ", b"login: ", b"Username: ", b"username: "], 5)
                 telnet_client.write(bytes(username, "utf-8") + b"\r\n")
                 telnet_client.expect([b"Password: ", b"password: "], 5)
@@ -55,9 +58,9 @@ class TelnetClient(Exploit):
                     print_error("Telnet Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     break
             except EOFError:
-                print_error("Telnet connection error")
+                print_error("Telnet connection error", verbose=self.verbosity)
             except Exception as err:
-                print_error(err)
+                print_error(err, verbose=self.verbosity)
 
         return None
 

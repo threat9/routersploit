@@ -2,6 +2,7 @@ import socket
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
+from routersploit.core.exploit.option import OptBool
 from routersploit.core.exploit.printer import print_error
 from routersploit.core.exploit.utils import is_ipv4
 from routersploit.core.exploit.utils import is_ipv6
@@ -15,13 +16,15 @@ class UDPClient(Exploit):
 
     target_protocol = Protocol.UDP
 
+    verbosity = OptBool("true", "Enable verbose output: true/false")
+
     def udp_create(self):
         if is_ipv4(self.target):
             udp_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         elif is_ipv6(self.target):
             udp_client = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         else:
-            print_error("Target address is not valid IPv4 nor IPv6 address")
+            print_error("Target address is not valid IPv4 nor IPv6 address", verbose=self.verbosity)
             return None
 
         udp_client.settimeout(UDP_SOCKET_TIMEOUT)
@@ -34,7 +37,7 @@ class UDPClient(Exploit):
             elif type(data) is str:
                 return udp_client.sendto(bytes(data, "utf-8"), (self.target, self.port))
             else:
-                print_error("Data to send is not type of bytes or string")
+                print_error("Data to send is not type of bytes or string", verbose=self.verbosity)
 
         return None
 
@@ -44,9 +47,9 @@ class UDPClient(Exploit):
                 response = udp_client.recv(num)
                 return str(response, "utf-8")
             except socket.timeout:
-                print_error("Socket did timeout")
+                print_error("Socket did timeout", verbose=self.verbosity)
             except socket.error:
-                print_error("Socket err")
+                print_error("Socket err", verbose=self.verbosity)
 
         return None
 
