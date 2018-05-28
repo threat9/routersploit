@@ -1,8 +1,9 @@
 .PHONY: build run test lint lint-modules clean prune help
 
-MODULES=routersploit
+DIRECTORY=.
+EXCLUDED=.git,rsf.py
 RSF_IMAGE=routersploit
-FLAKE8_IGNORED_RULES=E501,W503
+FLAKE8_IGNORED_RULES=E501,F405,F403
 
 build:
 	docker build -t $(RSF_IMAGE) .
@@ -11,14 +12,10 @@ run:
 	docker run -it --rm $(RSF_IMAGE)
 
 lint:
-	flake8 --exclude=__init__.py --ignore=$(FLAKE8_IGNORED_RULES) $(MODULES)
+	python3 -m flake8 --exclude=$(EXCLUDED) --ignore=$(FLAKE8_IGNORED_RULES) $(DIRECTORY)
 
 tests: clean
-ifeq ($(MODULES), routersploit)
-	python -m unittest discover
-else
-	python -m unittest $(MODULES)
-endif
+	python3 -m pytest -n16 tests 
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -34,8 +31,6 @@ help:
 	@echo "        Run Routersploit in docker container"
 	@echo "    lint"
 	@echo "        Check style with flake8."
-	@echo "    lint-modules"
-	@echo "        Check modules style with flake8."
 	@echo "    test"
 	@echo "        Run test suite"
 	@echo "    clean"

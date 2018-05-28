@@ -6,4 +6,5 @@ pycrypto==2.6.1
 pytest==3.5.1
 pytest-forked==0.2
 pytest-xdist==1.22.2
+flake8==3.5.0
 git+git://github.com/threat9/threat9-test-bed
