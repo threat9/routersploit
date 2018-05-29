@@ -12,4 +12,4 @@ Provide steps to test or reproduce the PR.
 - [ ] `run`
 - [ ] ...
 - [ ] Write tests ([Example](https://github.com/threat9/routersploit/blob/master/tests/exploits/routers/dlink/test_dsl_2750b_rce.py))
-- [ ] Document how it works
+- [ ] Document how it works ([Example](https://github.com/threat9/routersploit/blob/master/docs/modules/exploits/routers/dlink/dsl_2750b_rce.md))
