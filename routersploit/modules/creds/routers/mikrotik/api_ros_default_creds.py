@@ -78,7 +78,8 @@ class Exploit(TCPClient):
     def check_default(self):
         self.credentials = []
 
-        self.run_threads(self.target_function, self.defaults)
+        data = LockedIterator(self.defaults)
+        self.run_threads(self.threads, self.target_function, data)
 
         if self.credentials:
             return self.credentials
