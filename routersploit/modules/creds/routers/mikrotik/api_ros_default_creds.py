@@ -71,6 +71,7 @@ class Exploit(TCPClient):
     def check(self):
         tcp_client = self.tcp_connect()
         if tcp_client:
+            self.tcp_close(tcp_client)
             return True
 
         return False
