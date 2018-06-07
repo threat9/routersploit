@@ -71,6 +71,7 @@ class Exploit(TCPClient):
     def check(self):
         tcp_client = self.tcp_connect()
         if tcp_client:
+            self.tcp_close(tcp_client)
             return True
 
         return False
@@ -78,7 +79,8 @@ class Exploit(TCPClient):
     def check_default(self):
         self.credentials = []
 
-        self.run_threads(self.target_function, self.defaults)
+        data = LockedIterator(self.defaults)
+        self.run_threads(self.threads, self.target_function, data)
 
         if self.credentials:
             return self.credentials
