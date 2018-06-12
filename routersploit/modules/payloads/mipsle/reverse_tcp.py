@@ -10,9 +10,9 @@ class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         "name": "MIPSLE Reverse TCP",
         "description": "Creates interactive tcp reverse shell for MIPSLE architecture.",
-        "authors": [
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
-        ],
+        "authors": (
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
+        ),
     }
 
     architecture = Architectures.MIPSLE

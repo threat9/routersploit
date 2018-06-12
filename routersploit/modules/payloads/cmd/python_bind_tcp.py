@@ -7,7 +7,7 @@ class Exploit(PythonBindTCP):
         "name": "Python Reverse TCP One-Liner",
         "description": "Creates interactive tcp bind shell by using python one-liner.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 

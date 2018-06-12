@@ -11,7 +11,7 @@ class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
         "name": "MIPSBE Bind TCP",
         "description": "Creates interactive tcp bind shell for MIPSBE architecture.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 

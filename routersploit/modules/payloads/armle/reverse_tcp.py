@@ -11,7 +11,7 @@ class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
         "name": "ARMLE Reverse TCP",
         "description": "Creates interactive tcp reverse shell for ARMLE architecture.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 
