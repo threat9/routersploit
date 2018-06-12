@@ -7,7 +7,7 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
         "name": "Awk Bind TCP",
         "description": "Creates an interactive tcp bind shell by using (g)awk.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 

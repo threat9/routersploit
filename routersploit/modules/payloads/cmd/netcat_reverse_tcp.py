@@ -7,7 +7,7 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
         "name": "Netcat Reverse TCP",
         "description": "Creates interactive tcp reverse shell by using netcat.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 

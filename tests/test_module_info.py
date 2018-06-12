@@ -60,3 +60,19 @@ def test_scanner_info(scanner):
 
     assert "devices" in info
     assert isinstance(info["devices"], tuple)
+
+
+@pytest.mark.parametrize("payload", iter_modules("./routersploit/modules/payloads"))
+def test_payload_info(payload):
+    info = payload._Exploit__info__
+
+    assert isinstance(info, dict)
+
+    assert "name" in info
+    assert isinstance(info["name"], str)
+
+    assert "description" in info
+    assert isinstance(info["description"], str)
+
+    assert "authors" in info
+    assert isinstance(info["authors"], tuple)
