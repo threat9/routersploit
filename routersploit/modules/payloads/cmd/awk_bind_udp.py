@@ -7,7 +7,7 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
         "name": "Awk Bind UDP",
         "description": "Creates an interactive udp bind shell by using (g)awk.",
         "authors": (
-            "Marcin Bury <marcin[at]threat9.com>"  # routersploit module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
     }
 
