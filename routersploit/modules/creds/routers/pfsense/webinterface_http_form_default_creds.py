@@ -17,12 +17,12 @@ class Exploit(HTTPClient):
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")
     port = OptPort(443, "Target Web Interface port")
-    ssl = OptBool("true", "SSL enabled: true/false")
+    ssl = OptBool(True, "SSL enabled: true/false")
 
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:pfsense", "User:Pass or file with default credentials (file://)")
-    stop_on_success = OptBool("false", "Stop on first valid authentication attempt")
-    verbosity = OptBool("true", "Displaye authentication attempts")
+    stop_on_success = OptBool(False, "Stop on first valid authentication attempt")
+    verbosity = OptBool(True, "Displaye authentication attempts")
 
     def run(self):
         self.credentials = []

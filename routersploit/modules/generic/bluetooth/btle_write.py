@@ -18,7 +18,7 @@ class Exploit(BTLEClient):
     target = OptMAC("", "Target MAC address")
     char = OptString("", "Characteristic")
     data = OptString("41424344", "Data (in hex format)")
-    buffering = OptBool("true", "Buffering enabled: true/false. Results in real time.")
+    buffering = OptBool(True, "Buffering enabled: true/false. Results in real time.")
 
     def run(self):
         try:

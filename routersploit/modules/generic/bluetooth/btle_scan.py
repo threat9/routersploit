@@ -14,8 +14,8 @@ class Exploit(BTLEClient):
         ),
     }
 
-    enum = OptBool("false", "Automatically enumerate services: true/false")
-    buffering = OptBool("true", "Buffering enabled: true/false. Results in real time.")
+    enum = OptBool(False, "Automatically enumerate services: true/false")
+    buffering = OptBool(False, "Buffering enabled: true/false. Results in real time.")
 
     def run(self):
         devices = self.btle_scan()

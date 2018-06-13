@@ -16,7 +16,7 @@ class UDPClient(Exploit):
 
     target_protocol = Protocol.UDP
 
-    verbosity = OptBool("true", "Enable verbose output: true/false")
+    verbosity = OptBool(True, "Enable verbose output: true/false")
 
     def udp_create(self):
         if is_ipv4(self.target):
