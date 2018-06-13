@@ -22,7 +22,7 @@ class SSHClient(Exploit):
 
     target_protocol = Protocol.SSH
 
-    verbosity = OptBool("true", "Enable verbose output: true/false")
+    verbosity = OptBool(True, "Enable verbose output: true/false")
 
     def ssh_create(self):
         ssh_client = paramiko.SSHClient()

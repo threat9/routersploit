@@ -15,7 +15,7 @@ class TelnetClient(Exploit):
 
     target_protocol = Protocol.TELNET
 
-    verbosity = OptBool("true", "Enable verbose output: true/false")
+    verbosity = OptBool(True, "Enable verbose output: true/false")
 
     def telnet_connect(self, target=None, port=None):
         if not target:

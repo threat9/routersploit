@@ -16,8 +16,8 @@ class FTPClient(Exploit):
 
     target_protocol = Protocol.FTP
 
-    ssl = OptBool("false", "SSL enabled: true/false")
-    verbosity = OptBool("true", "Enable verbose output: true/false")
+    ssl = OptBool(False, "SSL enabled: true/false")
+    verbosity = OptBool(True, "Enable verbose output: true/false")
 
     def ftp_create(self):
         if self.ssl:

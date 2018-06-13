@@ -15,7 +15,7 @@ class SNMPClient(Exploit):
 
     target_protocol = Protocol.SNMP
 
-    verbosity = OptBool("true", "Enable verbose output: true/false")
+    verbosity = OptBool(True, "Enable verbose output: true/false")
 
     def snmp_get(self, community_string, oid, version=1, retries=0):
         cmdGen = cmdgen.CommandGenerator()

@@ -20,10 +20,10 @@ class Exploit(Exploit):
     target = OptIP("", "Target IPv4 or IPv6 address")
 
     http_port = OptPort(80, "Target Web Interface Port")
-    http_ssl = OptBool("false", "HTTPS enabled: true/false")
+    http_ssl = OptBool(False, "HTTPS enabled: true/false")
 
     ftp_port = OptPort(21, "Target FTP port (default: 21)")
-    ftp_ssl = OptBool("false", "FTPS enabled: true/false")
+    ftp_ssl = OptBool(False, "FTPS enabled: true/false")
 
     ssh_port = OptPort(22, "Target SSH port (default: 22)")
     telnet_port = OptPort(23, "Target Telnet port (default: 23)")

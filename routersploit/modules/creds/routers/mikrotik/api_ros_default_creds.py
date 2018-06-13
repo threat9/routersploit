@@ -20,8 +20,8 @@ class Exploit(TCPClient):
 
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:admin", "User:Pass or file with default credentials (file://)")
-    stop_on_success = OptBool("true", "Stop on first valid authentication attempt")
-    verbosity = OptBool("true", "Display authentication attempts")
+    stop_on_success = OptBool(True, "Stop on first valid authentication attempt")
+    verbosity = OptBool(True, "Display authentication attempts")
 
     def run(self):
         self.credentials = []

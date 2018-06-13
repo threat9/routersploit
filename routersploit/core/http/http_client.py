@@ -18,8 +18,8 @@ class HTTPClient(Exploit):
 
     target_protocol = Protocol.HTTP
 
-    verbosity = OptBool("true", "Verbosity enabled: true/false")
-    ssl = OptBool("false", "SSL enabled: true/false")
+    verbosity = OptBool(True, "Verbosity enabled: true/false")
+    ssl = OptBool(False, "SSL enabled: true/false")
 
     def http_request(self, method, path, session=requests, **kwargs):
         if self.ssl:
