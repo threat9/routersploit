@@ -81,20 +81,26 @@ class TelnetClient(Exploit):
 
     def telnet_read_until(self, telnet_client, data):
         if telnet_client:
-            if type(data) is str:
-                data = bytes(data, "utf-8")
+            try:
+                if type(data) is str:
+                    data = bytes(data, "utf-8")
 
-            response = telnet_client.read_until(data, 5)
-            return str(response, "utf-8")
+                response = telnet_client.read_until(data, 5)
+                return str(response, "utf-8")
+            except Exception:
+                pass
 
         return None
 
     def telnet_write(self, telnet_client, data):
         if telnet_client:
-            if type(data) is str:
-                data = bytes(data, "utf-8")
+            try:
+                if type(data) is str:
+                    data = bytes(data, "utf-8")
 
-            return telnet_client.write(data, 5)
+                return telnet_client.write(data, 5)
+            except Exception:
+                pass
 
         return None
 
