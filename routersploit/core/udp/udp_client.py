@@ -33,11 +33,12 @@ class UDPClient(Exploit):
     def udp_send(self, udp_client, data):
         if udp_client:
             if type(data) is bytes:
-                return udp_client.sendto(data, (self.target, self.port))
-            elif type(data) is str:
-                return udp_client.sendto(bytes(data, "utf-8"), (self.target, self.port))
+                try:
+                    return udp_client.sendto(data, (self.target, self.port))
+                except Exception:
+                    print_error("Exception while sending data", verbose=self.verbosity)
             else:
-                print_error("Data to send is not type of bytes or string", verbose=self.verbosity)
+                print_error("Data to send is not type of bytes", verbose=self.verbosity)
 
         return None
 
@@ -45,7 +46,7 @@ class UDPClient(Exploit):
         if udp_client:
             try:
                 response = udp_client.recv(num)
-                return str(response, "utf-8")
+                return response
             except socket.timeout:
                 print_error("Socket did timeout", verbose=self.verbosity)
             except socket.error:

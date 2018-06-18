@@ -5,6 +5,7 @@ from threat9_test_bed.service_mocks import HttpScenarioService, HttpServiceMock
 from threat9_test_bed.scenarios import TelnetScenario
 from threat9_test_bed.service_mocks.telnet_service_mock import TelnetServiceMock
 from threat9_test_bed.service_mocks.tcp_service_mock import TCPServiceMock
+from threat9_test_bed.service_mocks.udp_service_mock import UDPServiceMock
 
 
 @pytest.fixture
@@ -65,3 +66,9 @@ def generic_target():
 def tcp_target():
     with TCPServiceMock("127.0.0.1", 0) as tcp_service:
         yield tcp_service
+
+
+@pytest.fixture
+def udp_target():
+    with UDPServiceMock("127.0.0.1", 0) as udp_service:
+        yield udp_service

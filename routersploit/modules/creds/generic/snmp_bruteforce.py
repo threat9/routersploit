@@ -64,4 +64,12 @@ class Exploit(SNMPClient):
 
     @mute
     def check_default(self):
+        self.strings = []
+
+        data = LockedIterator(self.defaults)
+        self.run_threads(self.threads, self.target_function, data)
+
+        if self.strings:
+            return self.strings
+
         return None
