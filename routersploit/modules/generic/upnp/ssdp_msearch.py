@@ -28,12 +28,15 @@ class Exploit(UDPClient):
             "MX: 2\r\n" +
             "ST: upnp:rootdevice\r\n\r\n"
         )
+        request = bytes(request, "utf-8")
 
         udp_client = self.udp_create()
         self.udp_send(udp_client, request)
 
         response = self.udp_recv(udp_client, 1024)
         if response:
+            response = str(response, "utf-8")
+
             info = {}
             regexps = {
                 "server": r"Server:\s*(.*?)\r\n",
