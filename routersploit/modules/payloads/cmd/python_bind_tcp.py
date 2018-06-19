@@ -1,8 +1,8 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.python.bind_tcp import Exploit as PythonBindTCP
+from routersploit.modules.payloads.python.bind_tcp import Payload as PythonBindTCP
 
 
-class Exploit(PythonBindTCP):
+class Payload(PythonBindTCP):
     __info__ = {
         "name": "Python Reverse TCP One-Liner",
         "description": "Creates interactive tcp bind shell by using python one-liner.",
@@ -14,7 +14,7 @@ class Exploit(PythonBindTCP):
     cmd = OptString("python", "Python binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
+        payload = super(Payload, self).generate()
 
         cmd = '{} -c "{}"'.format(self.cmd, payload)
         return cmd

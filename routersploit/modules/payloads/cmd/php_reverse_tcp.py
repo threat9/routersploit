@@ -1,5 +1,5 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.php.reverse_tcp import Exploit as PHPReverseTCP
+from routersploit.modules.payloads.php.reverse_tcp import Payload as PHPReverseTCP
 
 
 class Exploit(PHPReverseTCP):

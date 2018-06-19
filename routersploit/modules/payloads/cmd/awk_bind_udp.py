@@ -2,7 +2,7 @@ from routersploit.core.exploit import *
 from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 
-class Exploit(BindTCPPayloadMixin, GenericPayload):
+class Payload(BindTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Awk Bind UDP",
         "description": "Creates an interactive udp bind shell by using (g)awk.",

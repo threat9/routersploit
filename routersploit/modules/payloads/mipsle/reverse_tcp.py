@@ -6,7 +6,7 @@ from routersploit.core.exploit.payloads import (
 )
 
 
-class Exploit(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
+class Payload(ReverseTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         "name": "MIPSLE Reverse TCP",
         "description": "Creates interactive tcp reverse shell for MIPSLE architecture.",

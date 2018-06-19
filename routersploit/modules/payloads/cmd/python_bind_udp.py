@@ -1,8 +1,8 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.python.bind_udp import Exploit as PythonBindUDP
+from routersploit.modules.payloads.python.bind_udp import Payload as PythonBindUDP
 
 
-class Exploit(PythonBindUDP):
+class Payload(PythonBindUDP):
     __info__ = {
         "name": "Python Bind UDP One-Liner",
         "description": "Creates interactive udp bind shell by using python one-liner.",
@@ -14,7 +14,7 @@ class Exploit(PythonBindUDP):
     cmd = OptString("python", "Python binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
+        payload = super(Payload, self).generate()
 
         cmd = '{} -c "{}"'.format(self.cmd, payload)
         return cmd

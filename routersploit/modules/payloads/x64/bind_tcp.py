@@ -6,7 +6,7 @@ from routersploit.core.exploit.payloads import (
 )
 
 
-class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
+class Payload(BindTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         "name": "X64 Bind TCP",
         "description": "Creates interactive tcp bind shell for X64 architecture.",

