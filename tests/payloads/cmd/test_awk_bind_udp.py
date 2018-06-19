@@ -1,4 +1,4 @@
-from routersploit.modules.payloads.cmd.awk_bind_udp import Exploit
+from routersploit.modules.payloads.cmd.awk_bind_udp import Payload
 
 
 # awk bind udp payload with rport=4321
@@ -10,7 +10,7 @@ bind_udp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.rport = 4321
 
-    assert payload.generate() == bind_udp
+    assert payload.run() == bind_udp

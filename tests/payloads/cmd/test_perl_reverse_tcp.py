@@ -1,4 +1,4 @@
-from routersploit.modules.payloads.cmd.perl_reverse_tcp import Exploit
+from routersploit.modules.payloads.cmd.perl_reverse_tcp import Payload
 
 
 # perl reverse udp payload with lhost=192.168.1.4 lport=4321
@@ -10,8 +10,8 @@ reverse_tcp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.lhost = "192.168.1.4"
     payload.lport = 4321
 
-    assert payload.generate() == reverse_tcp
+    assert payload.run() == reverse_tcp

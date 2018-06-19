@@ -14,7 +14,6 @@ class Payload(PerlReverseTCP):
     cmd = OptString("perl", "Perl binary")
 
     def generate(self):
+        self.fmt = self.cmd + " -MIO -e \"{}\""
         payload = super(Payload, self).generate()
-
-        cmd = "{} -MIO -e \"{}\"".format(self.cmd, payload)
-        return cmd
+        return payload

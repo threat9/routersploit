@@ -6,7 +6,7 @@ from routersploit.core.exploit.payloads import Architectures
 class Encoder(BaseEncoder):
     __info__ = {
         "name": "Python Base64 Encoder",
-        "description": "aaa",
+        "description": "Module encodes Python payload to Base64 format.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),

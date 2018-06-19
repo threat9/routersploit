@@ -4,7 +4,7 @@ from routersploit.core.exploit.payloads import (
     Architectures,
     BindTCPPayloadMixin,
 )
-from routersploit.modules.encoders.perl.base64 import Encoder 
+from routersploit.modules.encoders.perl.base64 import Encoder
 
 
 class Payload(BindTCPPayloadMixin, GenericPayload):

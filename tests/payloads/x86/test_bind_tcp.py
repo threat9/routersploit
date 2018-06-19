@@ -1,4 +1,4 @@
-from routersploit.modules.payloads.x86.bind_tcp import Exploit
+from routersploit.modules.payloads.x86.bind_tcp import Payload
 
 
 # bind tcp payload with rport=4321
@@ -30,7 +30,7 @@ elf_x86_reverse_tcp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.rport = 4321
 
     assert payload.generate() == bind_tcp

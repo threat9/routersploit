@@ -1,4 +1,4 @@
-from routersploit.core.exploit.option import OptString 
+from routersploit.core.exploit.option import OptString
 from routersploit.core.exploit.payloads import (
     GenericPayload,
     Architectures,
@@ -17,8 +17,8 @@ class Payload(ReverseTCPPayloadMixin, GenericPayload):
         ),
     }
 
-    architecture = Architecture.PYTHON
-    encoder = OptString(Encoder(), "Encoder") 
+    architecture = Architectures.PYTHON
+    encoder = OptString(Encoder(), "Encoder")
 
     def generate(self):
         return (

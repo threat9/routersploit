@@ -1,4 +1,4 @@
-from routersploit.modules.payloads.armle.bind_tcp import Exploit
+from routersploit.modules.payloads.armle.bind_tcp import Payload
 
 
 # armle bind tcp payload with rport=4321
@@ -54,7 +54,7 @@ elf_armle_bind_tcp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.rport = 4321
 
     assert payload.generate() == bind_tcp
