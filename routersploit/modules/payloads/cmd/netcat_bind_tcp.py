@@ -2,7 +2,7 @@ from routersploit.core.exploit import *
 from routersploit.core.exploit.payloads import BindTCPPayloadMixin, GenericPayload
 
 
-class Exploit(BindTCPPayloadMixin, GenericPayload):
+class Payload(BindTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Netcat Bind TCP",
         "description": "Creates interactive tcp bind shell by using netcat.",

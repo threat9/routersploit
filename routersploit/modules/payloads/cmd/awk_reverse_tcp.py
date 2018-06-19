@@ -2,7 +2,7 @@ from routersploit.core.exploit import *
 from routersploit.core.exploit.payloads import GenericPayload, ReverseTCPPayloadMixin
 
 
-class Exploit(ReverseTCPPayloadMixin, GenericPayload):
+class Payload(ReverseTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Awk Reverse TCP",
         "description": "Creates an interactive tcp reverse shell by using (g)awk.",

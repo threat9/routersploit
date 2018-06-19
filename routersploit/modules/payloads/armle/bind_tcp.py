@@ -6,7 +6,7 @@ from routersploit.core.exploit.payloads import (
 )
 
 
-class Exploit(BindTCPPayloadMixin, ArchitectureSpecificPayload):
+class Payload(BindTCPPayloadMixin, ArchitectureSpecificPayload):
     __info__ = {
         "name": "ARMLE Bind TCP",
         "description": "Creates interactive tcp bind shell for ARMLE architecture.",

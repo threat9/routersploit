@@ -1,4 +1,4 @@
-from routersploit.modules.payloads.mipsbe.bind_tcp import Exploit
+from routersploit.modules.payloads.mipsbe.bind_tcp import Payload
 
 
 # mipsbe bind tcp payload with rport=4321
@@ -51,7 +51,7 @@ elf_mipsbe_bind_tcp = (
 def test_payload_generation():
     """ Test scenario - payload generation """
 
-    payload = Exploit()
+    payload = Payload()
     payload.rport = 4321
 
     assert payload.generate() == bind_tcp

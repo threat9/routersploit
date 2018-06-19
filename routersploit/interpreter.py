@@ -31,6 +31,7 @@ from routersploit.core.exploit.printer import (
     printer_queue
 )
 from routersploit.core.exploit.exploit import GLOBAL_OPTS
+from routersploit.core.exploit.payloads import BasePayload
 
 import readline
 
@@ -207,7 +208,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = "rsf"
-        self.show_sub_commands = ("info", "options", "devices", "all", "creds", "exploits", "scanners", "wordlists")
+        self.show_sub_commands = ("info", "options", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
 
         self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
@@ -238,12 +239,13 @@ class RoutersploitInterpreter(BaseInterpreter):
 
  Join Threat9 Beta Program - https://www.threat9.com
 
- Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Generic: {generic_count} Payloads: {payloads_count}
+ Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Generic: {generic_count} Payloads: {payloads_count} Encoders: {encoders_count}
 """.format(exploits_count=self.modules_count["exploits"],
            scanners_count=self.modules_count["scanners"],
            creds_count=self.modules_count["creds"],
            generic_count=self.modules_count["generic"],
-           payloads_count=self.modules_count["payloads"])
+           payloads_count=self.modules_count["payloads"],
+           encoders_count=self.modules_count["encoders"])
 
     def __parse_prompt(self):
         raw_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 > "
@@ -343,6 +345,13 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_set(self, *args, **kwargs):
         key, _, value = args[0].partition(" ")
         if key in self.current_module.options:
+            if key == "encoder":
+                value = self.current_module.get_encoder(value)
+
+                if not value:
+                    print_error("Encoder not available. Check available encoders with `show encoders`.")
+                    return
+
             setattr(self.current_module, key, value)
             self.current_module.exploit_attributes[key][0] = value
 
@@ -450,6 +459,17 @@ class RoutersploitInterpreter(BaseInterpreter):
         wordlists = [(f, "file://{}/{}".format(WORDLISTS_DIR, f)) for f in os.listdir(WORDLISTS_DIR) if f.endswith(".txt")]
 
         print_table(headers, *wordlists, max_column_length=100)
+
+    @module_required
+    def _show_encoders(self, *args, **kwargs):
+        if issubclass(self.current_module.__class__, BasePayload):
+            encoders = self.current_module.get_encoders()
+            if encoders:
+                headers = ("Encoder", "Name", "Description")
+                print_table(headers, *encoders, max_column_length=100)
+                return
+
+        print_error("No encoders available")
 
     def __show_modules(self, root=''):
         for module in [module for module in self.modules if module.startswith(root)]:
