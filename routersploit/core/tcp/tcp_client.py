@@ -57,6 +57,18 @@ class TCPClient(Exploit):
     def tcp_recv(self, tcp_client, num):
         if tcp_client:
             try:
+                response = tcp_client.recv(num)
+                return response
+            except socket.timeout:
+                print_error("Socket did timeout", verbose=self.verbosity)
+            except socket.error:
+                print_error("Socket error", verbose=self.verbosity)
+
+        return None
+
+    def tcp_recv_all(self, tcp_client, num):
+        if tcp_client:
+            try:
                 response = b""
                 received = 0
                 while received < num:
