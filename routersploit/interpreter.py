@@ -33,11 +33,14 @@ from routersploit.core.exploit.printer import (
 from routersploit.core.exploit.exploit import GLOBAL_OPTS
 from routersploit.core.exploit.payloads import BasePayload
 
-import readline
+try:
+    import readline
+except ImportError:
+    import pyreadline as readline
 
 
 def is_libedit():
-    return "libedit" in readline.__doc__
+    return readline.__doc__ is not None and "libedit" in readline.__doc__
 
 
 class BaseInterpreter(object):

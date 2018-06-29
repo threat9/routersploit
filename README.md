@@ -26,6 +26,9 @@ Required:
 * pysnmp
 * pycrypto
 
+If you are using windows you should install:
+* pyreadline
+
 Optional:
 * bluepy - bluetooth low energy 
 
