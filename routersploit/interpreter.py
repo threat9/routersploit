@@ -40,7 +40,7 @@ except ImportError:
 
 
 def is_libedit():
-    return  readline.__doc__ is not None and "libedit" in readline.__doc__
+    return readline.__doc__ is not None and "libedit" in readline.__doc__
 
 
 class BaseInterpreter(object):
