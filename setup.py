@@ -15,6 +15,7 @@ setup(
     download_url="https://github.com/threat9/routersploit/",
     packages=find_packages(),
     include_package_data=True,
+    scripts=('rsf.py',),
     entry_points={},
     install_requires=[
         "future",
