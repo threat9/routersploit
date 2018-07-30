@@ -1,0 +1,3 @@
+recursive-include routersploit/resources/ssh_keys *.json *.key
+recursive-include routersploit/resources/vendors *.dat
+recursive-include routersploit/resources/wordlists *.txt
