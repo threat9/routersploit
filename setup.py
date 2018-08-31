@@ -22,7 +22,7 @@ setup(
         "requests",
         "paramiko",
         "pysnmp",
-        "pycrypto",
+        "pycryptodome",
     ],
     extras_require={
         "tests": [
