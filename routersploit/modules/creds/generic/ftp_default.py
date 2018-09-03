@@ -53,27 +53,26 @@ class Exploit(FTPClient):
             except StopIteration:
                 break
             else:
-                ftp = self.ftp_connect(retries=3)
-                if ftp is None:
+                ftp_client = self.ftp_create()
+                if ftp_client.connect(retries=3) is None:
                     print_error("Too many connections problems. Quiting...", verbose=self.verbosity)
                     return
 
-            try:
-                ftp.login(username, password)
-
+            if ftp_client.login(username, password):
                 if self.stop_on_success:
                     running.clear()
 
                 print_success("Authenticated Succeed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                 self.credentials.append((self.target, self.port, self.target_protocol, username, password))
 
-            except Exception as err:
+            else:
                 print_error("Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
-        ftp.close()
+        ftp_client.close()
 
     def check(self):
-        if self.ftp_test_connect():
+        ftp_client = self.ftp_create()
+        if ftp_client.test_connect():
             print_status("Target exposes FTP service", verbose=self.verbosity)
             return True
 

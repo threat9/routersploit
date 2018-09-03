@@ -17,42 +17,34 @@ from routersploit.core.exploit.utils import random_text
 SSH_TIMEOUT = 8.0
 
 
-class SSHClient(Exploit):
-    """ SSH Client exploit """
+class SSHCli(object):
+    def __init__(self, ssh_target, ssh_port, verbosity):
+        self.ssh_target = ssh_target
+        self.ssh_port = ssh_port
+        self.verbosity = verbosity
 
-    target_protocol = Protocol.SSH
+        self.ssh_client = paramiko.SSHClient()
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    verbosity = OptBool(True, "Enable verbose output: true/false")
-
-    def ssh_create(self):
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        return ssh_client
-
-    def ssh_login(self, username, password, retries=1):
-        ssh_client = self.ssh_create()
-
+    def login(self, username, password, retries=1):
         for _ in range(retries):
             try:
-                ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, password=password, look_for_keys=False)
+                self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, password=password, look_for_keys=False)
             except paramiko.AuthenticationException:
                 print_error("SSH Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
-                ssh_client.close()
+                self.ssh_client.close()
                 break
             except Exception as err:
                 print_error("Err: {}".format(err), verbose=self.verbosity)
             else:
                 print_success("SSH Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
-                return ssh_client
+                return self.ssh_client
 
-            ssh_client.close()
+            self.ssh_client.close()
 
-        return
+        return None
 
-    def ssh_login_pkey(self, username, priv_key, retries=1):
-        ssh_client = self.ssh_create()
-
+    def login_pkey(self, username, priv_key, retries=1):
         if "DSA PRIVATE KEY" in priv_key:
             priv_key = paramiko.DSSKey.from_private_key(io.StringIO(priv_key))
         elif "RSA PRIVATE KEY" in priv_key:
@@ -62,70 +54,67 @@ class SSHClient(Exploit):
 
         for _ in range(retries):
             try:
-                ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key, look_for_keys=False)
+                self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key, look_for_keys=False)
             except paramiko.AuthenticationException:
                 print_error("Authentication Failed - Username: '{}' auth with private key".format(username), verbose=self.verbosity)
             except Exception as err:
                 print_error("Err: {}".format(err), verbose=self.verbosity)
             else:
                 print_success("SSH Authentication Successful - Username: '{}' with private key".format(username), verbose=self.verbosity)
-                return ssh_client
+                return self.ssh_client
 
-            ssh_client.close()
+            self.ssh_client.close()
 
         return None
 
-    def ssh_test_connect(self):
-        ssh_client = self.ssh_create()
-
+    def test_connect(self):
         try:
-            ssh_client.connect(self.target, self.port, timeout=SSH_TIMEOUT, username="root", password=random_text(12), look_for_keys=False)
+            self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, username="root", password=random_text(12), look_for_keys=False)
         except paramiko.AuthenticationException:
-            ssh_client.close()
+            self.ssh_client.close()
             return True
 
         except socket.error:
             print_error("Connection error", verbose=self.verbosity)
-            ssh_client.close()
+            self.ssh_client.close()
             return False
 
         except Exception as err:
             print_error("Err: {}".format(err), verbose=self.verbosity)
 
-        ssh_client.close()
+        self.ssh_client.close()
         return False
 
-    def ssh_execute(self, ssh, cmd):
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd)
+    def execute(self, cmd):
+        ssh_stdin, ssh_stdout, ssh_stderr = self.ssh_client.exec_command(cmd)
         return ssh_stdout.read()
 
-    def ssh_get_file(self, ssh, remote_file, local_file):
-        sftp = ssh.open_sftp()
+    def get_file(self, remote_file, local_file):
+        sftp = self.ssh_client.open_sftp()
         sftp.get(remote_file, local_file)
 
-    def ssh_get_content(self, ssh, remote_file):
+    def get_content(self, remote_file):
         fp_content = io.BytesIO()
-        sftp = ssh.open_sftp()
+        sftp = self.ssh_client.open_sftp()
         sftp.getfo(remote_file, fp_content)
 
         return fp_content.getvalue()
 
-    def ssh_send_file(self, ssh, local_file, dest_file):
-        sftp = ssh.open_sftp()
+    def send_file(self, local_file, dest_file):
+        sftp = self.ssh_client.open_sftp()
         sftp.put(local_file, dest_file)
 
-    def ssh_send_content(self, ssh, content, dest_file):
+    def send_content(self, content, dest_file):
         fp_content = io.BytesIO(content)
-        sftp = ssh.open_sftp()
+        sftp = self.ssh_client.open_sftp()
         sftp.putfo(fp_content, dest_file)
 
-    def ssh_interactive(self, ssh):
-        if ssh:
-            chan = ssh.invoke_shell()
-            if os.name == "posix":
-                self._posix_shell(chan)
-            else:
-                self._windows_shell(chan)
+    def interactive(self):
+        chan = self.ssh_client.invoke_shell()
+        if os.name == "posix":
+            self._posix_shell(chan)
+        else:
+            self._windows_shell(chan)
 
     def _posix_shell(self, chan):
         import termios
@@ -184,8 +173,21 @@ class SSHClient(Exploit):
         except Exception as err:
             print_error("Err: {}".format(err), verbose=self.verbosity)
 
-    def ssh_close(self, ssh_client):
-        if ssh_client:
-            ssh_client.close()
-
+    def close(self):
+        self.ssh_client.close()
         return None
+
+
+class SSHClient(Exploit):
+    """ SSH Client exploit """
+
+    target_protocol = Protocol.SSH
+
+    verbosity = OptBool(True, "Enable verbose output: true/false")
+
+    def ssh_create(self, target=None, port=None):
+        ssh_target = target if target else self.target
+        ssh_port = port if port else self.port
+
+        ssh_client = SSHCli(ssh_target, ssh_port, verbosity=self.verbosity)
+        return ssh_client
