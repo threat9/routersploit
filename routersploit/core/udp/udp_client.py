@@ -17,6 +17,8 @@ class UDPCli(object):
         self.udp_port = udp_port
         self.verbosity = verbosity
 
+        self.peer = "{}:{}".format(self.udp_target, self.udp_port)
+
         if is_ipv4(self.udp_target):
             self.udp_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         elif is_ipv6(self.udp_target):
@@ -28,13 +30,10 @@ class UDPCli(object):
         self.udp_client.settimeout(UDP_SOCKET_TIMEOUT)
 
     def send(self, data):
-        if type(data) is bytes:
-            try:
-                return self.udp_client.sendto(data, (self.udp_target, self.udp_port))
-            except Exception:
-                print_error("Exception while sending data", verbose=self.verbosity)
-        else:
-            print_error("Data to send is not type of bytes", verbose=self.verbosity)
+        try:
+            return self.udp_client.sendto(data, (self.udp_target, self.udp_port))
+        except Exception as err:
+            print_error(self.peer, "Error while sending data", err, verbose=self.verbosity)
 
         return None
 
@@ -42,15 +41,17 @@ class UDPCli(object):
         try:
             response = self.udp_client.recv(num)
             return response
-        except socket.timeout:
-            print_error("Socket did timeout", verbose=self.verbosity)
-        except socket.error:
-            print_error("Socket err", verbose=self.verbosity)
+        except Exception as err:
+            print_error(self.peer, "Error while receiving data", err, verbose=self.verbosity)
 
         return None
 
     def close(self):
-        self.udp_client.close()
+        try:
+            self.udp_client.close()
+        except Exception as err:
+            print_error(self.peer, "Error while closing udp socket", err, verbose=self.verbosity)
+
         return None
 
 

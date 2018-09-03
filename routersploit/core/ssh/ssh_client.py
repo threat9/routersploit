@@ -23,6 +23,8 @@ class SSHCli(object):
         self.ssh_port = ssh_port
         self.verbosity = verbosity
 
+        self.peer = "{}:{}".format(self.ssh_target, self.ssh_port)
+
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -31,13 +33,13 @@ class SSHCli(object):
             try:
                 self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, password=password, look_for_keys=False)
             except paramiko.AuthenticationException:
-                print_error("SSH Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
+                print_error(self.peer, "SSH Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                 self.ssh_client.close()
                 break
             except Exception as err:
-                print_error("Err: {}".format(err), verbose=self.verbosity)
+                print_error(self.peer, "SSH Error while authenticating", err, verbose=self.verbosity)
             else:
-                print_success("SSH Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
+                print_success(self.peer, "SSH Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                 return self.ssh_client
 
             self.ssh_client.close()
@@ -56,11 +58,11 @@ class SSHCli(object):
             try:
                 self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key, look_for_keys=False)
             except paramiko.AuthenticationException:
-                print_error("Authentication Failed - Username: '{}' auth with private key".format(username), verbose=self.verbosity)
+                print_error(self.peer, "SSH Authentication Failed - Username: '{}' auth with private key".format(username), verbose=self.verbosity)
             except Exception as err:
-                print_error("Err: {}".format(err), verbose=self.verbosity)
+                print_error(self.peer, "SSH Error while authenticated by using private key", err, verbose=self.verbosity)
             else:
-                print_success("SSH Authentication Successful - Username: '{}' with private key".format(username), verbose=self.verbosity)
+                print_success(self.peer, "SSH Authentication Successful - Username: '{}' with private key".format(username), verbose=self.verbosity)
                 return self.ssh_client
 
             self.ssh_client.close()
@@ -73,41 +75,60 @@ class SSHCli(object):
         except paramiko.AuthenticationException:
             self.ssh_client.close()
             return True
-
-        except socket.error:
-            print_error("Connection error", verbose=self.verbosity)
-            self.ssh_client.close()
-            return False
-
         except Exception as err:
-            print_error("Err: {}".format(err), verbose=self.verbosity)
+            print_error(self.peer, "SSH Error while testing connection", err, verbose=self.verbosity)
 
         self.ssh_client.close()
         return False
 
     def execute(self, cmd):
-        ssh_stdin, ssh_stdout, ssh_stderr = self.ssh_client.exec_command(cmd)
-        return ssh_stdout.read()
+        try:
+            ssh_stdin, ssh_stdout, ssh_stderr = self.ssh_client.exec_command(cmd)
+            return ssh_stdout.read()
+        except Exception as err:
+            print_error(self.peer, "SSH Error while executing command on the server", err, verbose=self.verbosity)
+
+        return None
 
     def get_file(self, remote_file, local_file):
-        sftp = self.ssh_client.open_sftp()
-        sftp.get(remote_file, local_file)
+        try:
+            sftp = self.ssh_client.open_sftp()
+            sftp.get(remote_file, local_file)
+        except Exception as err:
+            print_error(self.peer, "SSH Error while retrieving file from the server", err, verbose=self.verbosity)
+
+        return None
 
     def get_content(self, remote_file):
-        fp_content = io.BytesIO()
-        sftp = self.ssh_client.open_sftp()
-        sftp.getfo(remote_file, fp_content)
+        try:
+            fp_content = io.BytesIO()
+            sftp = self.ssh_client.open_sftp()
+            sftp.getfo(remote_file, fp_content)
 
-        return fp_content.getvalue()
+            return fp_content.getvalue()
+        except Exception as err:
+            print_error(self.peer, "SSH Error while retrieving file content from the server", err, verbose=self.verbosity)
+
+        return None
 
     def send_file(self, local_file, dest_file):
-        sftp = self.ssh_client.open_sftp()
-        sftp.put(local_file, dest_file)
+        try:
+            sftp = self.ssh_client.open_sftp()
+            sftp.put(local_file, dest_file)
+        except Exception as err:
+            print_error(self.peer, "SSH Error while sending file to the server", err, verbose=self.verbosity)
+
+        return None
 
     def send_content(self, content, dest_file):
-        fp_content = io.BytesIO(content)
-        sftp = self.ssh_client.open_sftp()
-        sftp.putfo(fp_content, dest_file)
+        try:
+            fp_content = io.BytesIO(content)
+            sftp = self.ssh_client.open_sftp()
+            sftp.putfo(fp_content, dest_file)
+        except Exception as err:
+            print_error(self.peer, "SSH Error while sending content to the server", err, verbose=self.verbosity)
+
+        return None
 
     def interactive(self):
         chan = self.ssh_client.invoke_shell()
@@ -171,10 +192,14 @@ class SSHCli(object):
                 chan.send(d)
 
         except Exception as err:
-            print_error("Err: {}".format(err), verbose=self.verbosity)
+            print_error("Error", err, verbose=self.verbosity)
 
     def close(self):
-        self.ssh_client.close()
+        try:
+            self.ssh_client.close()
+        except Exception as err:
+            print_error(self.peer, "SSH Error while closing connection", verbose=self.verbosity)
+
         return None
 
 

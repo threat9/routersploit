@@ -18,6 +18,8 @@ class TCPCli(object):
         self.tcp_port = tcp_port
         self.verbosity = verbosity
 
+        self.peer = "{}:{}".format(self.tcp_target, self.tcp_port)
+
         if is_ipv4(self.tcp_target):
             self.tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         elif is_ipv6(self.tcp_target):
@@ -31,26 +33,19 @@ class TCPCli(object):
     def connect(self):
         try:
             self.tcp_client.connect((self.tcp_target, self.tcp_port))
-
-            print_status("Connection established", verbose=self.verbosity)
+            print_status(self.peer, "TCP Connection established", verbose=self.verbosity)
             return self.tcp_client
 
         except Exception as err:
-            print_error("Could not connect", verbose=self.verbosity)
-            print_error(err, verbose=self.verbosity)
+            print_error(self.peer, "TCP Error while connecting to the server", err, verbose=self.verbosity)
 
         return None
 
     def send(self, data):
-        if type(data) is bytes:
-            try:
-                return self.tcp_client.send(data)
-            except socket.timeout:
-                print_error("Socket did timeout", vebrose=self.verbosity)
-            except socket.error:
-                print_error("Socket error", vebrose=self.verbosity)
-        else:
-            print_error("Data to send is not type of bytes", verbose=self.verbosity)
+        try:
+            return self.tcp_client.send(data)
+        except Exception as err:
+            print_error(self.peer, "TCP Error while sending data", err, verbose=self.verbosity)
 
         return None
 
@@ -58,10 +53,8 @@ class TCPCli(object):
         try:
             response = self.tcp_client.recv(num)
             return response
-        except socket.timeout:
-            print_error("Socket did timeout", verbose=self.verbosity)
-        except socket.error:
-            print_error("Socket error", verbose=self.verbosity)
+        except Exception as err:
+            print_error(self.peer, "TCP Error while receiving data", err, verbose=self.verbosity)
 
         return None
 
@@ -79,15 +72,17 @@ class TCPCli(object):
                     break
 
             return response
-        except socket.timeout:
-            print_error("Socket did timeout", verbose=self.verbosity)
-        except socket.error:
-            print_error("Socket error", verbose=self.verbosity)
+        except Exception as err:
+            print_error(self.peer, "TCP Error while receiving all data", err, verbose=self.verbosity)
 
         return None
 
     def close(self):
-        self.tcp_client.close()
+        try:
+            self.tcp_client.close()
+        except Exception as err:
+            print_error(self.peer, "TCP Error while closing tcp socket", err, verbose=self.verbosity)
+
         return None
 
 

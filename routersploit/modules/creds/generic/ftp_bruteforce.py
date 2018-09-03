@@ -64,11 +64,7 @@ class Exploit(FTPClient):
                     if self.stop_on_success:
                         running.clear()
 
-                    print_success("Authenticated Succeed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     self.credentials.append((self.target, self.port, self.target_protocol, username, password))
-
-                else:
-                    print_error("Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
                 ftp_client.close()
 

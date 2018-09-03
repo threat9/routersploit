@@ -11,10 +11,14 @@ SNMP_TIMEOUT = 15.0
 
 
 class SNMPCli(object):
+    """ SNMP Client """
+
     def __init__(self, snmp_target, snmp_port, verbosity=False):
         self.snmp_target = snmp_target
         self.snmp_port = snmp_port
         self.verbosity = verbosity
+
+        self.peer = "{}:{}".format(self.snmp_target, snmp_port)
 
     def get(self, community_string, oid, version=1, retries=0):
         cmdGen = cmdgen.CommandGenerator()
@@ -26,13 +30,13 @@ class SNMPCli(object):
                 oid,
             )
         except Exception as err:
-            print_error("SNMP error", err, verbose=self.verbosity)
+            print_error(self.peer, "SNMP Error while accessing server", err, verbose=self.verbosity)
             return None
 
         if errorIndication or errorStatus:
-            print_error("SNMP invalid community string: '{}'".format(community_string), verbose=self.verbosity)
+            print_error(self.peer, "SNMP invalid community string: '{}'".format(community_string), verbose=self.verbosity)
         else:
-            print_success("SNMP valid community string found: '{}'".format(community_string), verbose=self.verbosity)
+            print_success(self.peer, "SNMP valid community string found: '{}'".format(community_string), verbose=self.verbosity)
             return varBinds
 
         return None

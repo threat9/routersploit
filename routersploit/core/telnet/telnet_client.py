@@ -16,6 +16,8 @@ class TelnetCli(object):
         self.telnet_port = telnet_port
         self.verbosity = verbosity
 
+        self.peer = "{}:{}".format(self.telnet_target, self.telnet_port)
+
         self.telnet_client = None
 
     def connect(self):
@@ -23,7 +25,7 @@ class TelnetCli(object):
             self.telnet_client = telnetlib.Telnet(self.telnet_target, self.telnet_port, timeout=TELNET_TIMEOUT)
             return self.telnet_client
         except Exception as err:
-            print_error("Error while connecting", err, verbose=self.verbosity)
+            print_error(self.peer, "Telnet Error while connecting to the server", err, verbose=self.verbosity)
 
         return None
 
@@ -42,15 +44,13 @@ class TelnetCli(object):
                 (i, obj, res) = self.telnet_client.expect([b"Incorrect", b"incorrect"], 5)
 
                 if i == -1 and any([x in res for x in [b"#", b"$", b">"]]) or len(res) > 500:  # big banner e.g. mikrotik
-                    print_success("Telnet Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
+                    print_success(self.peer, "Telnet Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     return self.telnet_client
                 else:
-                    print_error("Telnet Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
+                    print_error(self.peer, "Telnet Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     break
-            except EOFError:
-                print_error("Telnet connection error", verbose=self.verbosity)
             except Exception as err:
-                print_error(err, verbose=self.verbosity)
+                print_error(self.peer, "Telnet Error while authenticating to the server", err, verbose=self.verbosity)
 
         return None
 
@@ -62,7 +62,7 @@ class TelnetCli(object):
 
             return True
         except Exception as err:
-            print_error("Telnet connection error", err, verbose=self.verbosity)
+            print_error(self.peer, "Telnet Error while testing connection to the server", err, verbose=self.verbosity)
 
         return False
 
@@ -73,8 +73,8 @@ class TelnetCli(object):
         try:
             response = self.telnet_client.read_until(data, 5)
             return response
-        except Exception:
-            pass
+        except Exception as err:
+            print_error(self.peer, "Telnet Error while reading data from the server", err, verbose=self.verbosity)
 
         return None
 
@@ -82,12 +82,16 @@ class TelnetCli(object):
         try:
             return self.telnet_client.write(data, 5)
         except Exception as err:
-            print_error("Error while writing", err, verbose=self.verbosity)
+            print_error(self.peer, "Telnet Error while writing to the server", err, verbose=self.verbosity)
 
         return None
 
     def close(self):
-        self.telnet_client.close()
+        try:
+            self.telnet_client.close()
+        except Exception as err:
+            print_error(self.peer, "Telnet Error while closing connection", err, verbose=self.verbosity)
+
         return None
 
 
