@@ -31,9 +31,9 @@ class Exploit(UDPClient):
         request = bytes(request, "utf-8")
 
         udp_client = self.udp_create()
-        self.udp_send(udp_client, request)
+        udp_client.send(request)
 
-        response = self.udp_recv(udp_client, 1024)
+        response = udp_client.recv(1024)
         if response:
             response = str(response, "utf-8")
 
@@ -55,4 +55,4 @@ class Exploit(UDPClient):
         else:
             print_error("Target did not respond to M-SEARCH request")
 
-        self.udp_close(udp_client)
+        udp_client.close()

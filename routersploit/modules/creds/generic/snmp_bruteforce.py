@@ -50,7 +50,8 @@ class Exploit(SNMPClient):
             try:
                 community_string = data.next()
 
-                if self.snmp_get(community_string, "1.3.6.1.2.1.1.1.0", version=self.version):
+                snmp_client = self.snmp_create()
+                if snmp_client.get(community_string, "1.3.6.1.2.1.1.1.0", version=self.version):
                     if self.stop_on_success:
                         running.clear()
 

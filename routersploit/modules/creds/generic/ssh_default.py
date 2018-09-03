@@ -51,19 +51,20 @@ class Exploit(SSHClient):
         while running.is_set():
             try:
                 username, password = data.next().split(":")
-                ssh = self.ssh_login(username, password)
-                if ssh:
+                ssh_client = self.ssh_create()
+                if ssh_client.login(username, password):
                     if self.stop_on_success:
                         running.clear()
 
                     self.credentials.append((self.target, self.port, self.target_protocol, username, password))
-                    ssh.close()
+                    ssh_client.close()
 
             except StopIteration:
                 break
 
     def check(self):
-        if self.ssh_test_connect():
+        ssh_client = self.ssh_create()
+        if ssh_client.test_connect():
             print_status("Target exposes SSH service", verbose=self.verbosity)
             return True
 
