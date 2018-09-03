@@ -1,5 +1,5 @@
-future>=0.16.0
-requests>=2.9.1
-paramiko>=1.16.0
-pysnmp>=4.3.2
-pycryptodome==3.6.6
+future
+requests
+paramiko
+pysnmp
+pycryptodome
