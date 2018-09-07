@@ -22,7 +22,7 @@ class Exploit(TelnetClient):
 
     threads = OptInteger(8, "Number of threads")
 
-    usernames = OptWordlist("admin", "Username or file with usernames (file://)")
+    usernames = OptWordlist(wordlists.usernames, "Username or file with usernames (file://)")
     passwords = OptWordlist(wordlists.passwords, "Password or file with passwords (file://)")
 
     verbosity = OptBool(True, "Display authentication attempts")
