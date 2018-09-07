@@ -1,5 +1,4 @@
 !root
-test
 (blank)
 (brak)
 (non)
@@ -14,6 +13,8 @@ test
 31994
 3comcso
 60020
+666666
+888888
 ADMINISTRATOR
 ADMN
 ADSL
@@ -87,15 +88,16 @@ User
 VNC
 WP
 Wproot
+ZXDSL
 acc
 adfexc
 adm
 admin
+admin1
 admin2
 administrator
 adminstat
 adminstrator
-telecomadmin
 adminttd
 adminuser
 adminview
@@ -191,6 +193,7 @@ manuf
 mediator
 mlusr
 monitor
+mother
 mso
 mtch
 mtcl
@@ -255,8 +258,10 @@ teacher
 tech
 telco
 telecom
+telecomadmin
 tellabs
 temp1
+test
 tiara
 tiger
 topicalt
@@ -280,4 +285,3 @@ wradmin
 write
 xbox
 xd
-ZXDSL
