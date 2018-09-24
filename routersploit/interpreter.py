@@ -345,13 +345,6 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_set(self, *args, **kwargs):
         key, _, value = args[0].partition(" ")
         if key in self.current_module.options:
-            if key == "encoder":
-                value = self.current_module.get_encoder(value)
-
-                if not value:
-                    print_error("Encoder not available. Check available encoders with `show encoders`.")
-                    return
-
             setattr(self.current_module, key, value)
             self.current_module.exploit_attributes[key][0] = value
 
