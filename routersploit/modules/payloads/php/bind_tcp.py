@@ -1,4 +1,4 @@
-from routersploit.core.exploit.option import OptString
+from routersploit.core.exploit.option import OptEncoder
 from routersploit.core.exploit.payloads import (
     GenericPayload,
     Architectures,
@@ -18,7 +18,7 @@ class Payload(BindTCPPayloadMixin, GenericPayload):
     }
 
     architecture = Architectures.PHP
-    encoder = OptString(Encoder(), "Encoder")
+    encoder = OptEncoder(Encoder(), "Encoder")
 
     def generate(self):
         return (
