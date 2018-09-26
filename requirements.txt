@@ -1,5 +1,5 @@
 future
 requests
 paramiko
-pysnmp
+pysnmp==4.4.6
 pycryptodome
