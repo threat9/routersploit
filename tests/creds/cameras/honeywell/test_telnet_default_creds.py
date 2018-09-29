@@ -2,9 +2,16 @@ from routersploit.modules.creds.cameras.honeywell.telnet_default_creds import Ex
 
 
 def test_check_success(generic_target):
-    """ Test scenario - successful check """
+    """ Test scenario - testing against Telnet server """
 
     exploit = Exploit()
+    assert exploit.target == ""
+    assert exploit.port == 23
+    assert exploit.threads == 1
+    assert exploit.defaults == ["admin:1234"]
+    assert exploit.stop_on_success is True
+    assert exploit.verbosity is True
+
     exploit.target = generic_target.host
     exploit.port = generic_target.port
 

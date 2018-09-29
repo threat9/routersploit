@@ -5,6 +5,7 @@ def test_check_success(tcp_target):
     """ Test scenario - testing against mikrotik api ros server """
 
     exploit = Exploit()
+
     exploit.target = tcp_target.host
     exploit.port = tcp_target.port
 

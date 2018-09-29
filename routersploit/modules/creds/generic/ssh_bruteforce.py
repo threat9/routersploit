@@ -25,8 +25,8 @@ class Exploit(SSHClient):
     usernames = OptWordlist("admin", "Username or file with usernames (file://)")
     passwords = OptWordlist(wordlists.passwords, "Password or file with passwords (file://)")
 
-    verbosity = OptBool(True, "Display authentication attempts")
     stop_on_success = OptBool(True, "Stop on first valid authentication attempt")
+    verbosity = OptBool(True, "Display authentication attempts")
 
     def run(self):
         self.credentials = []

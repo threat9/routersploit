@@ -2,9 +2,17 @@ from routersploit.modules.creds.cameras.acti.ssh_default_creds import Exploit
 
 
 def test_check_success(target):
-    """ Test scenario - testing against HTTP server """
+    """ Test scenario - testing against SSH server """
 
     exploit = Exploit()
+
+    assert exploit.target == ""
+    assert exploit.port == 22
+    assert exploit.threads == 1
+    assert exploit.defaults == ["admin:12345", "admin:123456", "Admin:12345", "Admin:123456"]
+    assert exploit.stop_on_success is True
+    assert exploit.verbosity is True
+
     exploit.target = target.host
     exploit.port = target.port
 

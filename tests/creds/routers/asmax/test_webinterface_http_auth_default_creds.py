@@ -22,6 +22,14 @@ def test_check_success(target):
     cgi_mock.side_effect = apply_response
 
     exploit = Exploit()
+
+    assert exploit.target == ""
+    assert exploit.port == 80
+    assert exploit.threads == 1
+    assert exploit.defaults == ["admin:admin", "support:support", "user:user"]
+    assert exploit.stop_on_success is True
+    assert exploit.verbosity is True
+
     exploit.target = target.host
     exploit.port = target.port
 

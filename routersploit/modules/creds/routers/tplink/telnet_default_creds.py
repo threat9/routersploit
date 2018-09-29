@@ -16,7 +16,7 @@ class Exploit(TelnetDefault):
     }
 
     target = OptIP("", "Target IPv4, IPv6 address or file with ip:port (file://)")
-    port = OptPort(21, "Target Telnet port")
+    port = OptPort(23, "Target Telnet port")
 
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:admin", "User:Pass or file with default credentials (file://)")

@@ -24,8 +24,8 @@ class Exploit(SNMPClient):
 
     defaults = OptWordlist(wordlists.snmp, "SNMP community string or file with default communit stryings (file://)")
 
-    verbosity = OptBool(True, "Display authentication attempts")
     stop_on_success = OptBool(True, "Stop on first valid authentication attempt")
+    verbosity = OptBool(True, "Display authentication attempts")
 
     def run(self):
         self.strings = []
