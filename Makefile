@@ -15,7 +15,8 @@ lint:
 	python3 -m flake8 --exclude=$(EXCLUDED) --ignore=$(FLAKE8_IGNORED_RULES) $(DIRECTORY)
 
 tests: clean
-	python3 -m pytest -n16 tests 
+	python3 -m pytest -n16 tests/core/ tests/test_exploit_scenarios.py tests/test_module_info.py
+	python3 -m pytest -n16 tests/exploits/ tests/creds/ tests/encoders/ tests/generic/ tests/payloads/
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} +
