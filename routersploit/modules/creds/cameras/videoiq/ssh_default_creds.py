@@ -19,4 +19,4 @@ class Exploit(SSHDefault):
     port = OptPort(22, "Target SSH port")
 
     threads = OptInteger(1, "Number of threads")
-    default = OptWordlist("supervistor:supervisor", "User:Pass or file with default credentials (file://)")
+    defaults = OptWordlist("supervisor:supervisor", "User:Pass or file with default credentials (file://)")

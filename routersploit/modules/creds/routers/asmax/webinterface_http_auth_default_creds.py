@@ -20,4 +20,4 @@ class Exploit(HTTPBasicDigestDefault):
     path = OptString("/", "Target path")
 
     threads = OptInteger(1, "Number of threads")
-    default = OptWordlist("admin:admin,support:support,user:user", "User:Pass or file with default credentials (file://)")
+    defaults = OptWordlist("admin:admin,support:support,user:user", "User:Pass or file with default credentials (file://)")

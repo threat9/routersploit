@@ -16,12 +16,19 @@ def apply_response(*args, **kwargs):
 
 
 def test_check_success(target):
-    """ Test scenario - successful check """
+    """ Test scenario - testing against HTTP server """
 
     cgi_mock = target.get_route_mock("/", methods=["GET", "POST"])
     cgi_mock.side_effect = apply_response
 
     exploit = Exploit()
+    assert exploit.target == ""
+    assert exploit.port == 80
+    assert exploit.threads == 1
+    assert exploit.defaults == ["root:pass", "root:admin"]
+    assert exploit.stop_on_success is True
+    assert exploit.verbosity is True
+
     exploit.target = target.host
     exploit.port = target.port
 

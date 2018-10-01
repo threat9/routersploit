@@ -21,7 +21,7 @@ class Exploit(HTTPClient):
     threads = OptInteger(1, "Number of threads")
     defaults = OptWordlist("admin:admin", "User:Pass or file with default credentials (file://)")
 
-    stop_on_success = OptBool(False, "Stop on first valid authentication attempt")
+    stop_on_success = OptBool(True, "Stop on first valid authentication attempt")
     verbosity = OptBool(True, "Display authentication attempts")
 
     def run(self):
