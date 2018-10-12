@@ -12,7 +12,17 @@ UDP_SOCKET_TIMEOUT = 8.0
 
 
 class UDPCli(object):
-    def __init__(self, udp_target, udp_port, verbosity=False):
+    """ UDP Client provides methods to handle communication with UDP server """
+
+    def __init__(self, udp_target: str, udp_port: int, verbosity: bool=False) -> None:
+        """ UDP client constructor
+
+        :param str udp_target: target UDP server ip address
+        :param int udp_port: target UDP server port
+        :param bool verbosity: display verbose output
+        :return None:
+        """
+
         self.udp_target = udp_target
         self.udp_port = udp_port
         self.verbosity = verbosity
@@ -29,15 +39,28 @@ class UDPCli(object):
 
         self.udp_client.settimeout(UDP_SOCKET_TIMEOUT)
 
-    def send(self, data):
+    def send(self, data: bytes) -> bool:
+        """ Send UDP data
+
+        :param bytes data: data that should be sent to the server
+        :return bool: True if data was sent, False otherwise
+        """
+
         try:
-            return self.udp_client.sendto(data, (self.udp_target, self.udp_port))
+            self.udp_client.sendto(data, (self.udp_target, self.udp_port))
+            return True
         except Exception as err:
             print_error(self.peer, "Error while sending data", err, verbose=self.verbosity)
 
-        return None
+        return False
 
-    def recv(self, num):
+    def recv(self, num: int) -> bytes:
+        """ Receive UDP data
+
+        :param int num: number of bytes that should received from the server
+        :return bytes: bytes received from the server
+        """
+
         try:
             response = self.udp_client.recv(num)
             return response
@@ -46,13 +69,19 @@ class UDPCli(object):
 
         return None
 
-    def close(self):
+    def close(self) -> bool:
+        """ Close UDP connection
+
+        :return bool: True if connection was closed successful, False otherwise
+        """
+
         try:
             self.udp_client.close()
+            return True
         except Exception as err:
             print_error(self.peer, "Error while closing udp socket", err, verbose=self.verbosity)
 
-        return None
+        return False
 
 
 class UDPClient(Exploit):
@@ -62,7 +91,14 @@ class UDPClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def udp_create(self, target=None, port=None):
+    def udp_create(self, target: str=None, port: int=None) -> UDPCli:
+        """ Create UDP client
+
+        :param str target: target UDP server ip address
+        :param int port: target UDP server port
+        :return UDPCli: UDP client object
+        """
+
         udp_target = target if target else self.target
         udp_port = port if port else self.port
 

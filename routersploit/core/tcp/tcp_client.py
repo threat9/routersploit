@@ -13,7 +13,17 @@ TCP_SOCKET_TIMEOUT = 8.0
 
 
 class TCPCli(object):
-    def __init__(self, tcp_target, tcp_port, verbosity=False):
+    """ TCP Client provides methods to handle communication with TCP server """
+
+    def __init__(self, tcp_target: str, tcp_port: int, verbosity: bool=False) -> None:
+        """ TCP client constructor
+
+        :param str tcp_target: target TCP server ip address
+        :param int tcp_port: target TCP server port
+        :param bool verbosity: display verbose output
+        :return None:
+        """
+
         self.tcp_target = tcp_target
         self.tcp_port = tcp_port
         self.verbosity = verbosity
@@ -30,26 +40,42 @@ class TCPCli(object):
 
         self.tcp_client.settimeout(TCP_SOCKET_TIMEOUT)
 
-    def connect(self):
+    def connect(self) -> bool:
+        """ Connect to TCP server
+
+        :return bool: True if connection was successful, False otherwise
+        """
         try:
             self.tcp_client.connect((self.tcp_target, self.tcp_port))
             print_status(self.peer, "TCP Connection established", verbose=self.verbosity)
-            return self.tcp_client
+            return True
 
         except Exception as err:
             print_error(self.peer, "TCP Error while connecting to the server", err, verbose=self.verbosity)
 
-        return None
+        return False
 
-    def send(self, data):
+    def send(self, data: bytes) -> bool:
+        """ Send data to TCP server
+
+        :param bytes data: data that should be sent to TCP server
+        :return bool: True if sending data was successful, False otherwise
+        """
         try:
-            return self.tcp_client.send(data)
+            self.tcp_client.send(data)
+            return True
         except Exception as err:
             print_error(self.peer, "TCP Error while sending data", err, verbose=self.verbosity)
 
-        return None
+        return False
 
-    def recv(self, num):
+    def recv(self, num: int) -> bytes:
+        """ Receive data from TCP server
+
+        :param int num: number of bytes that should be received from the server
+        :return bytes: data that was received from the server
+        """
+
         try:
             response = self.tcp_client.recv(num)
             return response
@@ -58,7 +84,13 @@ class TCPCli(object):
 
         return None
 
-    def recv_all(self, num):
+    def recv_all(self, num: int) -> bytes:
+        """ Receive all data sent by the server
+
+        :param int num: number of total bytes that should be received
+        :return bytes: data that was received from the server
+        """
+
         try:
             response = b""
             received = 0
@@ -77,13 +109,19 @@ class TCPCli(object):
 
         return None
 
-    def close(self):
+    def close(self) -> bool:
+        """ Close connection to TCP server
+
+        :return bool: True if closing connection was successful, False otherwise
+        """
+
         try:
             self.tcp_client.close()
+            return True
         except Exception as err:
             print_error(self.peer, "TCP Error while closing tcp socket", err, verbose=self.verbosity)
 
-        return None
+        return False
 
 
 class TCPClient(Exploit):
@@ -93,7 +131,14 @@ class TCPClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def tcp_create(self, target=None, port=None):
+    def tcp_create(self, target: str=None, port: int=None) -> TCPCli:
+        """ Creates TCP client
+
+        :param str target: target TCP server ip address
+        :param int port: target TCP server port
+        :return TCPCli: TCP client object
+        """
+
         tcp_target = target if target else self.target
         tcp_port = port if port else self.port
 
