@@ -14,14 +14,23 @@ HTTP_TIMEOUT = 30.0
 
 
 class HTTPClient(Exploit):
-    """ HTTP Client exploit """
+    """ HTTP Client provides methods to handle communication with HTTP server """
 
     target_protocol = Protocol.HTTP
 
     verbosity = OptBool(True, "Verbosity enabled: true/false")
     ssl = OptBool(False, "SSL enabled: true/false")
 
-    def http_request(self, method, path, session=requests, **kwargs):
+    def http_request(self, method: str, path: str, session: requests=requests, **kwargs) -> requests.Response:
+        """ Requests HTTP resource
+
+        :param str method: method that should be issued e.g. GET, POST
+        :param str path: path to the resource that should be requested
+        :param requests session: session manager that should be used
+        :param kwargs: kwargs passed to request method
+        :return Response: Response object
+        """
+
         if self.ssl:
             url = "https://"
         else:
@@ -48,7 +57,13 @@ class HTTPClient(Exploit):
 
         return None
 
-    def get_target_url(self, path=""):
+    def get_target_url(self, path: str="") -> str:
+        """ Get target URL
+
+        :param str path: path to http server resource
+        :return str: full target url with correct schema
+        """
+
         if self.ssl:
             url = "https://"
         else:
@@ -58,7 +73,12 @@ class HTTPClient(Exploit):
 
         return url
 
-    def http_test_connect(self):
+    def http_test_connect(self) -> bool:
+        """ Test connection to HTTP server
+
+        :return bool: True if test connection was successful, False otherwise
+        """
+
         response = self.http_request(
             method="GET",
             path="/"
