@@ -20,7 +20,7 @@ SSH_TIMEOUT = 8.0
 class SSHCli(object):
     """ SSH Client provides methods to handle communication with SSH server """
 
-    def __init__(self, ssh_target: str, ssh_port: int, verbosity=False) -> None:
+    def __init__(self, ssh_target: str, ssh_port: int, verbosity: bool = False) -> None:
         """ SSH client constructor
 
         :param str ssh_target: SSH target ip address
@@ -38,7 +38,7 @@ class SSHCli(object):
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    def login(self, username: str, password: str, retries: int=1) -> bool:
+    def login(self, username: str, password: str, retries: int = 1) -> bool:
         """ Login to SSH server
 
         :param str username: SSH account username
@@ -64,7 +64,7 @@ class SSHCli(object):
 
         return False
 
-    def login_pkey(self, username: str, priv_key: str, retries: int=1) -> bool:
+    def login_pkey(self, username: str, priv_key: str, retries: int = 1) -> bool:
         """ Login to SSH server with private key
 
         :param str username: SSH account username
@@ -289,7 +289,7 @@ class SSHCli(object):
             self.ssh_client.close()
             return True
         except Exception as err:
-            print_error(self.peer, "SSH Error while closing connection", verbose=self.verbosity)
+            print_error(self.peer, "SSH Error while closing connection", err, verbose=self.verbosity)
 
         return False
 
@@ -301,7 +301,7 @@ class SSHClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def ssh_create(self, target: str=None, port: int=None) -> SSHCli:
+    def ssh_create(self, target: str = None, port: int = None) -> SSHCli:
         """ Create SSH client
 
         :param str target: target SSH server ip address

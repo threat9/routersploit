@@ -13,7 +13,7 @@ SNMP_TIMEOUT = 15.0
 class SNMPCli(object):
     """ SNMP Client provides methods to handle communication with SNMP server """
 
-    def __init__(self, snmp_target: str, snmp_port: int, verbosity: bool=False) -> None:
+    def __init__(self, snmp_target: str, snmp_port: int, verbosity: bool = False) -> None:
         """ SNMP client constructor
 
         :param str snmp_target: target SNMP server ip address
@@ -28,7 +28,7 @@ class SNMPCli(object):
 
         self.peer = "{}:{}".format(self.snmp_target, snmp_port)
 
-    def get(self, community_string: str, oid: str, version: int=1, retries: int=0) -> bytes:
+    def get(self, community_string: str, oid: str, version: int = 1, retries: int = 0) -> bytes:
         """ Get OID from SNMP server
 
         :param str community_string: SNMP server communit string
@@ -66,7 +66,7 @@ class SNMPClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def snmp_create(self, target: str=None, port: int=None) -> SNMPCli:
+    def snmp_create(self, target: str = None, port: int = None) -> SNMPCli:
         """ Create SNMP client
 
         :param str target: target SNMP server ip address

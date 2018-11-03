@@ -21,7 +21,7 @@ class HTTPClient(Exploit):
     verbosity = OptBool(True, "Verbosity enabled: true/false")
     ssl = OptBool(False, "SSL enabled: true/false")
 
-    def http_request(self, method: str, path: str, session: requests=requests, **kwargs) -> requests.Response:
+    def http_request(self, method: str, path: str, session: requests = requests, **kwargs) -> requests.Response:
         """ Requests HTTP resource
 
         :param str method: method that should be issued e.g. GET, POST
@@ -57,7 +57,7 @@ class HTTPClient(Exploit):
 
         return None
 
-    def get_target_url(self, path: str="") -> str:
+    def get_target_url(self, path: str = "") -> str:
         """ Get target URL
 
         :param str path: path to http server resource
