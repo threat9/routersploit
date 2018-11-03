@@ -14,7 +14,7 @@ FTP_TIMEOUT = 8.0
 class FTPCli(object):
     """ FTP Client provides methods to handle communication with FTP server """
 
-    def __init__(self, ftp_target: str, ftp_port: int, ssl: bool=False, verbosity: bool=False) -> None:
+    def __init__(self, ftp_target: str, ftp_port: int, ssl: bool = False, verbosity: bool = False) -> None:
         """ FTP client constructor
 
         :param str ftp_target: target FTP server ip address
@@ -35,7 +35,7 @@ class FTPCli(object):
         else:
             self.ftp_client = ftplib.FTP()
 
-    def connect(self, retries: int=1) -> bool:
+    def connect(self, retries: int = 1) -> bool:
         """ Connect to FTP server
 
         :param int retries: number of retry attempts
@@ -65,7 +65,7 @@ class FTPCli(object):
             self.ftp_client.login(username, password)
             print_success(self.peer, "FTP Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
             return True
-        except Exception as err:
+        except Exception:
             print_error(self.peer, "FTP Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
         self.ftp_client.close()
@@ -122,7 +122,7 @@ class FTPClient(Exploit):
     ssl = OptBool(False, "SSL enabled: true/false")
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def ftp_create(self, target: str=None, port: int=None) -> FTPCli:
+    def ftp_create(self, target: str = None, port: int = None) -> FTPCli:
         """ Create FTP client
 
         :param str target: target FTP server ip address

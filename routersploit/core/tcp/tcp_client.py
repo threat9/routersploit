@@ -15,7 +15,7 @@ TCP_SOCKET_TIMEOUT = 8.0
 class TCPCli(object):
     """ TCP Client provides methods to handle communication with TCP server """
 
-    def __init__(self, tcp_target: str, tcp_port: int, verbosity: bool=False) -> None:
+    def __init__(self, tcp_target: str, tcp_port: int, verbosity: bool = False) -> None:
         """ TCP client constructor
 
         :param str tcp_target: target TCP server ip address
@@ -131,7 +131,7 @@ class TCPClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def tcp_create(self, target: str=None, port: int=None) -> TCPCli:
+    def tcp_create(self, target: str = None, port: int = None) -> TCPCli:
         """ Creates TCP client
 
         :param str target: target TCP server ip address

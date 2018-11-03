@@ -13,7 +13,7 @@ TELNET_TIMEOUT = 30.0
 class TelnetCli(object):
     """ Telnet Client provides methods to handle communication with Telnet server """
 
-    def __init__(self, telnet_target: str, telnet_port: int, verbosity=False) -> None:
+    def __init__(self, telnet_target: str, telnet_port: int, verbosity: bool = False) -> None:
         """ Telnet client constructor
 
         :param str telnet_target: target Telnet server ip address
@@ -44,7 +44,7 @@ class TelnetCli(object):
 
         return False
 
-    def login(self, username: str, password: str, retries: int=1) -> bool:
+    def login(self, username: str, password: str, retries: int = 1) -> bool:
         """ Login to Telnet server
 
         :param str username: Telnet account username
@@ -154,7 +154,7 @@ class TelnetClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def telnet_create(self, target: str=None, port: int=None) -> TelnetCli:
+    def telnet_create(self, target: str = None, port: int = None) -> TelnetCli:
         """ Create Telnet client
 
         :param str target: target Telnet ip address

