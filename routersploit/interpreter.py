@@ -265,14 +265,14 @@ class RoutersploitInterpreter(BaseInterpreter):
         set_opts = []
 
         try:
-            opts, args = getopt.getopt(argv,"hxm:s:",["module=", "set="])
+            opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
         except getopt.GetoptError:
             print('rsf.py -m <module>')
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print('msf.py -m <module> -s "<option> <value"')
-                sys.exit()
+                print('msf.py -x -m <module> -s "<option> <value"')
+                sys.exit(0)
             elif opt == '-x':
                 noninteractive = True
             elif opt in ("-m", "--module"):
