@@ -261,19 +261,20 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def __handle_if_noninteractive(self, argv):
         noninteractive = False
-        module = ''
+        module = ""
         set_opts = []
 
         try:
             opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
         except getopt.GetoptError:
-            print('rsf.py -m <module>')
+            print_info("{} -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
             sys.exit(2)
+
         for opt, arg in opts:
-            if opt == '-h':
-                print('msf.py -x -m <module> -s "<option> <value"')
+            if opt == "-h":
+                print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
                 sys.exit(0)
-            elif opt == '-x':
+            elif opt == "-x":
                 noninteractive = True
             elif opt in ("-m", "--module"):
                 module = arg
