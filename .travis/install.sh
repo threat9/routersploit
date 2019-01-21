@@ -15,7 +15,6 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     pyenv global $PYTHON_VERSION
     pyenv rehash
 
-    pip install --user --upgrade pip==9.0.3
     pip install --user virtualenv
     python -m virtualenv ~/.venv
     source ~/.venv/bin/activate
