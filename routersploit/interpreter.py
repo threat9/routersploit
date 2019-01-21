@@ -4,6 +4,7 @@ import atexit
 import itertools
 import os
 import sys
+import getopt
 import traceback
 from collections import Counter
 
@@ -220,6 +221,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.modules_count.update([module.split('.')[0] for module in self.modules])
         self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
 
+        self.__handle_if_noninteractive(sys.argv[1:])
+
         self.__parse_prompt()
 
         self.banner = """ ______            _            _____       _       _ _
@@ -255,6 +258,37 @@ class RoutersploitInterpreter(BaseInterpreter):
         module_prompt_default_template = "\001\033[4m\002{host}\001\033[0m\002 (\001\033[91m\002{module}\001\033[0m\002) > "
         module_prompt_template = os.getenv("RSF_MODULE_PROMPT", module_prompt_default_template).replace('\\033', '\033')
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
+
+    def __handle_if_noninteractive(self, argv):
+        noninteractive = False
+        module = ''
+        set_opts = []
+
+        try:
+            opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
+        except getopt.GetoptError:
+            print('rsf.py -m <module>')
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt == '-h':
+                print('msf.py -x -m <module> -s "<option> <value"')
+                sys.exit(0)
+            elif opt == '-x':
+                noninteractive = True
+            elif opt in ("-m", "--module"):
+                module = arg
+            elif opt in ("-s", "--set"):
+                set_opts.append(arg)
+
+        if noninteractive:
+            self.command_use(module)
+
+            for opt in set_opts:
+                self.command_set(opt)
+
+            self.command_exploit()
+
+            sys.exit(0)
 
     @property
     def module_metadata(self):
