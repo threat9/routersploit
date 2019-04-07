@@ -30,7 +30,7 @@ class Device(ScanEntry):
     def _update(self, resp):
         ScanEntry._update(self, resp)
 
-        if self.addrType is "random":
+        if self.addrType == "random":
             self.vendor = "None (Random MAC address)"
         else:
             self.vendor = lookup_vendor(self.addr)
