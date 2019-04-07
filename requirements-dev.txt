@@ -3,7 +3,7 @@ requests
 paramiko
 pysnmp==4.4.6
 pycryptodome
-pytest==3.6.0
+pytest
 pytest-forked
 pytest-xdist
 flake8
