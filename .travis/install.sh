@@ -20,4 +20,5 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     source ~/.venv/bin/activate
 fi
 
+python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
