@@ -209,7 +209,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = "rsf"
-        self.show_sub_commands = ("info", "options", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
+        self.show_sub_commands = ("info", "options", "advanced", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
 
         self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
@@ -435,6 +435,24 @@ class RoutersploitInterpreter(BaseInterpreter):
             try:
                 opt_description = self.current_module.exploit_attributes[opt_key][1]
                 opt_display_value = self.current_module.exploit_attributes[opt_key][0]
+                if self.current_module.exploit_attributes[opt_key][2]:
+                    continue
+            except (KeyError, IndexError, AttributeError):
+                pass
+            else:
+                yield opt_key, opt_display_value, opt_description
+
+    @module_required
+    def get_opts_adv(self, *args):
+        """ Generator returning module's advanced Option attributes (option_name, option_value, option_description)
+
+        :param args: Option names
+        :return:
+        """
+        for opt_key in args:
+            try:
+                opt_description = self.current_module.exploit_attributes[opt_key][1]
+                opt_display_value = self.current_module.exploit_attributes[opt_key][0]
             except (KeyError, AttributeError):
                 pass
             else:
@@ -461,6 +479,22 @@ class RoutersploitInterpreter(BaseInterpreter):
         if module_opts:
             print_info("\nModule options:")
             print_table(headers, *self.get_opts(*module_opts))
+
+        print_info()
+
+    @module_required
+    def _show_advanced(self, *args, **kwargs):
+        target_names = ["target", "port", "ssl", "rhost", "rport", "lhost", "lport"]
+        target_opts = [opt for opt in self.current_module.options if opt in target_names]
+        module_opts = [opt for opt in self.current_module.options if opt not in target_opts]
+        headers = ("Name", "Current settings", "Description")
+
+        print_info("\nTarget options:")
+        print_table(headers, *self.get_opts(*target_opts))
+
+        if module_opts:
+            print_info("\nModule options:")
+            print_table(headers, *self.get_opts_adv(*module_opts))
 
         print_info()
 
