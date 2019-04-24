@@ -218,7 +218,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_prompt_template = None
         self.prompt_hostname = "rsf"
         self.show_sub_commands = ("info", "options", "advanced", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
-        self.search_sub_commands = ("type", "device", "language", "vendor")
+        self.search_sub_commands = ("type", "device", "language", "payload", "vendor")
 
         self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
@@ -600,36 +600,42 @@ class RoutersploitInterpreter(BaseInterpreter):
         os.system(args[0])
 
     def command_search(self, *args, **kwargs):
-        
         mod_type = ''
         mod_detail = ''
         mod_vendor = ''
-        
-        keyword = args[0].strip("'\"").lower()
+        existing_modules = [ name for _, name, _ in pkgutil.iter_modules([MODULES_DIR]) ]
+        devices = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'exploits')])]
+        languages = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'encoders')])]
+        payloads = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'payloads')])]
+
+        try:
+            keyword = args[0].strip("'\"").lower()
+        except IndexError:
+            keyword = ''
 
         if not (len(keyword) or len(kwargs.keys())):
             print_error("Please specify at least search keyword. e.g. 'search cisco'")
             print_error("You can specify options. e.g. 'search type=exploits device=routers vendor=linksys WRT100 rce'")
             return
-        
+
         for (key, value) in kwargs.items():
             if key == 'type':
-                if value not in ['creds','exploits','encoders','generic','payloads','scanners']:
+                if value not in existing_modules:
                     print_error("Unknown module type.")
                     return
                 # print_info(' - Type  :\t{}'.format(value))
                 mod_type = "{}.".format(value)
-            elif key == 'device':
-                if value not in ['routers','cameras','generic','misc']:
-                    print_error("Unknown device type.")
+            elif key in ['device', 'language', 'payload']:
+                if key == 'device' and (value not in devices):
+                    print_error("Unknown exploit type.")
                     return
-                # print_info(' - Device:\t{}'.format(value))
-                mod_detail = ".{}.".format(value)
-            elif key == 'language':
-                if value not in ['php','perl','python']:
-                    print_error("Unknown language.")
+                elif key == 'language' and (value not in languages):
+                    print_error("Unknown encoder language.")
                     return
-                # print_info(' - Language:\t{}'.format(value))
+                elif key == 'payload' and (value not in payloads):
+                    print_error("Unknown payload type.")
+                    return
+                # print_info(' - {}:\t{}'.format(key.capitalize(), value))
                 mod_detail = ".{}.".format(value)
             elif key == 'vendor':
                 # print_info(' - Vendor:\t{}'.format(value))
