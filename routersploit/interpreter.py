@@ -221,7 +221,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.modules_count.update([module.split('.')[0] for module in self.modules])
         self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
 
-        self.__handle_if_noninteractive(sys.argv[1:])
+        if len(sys.argv[1:]):
+            self.__handle_if_noninteractive(sys.argv[1:])
 
         self.__parse_prompt()
 
@@ -263,16 +264,18 @@ class RoutersploitInterpreter(BaseInterpreter):
         noninteractive = False
         module = ""
         set_opts = []
-
+        
         try:
             opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
         except getopt.GetoptError:
-            print_info("{} -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
+            print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
+            printer_queue.join()
             sys.exit(2)
 
         for opt, arg in opts:
-            if opt == "-h":
+            if opt in ("-h", "--help"):
                 print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
+                printer_queue.join()
                 sys.exit(0)
             elif opt == "-x":
                 noninteractive = True
@@ -288,7 +291,7 @@ class RoutersploitInterpreter(BaseInterpreter):
                 self.command_set(opt)
 
             self.command_exploit()
-
+            printer_queue.join()
             sys.exit(0)
 
     @property
