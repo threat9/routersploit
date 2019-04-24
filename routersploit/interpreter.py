@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import atexit
 import itertools
+import pkgutil
 import os
 import sys
 import getopt
@@ -80,10 +81,17 @@ class BaseInterpreter(object):
         """ Split line into command and argument.
 
         :param line: line to parse
-        :return: (command, argument)
+        :return: (command, argument, named_arguments)
         """
+        kwargs = dict()
         command, _, arg = line.strip().partition(" ")
-        return command, arg.strip()
+        args = arg.strip().split()
+        for word in args:
+            if '=' in word:
+                (key, value) = word.split('=',1)
+                kwargs[key.lower()] = value
+                arg = arg.replace(word,'')
+        return command, ' '.join(arg.split()), kwargs
 
     @property
     def prompt(self):
@@ -110,11 +118,11 @@ class BaseInterpreter(object):
         printer_queue.join()
         while True:
             try:
-                command, args = self.parse_line(input(self.prompt))
+                command, args, kwargs = self.parse_line(input(self.prompt))
                 if not command:
                     continue
                 command_handler = self.get_command_handler(command)
-                command_handler(args)
+                command_handler(args, **kwargs)
             except RoutersploitException as err:
                 print_error(err)
             except EOFError:
@@ -140,7 +148,7 @@ class BaseInterpreter(object):
             end_index = readline.get_endidx() - stripped
 
             if start_index > 0:
-                cmd, args = self.parse_line(line)
+                cmd, args, _ = self.parse_line(line)
                 if cmd == "":
                     complete_function = self.default_completer
                 else:
@@ -210,6 +218,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_prompt_template = None
         self.prompt_hostname = "rsf"
         self.show_sub_commands = ("info", "options", "advanced", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
+        self.search_sub_commands = ("type", "device", "language", "vendor")
 
         self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
@@ -237,7 +246,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             Embedded Devices
 
  Codename   : I Knew You Were Trouble
- Version    : 3.4.0
+ Version    : 3.4.1
  Homepage   : https://www.threat9.com - @threatnine
  Join Slack : https://www.threat9.com/slack
 
@@ -591,18 +600,65 @@ class RoutersploitInterpreter(BaseInterpreter):
         os.system(args[0])
 
     def command_search(self, *args, **kwargs):
-        keyword = args[0]
+        
+        mod_type = ''
+        mod_detail = ''
+        mod_vendor = ''
+        
+        keyword = args[0].strip("'\"").lower()
 
-        if not keyword:
-            print_error("Please specify search keyword. e.g. 'search cisco'")
+        if not (len(keyword) or len(kwargs.keys())):
+            print_error("Please specify at least search keyword. e.g. 'search cisco'")
+            print_error("You can specify options. e.g. 'search type=exploits device=routers vendor=linksys WRT100 rce'")
             return
+        
+        for (key, value) in kwargs.items():
+            if key == 'type':
+                if value not in ['creds','exploits','encoders','generic','payloads','scanners']:
+                    print_error("Unknown module type.")
+                    return
+                # print_info(' - Type  :\t{}'.format(value))
+                mod_type = "{}.".format(value)
+            elif key == 'device':
+                if value not in ['routers','cameras','generic','misc']:
+                    print_error("Unknown device type.")
+                    return
+                # print_info(' - Device:\t{}'.format(value))
+                mod_detail = ".{}.".format(value)
+            elif key == 'language':
+                if value not in ['php','perl','python']:
+                    print_error("Unknown language.")
+                    return
+                # print_info(' - Language:\t{}'.format(value))
+                mod_detail = ".{}.".format(value)
+            elif key == 'vendor':
+                # print_info(' - Vendor:\t{}'.format(value))
+                mod_vendor = ".{}.".format(value)
 
         for module in self.modules:
-            if keyword in module:
-                module = humanize_path(module)
-                print_info(
-                    "{}\033[31m{}\033[0m{}".format(*module.partition(keyword))
-                )
+            if mod_type not in str(module):
+                continue
+            if mod_detail not in str(module):
+                continue
+            if mod_vendor not in str(module):
+                continue
+            if not all(word in str(module) for word in keyword.split()):
+                continue
+            
+            found = humanize_path(module)
+
+            if len(keyword):
+                for word in keyword.split():
+                    found = found.replace(word, "\033[31m{}\033[0m".format(word))
+
+            print_info(found)
+
+    @stop_after(2)
+    def complete_search(self, text, *args, **kwargs):
+        if text:
+            return [command for command in self.search_sub_commands if command.startswith(text)]
+        else:
+            return self.search_sub_commands
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
