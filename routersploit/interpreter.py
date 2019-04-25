@@ -125,12 +125,10 @@ class BaseInterpreter(object):
                 command_handler(args, **kwargs)
             except RoutersploitException as err:
                 print_error(err)
-            except EOFError:
+            except (EOFError, KeyboardInterrupt, SystemExit):
                 print_info()
-                print_status("routersploit stopped")
+                print_error("RouterSploit stopped")
                 break
-            except KeyboardInterrupt:
-                print_info()
             finally:
                 printer_queue.join()
 
@@ -230,9 +228,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.modules_count.update([module.split('.')[0] for module in self.modules])
         self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
 
-        if len(sys.argv[1:]):
-            self.__handle_if_noninteractive(sys.argv[1:])
-
         self.__parse_prompt()
 
         self.banner = """ ______            _            _____       _       _ _
@@ -270,38 +265,51 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
 
     def __handle_if_noninteractive(self, argv):
-        noninteractive = False
+        """ Keep old method for backward compat only """
+        self.nonInteractive(argv)
+
+    def nonInteractive(self, argv):
+        """ Execute specific command and return result without launching the interactive CLI
+        
+        :return:
+        
+        """
         module = ""
         set_opts = []
-        
+
         try:
-            opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
+            opts, args = getopt.getopt(argv[1:], "hm:s:", ["help=", "module=", "set="])
         except getopt.GetoptError:
-            print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
+            print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
             printer_queue.join()
-            sys.exit(2)
+            return
 
         for opt, arg in opts:
             if opt in ("-h", "--help"):
-                print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
+                print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
                 printer_queue.join()
-                sys.exit(0)
-            elif opt == "-x":
-                noninteractive = True
+                return
             elif opt in ("-m", "--module"):
                 module = arg
             elif opt in ("-s", "--set"):
                 set_opts.append(arg)
 
-        if noninteractive:
-            self.command_use(module)
-
-            for opt in set_opts:
-                self.command_set(opt)
-
-            self.command_exploit()
+        if not len(module):
+            print_error('A module is required when running non-interactively')
             printer_queue.join()
-            sys.exit(0)
+            return
+
+        self.command_use(module)
+
+        for opt in set_opts:
+            self.command_set(opt)
+
+        self.command_exploit()
+
+        # Wait for results if needed
+        printer_queue.join()
+
+        return
 
     @property
     def module_metadata(self):
@@ -376,7 +384,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @module_required
     def command_run(self, *args, **kwargs):
-        print_status("Running module...")
+        print_status("Running module {}...".format(self.current_module))
         try:
             self.current_module.run()
         except KeyboardInterrupt:

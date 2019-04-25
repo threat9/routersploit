@@ -17,10 +17,15 @@ LOGGER.setLevel(logging.DEBUG)
 LOGGER.addHandler(log_handler)
 
 
-def routersploit():
+def routersploit(argv):
     rsf = RoutersploitInterpreter()
-    rsf.start()
-
+    if len(argv[1:]):
+        rsf.nonInteractive(argv)
+    else:
+        rsf.start()
 
 if __name__ == "__main__":
-    routersploit()
+    try:
+        routersploit(sys.argv)
+    except (KeyboardInterrupt, SystemExit):
+        pass

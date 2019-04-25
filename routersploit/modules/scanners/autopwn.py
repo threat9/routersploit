@@ -1,4 +1,6 @@
-from os import path
+import os
+import pkgutil
+
 from routersploit.core.exploit import *
 from routersploit.core.exploit.exploit import Protocol
 
@@ -54,8 +56,8 @@ class Exploit(Exploit):
         self.vulnerabilities = []
         self.creds = []
         self.not_verified = []
-        self._exploits_directories = [path.join(utils.MODULES_DIR, "exploits", module) for module in self.modules]
-        self._creds_directories = [path.join(utils.MODULES_DIR, "creds", module) for module in self.modules]
+        self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module) for module in self.modules]
+        self._creds_directories = [os.path.join(utils.MODULES_DIR, "creds", module) for module in self.modules]
 
     def run(self):
         self.vulnerabilities = []
@@ -64,7 +66,7 @@ class Exploit(Exploit):
 
         # Update list of directories with specific vendor if needed
         if self.vendor != 'any':
-            self._exploits_directories = [path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
+            self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
 
         
         if self.check_exploits:
