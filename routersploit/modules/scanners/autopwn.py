@@ -67,7 +67,6 @@ class Exploit(Exploit):
         if self.vendor != 'any':
             self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
 
-
         if self.check_exploits:
             # vulnerabilities
             print_info()
