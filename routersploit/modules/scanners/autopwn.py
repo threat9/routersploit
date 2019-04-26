@@ -1,5 +1,4 @@
 import os
-import pkgutil
 
 from routersploit.core.exploit import *
 from routersploit.core.exploit.exploit import Protocol
@@ -36,7 +35,7 @@ class Exploit(Exploit):
 
     ssh_use = OptBool(True, "Check SSH service: true/false")
     ssh_port = OptPort(22, "Target SSH port (default: 22)", advanced=True)
-    
+
     telnet_use = OptBool(True, "Check Telnet service: true/false")
     telnet_port = OptPort(23, "Target Telnet port (default: 23)", advanced=True)
 
@@ -68,7 +67,7 @@ class Exploit(Exploit):
         if self.vendor != 'any':
             self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
 
-        
+
         if self.check_exploits:
             # vulnerabilities
             print_info()

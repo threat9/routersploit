@@ -88,9 +88,9 @@ class BaseInterpreter(object):
         args = arg.strip().split()
         for word in args:
             if '=' in word:
-                (key, value) = word.split('=',1)
+                (key, value) = word.split('=', 1)
                 kwargs[key.lower()] = value
-                arg = arg.replace(word,'')
+                arg = arg.replace(word, '')
         return command, ' '.join(arg.split()), kwargs
 
     @property
@@ -270,9 +270,9 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def nonInteractive(self, argv):
         """ Execute specific command and return result without launching the interactive CLI
-        
+
         :return:
-        
+
         """
         module = ""
         set_opts = []
@@ -611,10 +611,10 @@ class RoutersploitInterpreter(BaseInterpreter):
         mod_type = ''
         mod_detail = ''
         mod_vendor = ''
-        existing_modules = [ name for _, name, _ in pkgutil.iter_modules([MODULES_DIR]) ]
-        devices = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'exploits')])]
-        languages = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'encoders')])]
-        payloads = [ name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'payloads')])]
+        existing_modules = [name for _, name, _ in pkgutil.iter_modules([MODULES_DIR])]
+        devices = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'exploits')])]
+        languages = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'encoders')])]
+        payloads = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'payloads')])]
 
         try:
             keyword = args[0].strip("'\"").lower()
@@ -658,7 +658,7 @@ class RoutersploitInterpreter(BaseInterpreter):
                 continue
             if not all(word in str(module) for word in keyword.split()):
                 continue
-            
+
             found = humanize_path(module)
 
             if len(keyword):
