@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import atexit
 import itertools
+import pkgutil
 import os
 import sys
 import getopt
@@ -80,10 +81,17 @@ class BaseInterpreter(object):
         """ Split line into command and argument.
 
         :param line: line to parse
-        :return: (command, argument)
+        :return: (command, argument, named_arguments)
         """
+        kwargs = dict()
         command, _, arg = line.strip().partition(" ")
-        return command, arg.strip()
+        args = arg.strip().split()
+        for word in args:
+            if '=' in word:
+                (key, value) = word.split('=', 1)
+                kwargs[key.lower()] = value
+                arg = arg.replace(word, '')
+        return command, ' '.join(arg.split()), kwargs
 
     @property
     def prompt(self):
@@ -110,19 +118,17 @@ class BaseInterpreter(object):
         printer_queue.join()
         while True:
             try:
-                command, args = self.parse_line(input(self.prompt))
+                command, args, kwargs = self.parse_line(input(self.prompt))
                 if not command:
                     continue
                 command_handler = self.get_command_handler(command)
-                command_handler(args)
+                command_handler(args, **kwargs)
             except RoutersploitException as err:
                 print_error(err)
-            except EOFError:
+            except (EOFError, KeyboardInterrupt, SystemExit):
                 print_info()
-                print_status("routersploit stopped")
+                print_error("RouterSploit stopped")
                 break
-            except KeyboardInterrupt:
-                print_info()
             finally:
                 printer_queue.join()
 
@@ -140,7 +146,7 @@ class BaseInterpreter(object):
             end_index = readline.get_endidx() - stripped
 
             if start_index > 0:
-                cmd, args = self.parse_line(line)
+                cmd, args, _ = self.parse_line(line)
                 if cmd == "":
                     complete_function = self.default_completer
                 else:
@@ -209,7 +215,8 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.raw_prompt_template = None
         self.module_prompt_template = None
         self.prompt_hostname = "rsf"
-        self.show_sub_commands = ("info", "options", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
+        self.show_sub_commands = ("info", "options", "advanced", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
+        self.search_sub_commands = ("type", "device", "language", "payload", "vendor")
 
         self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
@@ -220,8 +227,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.modules_count = Counter()
         self.modules_count.update([module.split('.')[0] for module in self.modules])
         self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
-
-        self.__handle_if_noninteractive(sys.argv[1:])
 
         self.__parse_prompt()
 
@@ -236,7 +241,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             Embedded Devices
 
  Codename   : I Knew You Were Trouble
- Version    : 3.4.0
+ Version    : 3.4.1
  Homepage   : https://www.threat9.com - @threatnine
  Join Slack : https://www.threat9.com/slack
 
@@ -260,36 +265,51 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.module_prompt_template = module_prompt_template if all(map(lambda x: x in module_prompt_template, ['{host}', "{module}"])) else module_prompt_default_template
 
     def __handle_if_noninteractive(self, argv):
-        noninteractive = False
+        """ Keep old method for backward compat only """
+        self.nonInteractive(argv)
+
+    def nonInteractive(self, argv):
+        """ Execute specific command and return result without launching the interactive CLI
+
+        :return:
+
+        """
         module = ""
         set_opts = []
 
         try:
-            opts, args = getopt.getopt(argv, "hxm:s:", ["module=", "set="])
+            opts, args = getopt.getopt(argv[1:], "hm:s:", ["help=", "module=", "set="])
         except getopt.GetoptError:
-            print_info("{} -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
-            sys.exit(2)
+            print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
+            printer_queue.join()
+            return
 
         for opt, arg in opts:
-            if opt == "-h":
-                print_info("{} -x -m <module> -s \"<option> <value>\"".format(sys.argv[0]))
-                sys.exit(0)
-            elif opt == "-x":
-                noninteractive = True
+            if opt in ("-h", "--help"):
+                print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
+                printer_queue.join()
+                return
             elif opt in ("-m", "--module"):
                 module = arg
             elif opt in ("-s", "--set"):
                 set_opts.append(arg)
 
-        if noninteractive:
-            self.command_use(module)
+        if not len(module):
+            print_error('A module is required when running non-interactively')
+            printer_queue.join()
+            return
 
-            for opt in set_opts:
-                self.command_set(opt)
+        self.command_use(module)
 
-            self.command_exploit()
+        for opt in set_opts:
+            self.command_set(opt)
 
-            sys.exit(0)
+        self.command_exploit()
+
+        # Wait for results if needed
+        printer_queue.join()
+
+        return
 
     @property
     def module_metadata(self):
@@ -364,7 +384,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @module_required
     def command_run(self, *args, **kwargs):
-        print_status("Running module...")
+        print_status("Running module {}...".format(self.current_module))
         try:
             self.current_module.run()
         except KeyboardInterrupt:
@@ -435,6 +455,24 @@ class RoutersploitInterpreter(BaseInterpreter):
             try:
                 opt_description = self.current_module.exploit_attributes[opt_key][1]
                 opt_display_value = self.current_module.exploit_attributes[opt_key][0]
+                if self.current_module.exploit_attributes[opt_key][2]:
+                    continue
+            except (KeyError, IndexError, AttributeError):
+                pass
+            else:
+                yield opt_key, opt_display_value, opt_description
+
+    @module_required
+    def get_opts_adv(self, *args):
+        """ Generator returning module's advanced Option attributes (option_name, option_value, option_description)
+
+        :param args: Option names
+        :return:
+        """
+        for opt_key in args:
+            try:
+                opt_description = self.current_module.exploit_attributes[opt_key][1]
+                opt_display_value = self.current_module.exploit_attributes[opt_key][0]
             except (KeyError, AttributeError):
                 pass
             else:
@@ -461,6 +499,22 @@ class RoutersploitInterpreter(BaseInterpreter):
         if module_opts:
             print_info("\nModule options:")
             print_table(headers, *self.get_opts(*module_opts))
+
+        print_info()
+
+    @module_required
+    def _show_advanced(self, *args, **kwargs):
+        target_names = ["target", "port", "ssl", "rhost", "rport", "lhost", "lport"]
+        target_opts = [opt for opt in self.current_module.options if opt in target_names]
+        module_opts = [opt for opt in self.current_module.options if opt not in target_opts]
+        headers = ("Name", "Current settings", "Description")
+
+        print_info("\nTarget options:")
+        print_table(headers, *self.get_opts(*target_opts))
+
+        if module_opts:
+            print_info("\nModule options:")
+            print_table(headers, *self.get_opts_adv(*module_opts))
 
         print_info()
 
@@ -554,18 +608,71 @@ class RoutersploitInterpreter(BaseInterpreter):
         os.system(args[0])
 
     def command_search(self, *args, **kwargs):
-        keyword = args[0]
+        mod_type = ''
+        mod_detail = ''
+        mod_vendor = ''
+        existing_modules = [name for _, name, _ in pkgutil.iter_modules([MODULES_DIR])]
+        devices = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'exploits')])]
+        languages = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'encoders')])]
+        payloads = [name for _, name, _ in pkgutil.iter_modules([os.path.join(MODULES_DIR, 'payloads')])]
 
-        if not keyword:
-            print_error("Please specify search keyword. e.g. 'search cisco'")
+        try:
+            keyword = args[0].strip("'\"").lower()
+        except IndexError:
+            keyword = ''
+
+        if not (len(keyword) or len(kwargs.keys())):
+            print_error("Please specify at least search keyword. e.g. 'search cisco'")
+            print_error("You can specify options. e.g. 'search type=exploits device=routers vendor=linksys WRT100 rce'")
             return
 
+        for (key, value) in kwargs.items():
+            if key == 'type':
+                if value not in existing_modules:
+                    print_error("Unknown module type.")
+                    return
+                # print_info(' - Type  :\t{}'.format(value))
+                mod_type = "{}.".format(value)
+            elif key in ['device', 'language', 'payload']:
+                if key == 'device' and (value not in devices):
+                    print_error("Unknown exploit type.")
+                    return
+                elif key == 'language' and (value not in languages):
+                    print_error("Unknown encoder language.")
+                    return
+                elif key == 'payload' and (value not in payloads):
+                    print_error("Unknown payload type.")
+                    return
+                # print_info(' - {}:\t{}'.format(key.capitalize(), value))
+                mod_detail = ".{}.".format(value)
+            elif key == 'vendor':
+                # print_info(' - Vendor:\t{}'.format(value))
+                mod_vendor = ".{}.".format(value)
+
         for module in self.modules:
-            if keyword in module:
-                module = humanize_path(module)
-                print_info(
-                    "{}\033[31m{}\033[0m{}".format(*module.partition(keyword))
-                )
+            if mod_type not in str(module):
+                continue
+            if mod_detail not in str(module):
+                continue
+            if mod_vendor not in str(module):
+                continue
+            if not all(word in str(module) for word in keyword.split()):
+                continue
+
+            found = humanize_path(module)
+
+            if len(keyword):
+                for word in keyword.split():
+                    found = found.replace(word, "\033[31m{}\033[0m".format(word))
+
+            print_info(found)
+
+    @stop_after(2)
+    def complete_search(self, text, *args, **kwargs):
+        if text:
+            return [command for command in self.search_sub_commands if command.startswith(text)]
+        else:
+            return self.search_sub_commands
 
     def command_exit(self, *args, **kwargs):
         raise EOFError

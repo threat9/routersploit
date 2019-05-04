@@ -75,3 +75,8 @@ venv/
 # vim
 *.swp
 *.swo
+
+# Pipenv files
+Pipfile
+Pipfile.lock
+

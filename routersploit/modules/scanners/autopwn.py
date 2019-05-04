@@ -1,4 +1,5 @@
-from os import path
+import os
+
 from routersploit.core.exploit import *
 from routersploit.core.exploit.exploit import Protocol
 
@@ -19,14 +20,34 @@ class Exploit(Exploit):
 
     target = OptIP("", "Target IPv4 or IPv6 address")
 
-    http_port = OptPort(80, "Target Web Interface Port")
+    vendor = OptString("any", "Vendor concerned (default: any)")
+
+    check_exploits = OptBool(True, "Check exploits against target: true/false", advanced=True)
+    check_creds = OptBool(True, "Check factory credentials against target: true/false", advanced=True)
+
+    http_use = OptBool(True, "Check HTTP[s] service: true/false")
+    http_port = OptPort(80, "Target Web Interface Port", advanced=True)
     http_ssl = OptBool(False, "HTTPS enabled: true/false")
 
-    ftp_port = OptPort(21, "Target FTP port (default: 21)")
+    ftp_use = OptBool(True, "Check FTP[s] service: true/false")
+    ftp_port = OptPort(21, "Target FTP port (default: 21)", advanced=True)
     ftp_ssl = OptBool(False, "FTPS enabled: true/false")
 
-    ssh_port = OptPort(22, "Target SSH port (default: 22)")
-    telnet_port = OptPort(23, "Target Telnet port (default: 23)")
+    ssh_use = OptBool(True, "Check SSH service: true/false")
+    ssh_port = OptPort(22, "Target SSH port (default: 22)", advanced=True)
+
+    telnet_use = OptBool(True, "Check Telnet service: true/false")
+    telnet_port = OptPort(23, "Target Telnet port (default: 23)", advanced=True)
+
+    snmp_use = OptBool(True, "Check SNMP service: true/false")
+    snmp_community = OptString("public", "Target SNMP community name (default: public)", advanced=True)
+    snmp_port = OptPort(161, "Target SNMP port (default: 161)", advanced=True)
+
+    tcp_use = OptBool(True, "Check custom TCP services", advanced=True)
+    # tcp_port = OptPort(None, "Restrict TCP custom service tests to specific port (default: None)")
+
+    udp_use = OptBool(True, "Check custom UDP services", advanced=True)
+    # udp_port = OptPort(None, "Restrict UDP custom service tests to specific port (default: None)")
 
     threads = OptInteger(8, "Number of threads")
 
@@ -34,36 +55,42 @@ class Exploit(Exploit):
         self.vulnerabilities = []
         self.creds = []
         self.not_verified = []
-        self._exploits_directories = [path.join(utils.MODULES_DIR, "exploits", module) for module in self.modules]
-        self._creds_directories = [path.join(utils.MODULES_DIR, "creds", module) for module in self.modules]
+        self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module) for module in self.modules]
+        self._creds_directories = [os.path.join(utils.MODULES_DIR, "creds", module) for module in self.modules]
 
     def run(self):
         self.vulnerabilities = []
         self.creds = []
         self.not_verified = []
 
-        # vulnerabilities
-        print_info()
-        print_info("\033[94m[*]\033[0m", "Starting vulnerablity check...".format(self.target))
+        # Update list of directories with specific vendor if needed
+        if self.vendor != 'any':
+            self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
 
-        modules = []
-        for directory in self._exploits_directories:
-            for module in utils.iter_modules(directory):
-                modules.append(module)
+        if self.check_exploits:
+            # vulnerabilities
+            print_info()
+            print_info("\033[94m[*]\033[0m", "{} Starting vulnerablity check...".format(self.target))
 
-        data = LockedIterator(modules)
-        self.run_threads(self.threads, self.exploits_target_function, data)
+            modules = []
+            for directory in self._exploits_directories:
+                for module in utils.iter_modules(directory):
+                    modules.append(module)
 
-        # default creds
-        print_info()
-        print_info("\033[94m[*]\033[0m", "{} Starting default credentials check...".format(self.target))
-        modules = []
-        for directory in self._creds_directories:
-            for module in utils.iter_modules(directory):
-                modules.append(module)
+            data = LockedIterator(modules)
+            self.run_threads(self.threads, self.exploits_target_function, data)
 
-        data = LockedIterator(modules)
-        self.run_threads(self.threads, self.creds_target_function, data)
+        if self.check_creds:
+            # default creds
+            print_info()
+            print_info("\033[94m[*]\033[0m", "{} Starting default credentials check...".format(self.target))
+            modules = []
+            for directory in self._creds_directories:
+                for module in utils.iter_modules(directory):
+                    modules.append(module)
+
+            data = LockedIterator(modules)
+            self.run_threads(self.threads, self.creds_target_function, data)
 
         # results:
         print_info()
@@ -99,20 +126,45 @@ class Exploit(Exploit):
             else:
                 exploit.target = self.target
 
+                # Avoid checking specific protocol - reduce network impact
                 if exploit.target_protocol == Protocol.HTTP:
+                    if not self.http_use:
+                        continue
                     exploit.port = self.http_port
                     if self.http_ssl:
                         exploit.ssl = "true"
                         exploit.target_protocol = Protocol.HTTPS
 
                 elif exploit.target_protocol is Protocol.FTP:
+                    if not self.ftp_use:
+                        continue
                     exploit.port = self.ftp_port
                     if self.ftp_ssl:
                         exploit.ssl = "true"
                         exploit.target_protocol = Protocol.FTPS
 
                 elif exploit.target_protocol is Protocol.TELNET:
+                    if not self.telnet_use:
+                        continue
                     exploit.port = self.telnet_port
+
+                elif exploit.target_protocol is Protocol.SSH:
+                    if not self.ssh_use:
+                        continue
+                    exploit.port = self.ssh_port
+
+                elif exploit.target_protocol is Protocol.SNMP:
+                    if not self.snmp_use:
+                        continue
+                    exploit.port = self.ssh_port
+
+                elif exploit.target_protocol is Protocol.TCP:
+                    if not self.tcp_use:
+                        continue
+
+                elif exploit.target_protocol is Protocol.UDP:
+                    if not self.udp_use:
+                        continue
 
         #        elif exploit.target_protocol not in ["tcp", "udp"]:
         #            exploit.target_protocol = "custom"
