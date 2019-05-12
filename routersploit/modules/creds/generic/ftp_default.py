@@ -49,7 +49,7 @@ class Exploit(FTPClient):
     def target_function(self, running, data):
         while running.is_set():
             try:
-                username, password = data.next().split(":")
+                username, password = data.next().split(":", 1)
             except StopIteration:
                 break
             else:
