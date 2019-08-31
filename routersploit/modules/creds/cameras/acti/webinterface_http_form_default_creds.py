@@ -48,7 +48,7 @@ class Exploit(HTTPClient):
     def target_function(self, running, creds):
         while running.is_set():
             try:
-                username, password = creds.next().split(":")
+                username, password = creds.next().split(":", 1)
 
                 data = {
                     "LOGIN_ACCOUNT": username,
