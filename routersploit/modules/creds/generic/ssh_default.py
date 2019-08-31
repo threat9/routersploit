@@ -50,7 +50,7 @@ class Exploit(SSHClient):
     def target_function(self, running, data):
         while running.is_set():
             try:
-                username, password = data.next().split(":")
+                username, password = data.next().split(":", 1)
                 ssh_client = self.ssh_create()
                 if ssh_client.login(username, password):
                     if self.stop_on_success:

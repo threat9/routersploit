@@ -50,7 +50,7 @@ class Exploit(TelnetClient):
     def target_function(self, running, data):
         while running.is_set():
             try:
-                username, password = data.next().split(":")
+                username, password = data.next().split(":", 1)
                 telnet_client = self.telnet_create()
                 if telnet_client.login(username, password, retries=3):
                     if self.stop_on_success:

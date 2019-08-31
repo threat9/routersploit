@@ -45,7 +45,7 @@ class Exploit(HTTPClient):
             print_error("Credentials not found")
 
     def target_function(self, data):
-        username, password = data.split(":")
+        username, password = data.split(":", 1)
 
     def check(self):
         response = self.http_request(
