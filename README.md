@@ -75,6 +75,16 @@ sudo python3 -m pip install -r requirements.txt
 python3 rsf.py
 ```
 
+
+## Installation on FreeBSD
+```
+git clone https://www.github.com/threat9/routersploit
+cd routersploit
+sudo python3 -m pip install -r requirements.txt
+python3 rsf.py
+```
+
+
 ## Running on Docker
 
 ```
