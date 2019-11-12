@@ -118,6 +118,18 @@ def test_opt_integer():
     assert opt_integer.value == 9999999
     assert opt_integer.__get__(None, None) == 9999999
 
+    # Test OptInteger setting to 0
+    opt_integer = OptInteger(0, "Test Integer with 0")
+    assert opt_integer.display_value == "0"
+    assert opt_integer.value == 0
+    assert opt_integer.__get__(None, None) == 0
+
+    # Test OptInteger setting to 0x100
+    opt_integer.__set__(None, "0x100")
+    assert opt_integer.display_value == "0x100"
+    assert opt_integer.value == 0x100
+    assert opt_integer.__get__(None, None) == 0x100
+
     # Test OptInteget setting to invalid value
     try:
         opt_integer.__set__(None, "Invalid Value")
