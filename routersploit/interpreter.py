@@ -36,7 +36,7 @@ from routersploit.core.exploit.exploit import GLOBAL_OPTS
 from routersploit.core.exploit.payloads import BasePayload
 
 import readline
-if sys.platform is "win32":
+if sys.platform == "win32":
     import colorama
     colorama.init(autoreset = True)
 
