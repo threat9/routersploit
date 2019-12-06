@@ -41,7 +41,7 @@ if sys.platform == "win32":
     colorama.init(autoreset = True)
 
 def is_libedit():
-    return "libedit" in readline.__doc__
+    return "libedit" in (readline.__doc__ or "")
 
 
 class BaseInterpreter(object):
