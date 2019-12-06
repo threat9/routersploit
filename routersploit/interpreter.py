@@ -36,7 +36,9 @@ from routersploit.core.exploit.exploit import GLOBAL_OPTS
 from routersploit.core.exploit.payloads import BasePayload
 
 import readline
-
+if sys.platform is "win32":
+    import colorama
+    colorama.init(autoreset = True)
 
 def is_libedit():
     return "libedit" in readline.__doc__
