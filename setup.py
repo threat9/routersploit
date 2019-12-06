@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 README = open("README.md", "r").read()
 DEPENDENCIES = open("requirements.txt", "r").read().split("\n")
-if platform is "win32":
+if platform == "win32":
     DEPENDENCIES += ["colorama", "pyreadline"]
 
 setup(name = "routersploit",
