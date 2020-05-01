@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cd /root/routersploit
+PWD=$(pwd)
+echo "Please enter the module you'd like to use"
+echo "eg. - scanners/autopwn"
+echo "    - exploits/routers/mikrotik/routeros_jailbreak"
+read OPT
+echo "Please ensure there is a file with your target IP block in your current working directory"
+echo "This file MUST be named targets.txt. If not, open a new terminal & do so now. Then hit enter"
+read RANDOM
+for name in `cat targets.txt`
+do
+  python3 rsf.py -m ${OPT} -s "target ${name}"
+done
