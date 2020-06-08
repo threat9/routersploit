@@ -49,7 +49,16 @@ class SSHCli(object):
 
         for _ in range(retries):
             try:
-                self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, password=password, look_for_keys=False)
+                self.ssh_client.connect(
+                    self.ssh_target,
+                    self.ssh_port,
+                    timeout=SSH_TIMEOUT,
+                    banner_timeout=SSH_TIMEOUT,
+                    username=username,
+                    password=password,
+                    look_for_keys=False,
+                    allow_agent=False,
+                )
             except paramiko.AuthenticationException:
                 print_error(self.peer, "SSH Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                 self.ssh_client.close()
@@ -82,7 +91,16 @@ class SSHCli(object):
 
         for _ in range(retries):
             try:
-                self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, banner_timeout=SSH_TIMEOUT, username=username, pkey=priv_key, look_for_keys=False)
+                self.ssh_client.connect(
+                    self.ssh_target,
+                    self.ssh_port,
+                    timeout=SSH_TIMEOUT,
+                    banner_timeout=SSH_TIMEOUT,
+                    username=username,
+                    pkey=priv_key,
+                    look_for_keys=False,
+                    allow_agent=False,
+                )
             except paramiko.AuthenticationException:
                 print_error(self.peer, "SSH Authentication Failed - Username: '{}' auth with private key".format(username), verbose=self.verbosity)
             except Exception as err:
@@ -102,7 +120,15 @@ class SSHCli(object):
         """
 
         try:
-            self.ssh_client.connect(self.ssh_target, self.ssh_port, timeout=SSH_TIMEOUT, username="root", password=random_text(12), look_for_keys=False)
+            self.ssh_client.connect(
+                self.ssh_target,
+                self.ssh_port,
+                timeout=SSH_TIMEOUT,
+                username="root",
+                password=random_text(12),
+                look_for_keys=False,
+                allow_agent=False,
+            )
         except paramiko.AuthenticationException:
             self.ssh_client.close()
             return True
