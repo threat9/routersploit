@@ -56,7 +56,7 @@ python3 -m pip install -r requirements.txt
 python3 rsf.py
 ```
 
-Bluetooth Low Enery support:
+Bluetooth Low Energy support:
 
 ```
 sudo apt-get install libglib2.0-dev
