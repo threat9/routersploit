@@ -7,7 +7,7 @@ from routersploit.core.exploit.exploit import Protocol
 class Exploit(Exploit):
     __info__ = {
         "name": "AutoPwn",
-        "description": "Module scans for all vulnerablities and weaknesses.",
+        "description": "Module scans for all vulnerabilities and weaknesses.",
         "authors": (
             "Marcin Bury <marcin[at]threat9.com>",  # routersploit module
         ),
