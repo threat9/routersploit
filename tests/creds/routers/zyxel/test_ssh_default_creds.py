@@ -9,7 +9,7 @@ def test_check_success(generic_target):
     assert exploit.target == ""
     assert exploit.port == 22
     assert exploit.threads == 1
-    assert exploit.defaults == ["admin:admin", "admin:1234", "admin:user"]
+    assert exploit.defaults == ["admin:admin", "admin:1234", "admin:user","admin:Zyxel*2012*"]
     assert exploit.stop_on_success is True
     assert exploit.verbosity is True
 
