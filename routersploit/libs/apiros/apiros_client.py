@@ -145,7 +145,7 @@ class ApiRosClient(object):
         ret = ''
         while len(ret) < length:
             s = self.sk.recv(length - len(ret))
-            if s == '':
+            if s is None or s == '':
                 raise RuntimeError("connection closed by remote end")
 
             ret += s.decode('UTF-8', 'replace')
