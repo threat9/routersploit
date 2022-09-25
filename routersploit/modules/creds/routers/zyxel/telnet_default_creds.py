@@ -19,4 +19,4 @@ class Exploit(TelnetDefault):
     port = OptPort(23, "Target Telnet port")
 
     threads = OptInteger(1, "Number of threads")
-    defaults = OptWordlist("admin:admin,admin:1234,admin:user", "User:Pass or file with default credentials (file://)")
+    defaults = OptWordlist("admin:admin,admin:1234,admin:user,admin:Zyxel*2012*", "User:Pass or file with default credentials (file://)")

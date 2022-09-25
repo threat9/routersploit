@@ -252,6 +252,7 @@ admin:visual
 admin:w2402
 admin:xad$l#12
 admin:zhone
+admin:Zyxel*2012*
 admin:zhongxing
 admin:zoomadsl
 administrator:1234
