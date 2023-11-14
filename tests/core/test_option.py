@@ -1,3 +1,4 @@
+import contextlib
 from routersploit.modules.encoders.php.hex import Encoder as PHPHexEncoder
 from routersploit.core.exploit.exceptions import OptionValidationError
 from routersploit.core.exploit.option import (
@@ -45,39 +46,31 @@ def test_opt_port():
     # Test OptPort creation
     opt_port = OptPort(80, "Test Port Description")
     assert opt_port.description == "Test Port Description"
-    assert opt_port.display_value == "80"
-    assert opt_port.value == 80
-    assert opt_port.__get__(None, None) == 80
-
+    verify_opt_port_properties(opt_port, "80", 80)
     # Test OptPort setting to 4444
     opt_port.__set__(None, 4444)
-    assert opt_port.display_value == "4444"
-    assert opt_port.value == 4444
-    assert opt_port.__get__(None, None) == 4444
-
+    verify_opt_port_properties(opt_port, "4444", 4444)
     # Test OptPort setting to 0
-    try:
+    with contextlib.suppress(OptionValidationError):
         opt_port.__set__(None, 0)
         assert False
-    except OptionValidationError:
-        assert True
-
     # Test OptPort setting to 65536
-    try:
+    with contextlib.suppress(OptionValidationError):
         opt_port.__set__(None, 65536)
         assert False
-    except OptionValidationError:
-        assert True
+
+
+def verify_opt_port_properties(opt_port, arg1, arg2):
+    assert opt_port.display_value == arg1
+    assert opt_port.value == arg2
+    assert opt_port.__get__(None, None) == arg2
 
 
 def test_opt_bool():
     # Test OptBool creation
     opt_bool = OptBool(True, "Test Bool Description")
     assert opt_bool.description == "Test Bool Description"
-    assert opt_bool.display_value == "true"
-    assert opt_bool.value
-    assert opt_bool.__get__(None, None)
-
+    assert_opt_bool_true(opt_bool)
     # Test OptBool setting to false
     opt_bool.__set__(None, "false")
     assert opt_bool.display_value == "false"
@@ -86,16 +79,17 @@ def test_opt_bool():
 
     # Test OptBool setting to true
     opt_bool.__set__(None, "true")
+    assert_opt_bool_true(opt_bool)
+    # Test OptBool setting to invalid value
+    with contextlib.suppress(OptionValidationError):
+        opt_bool.__set__(None, "Invalid Value")
+        assert False
+
+
+def assert_opt_bool_true(opt_bool):
     assert opt_bool.display_value == "true"
     assert opt_bool.value
     assert opt_bool.__get__(None, None)
-
-    # Test OptBool setting to invalid value
-    try:
-        opt_bool.__set__(None, "Invalid Value")
-        assert False
-    except OptionValidationError:
-        assert True
 
 
 def test_opt_integer():
@@ -142,65 +136,59 @@ def test_opt_float():
     # Test OptFloat creation
     opt_float = OptFloat(3.14, "Test Float Description")
     assert opt_float.description == "Test Float Description"
-    assert opt_float.display_value == "3.14"
-    assert opt_float.value == 3.14
-    assert opt_float.__get__(None, None) == 3.14
-
+    assert_opt_float_values(opt_float, "3.14", 3.14)
     # Test OptFloat setting to -1
     opt_float.__set__(None, -1)
-    assert opt_float.display_value == "-1"
-    assert opt_float.value == -1
-    assert opt_float.__get__(None, None) == -1
-
+    assert_opt_float_values(opt_float, "-1", -1)
     # Test OptFloat setting to 999.9999
     opt_float.__set__(None, 999.9999)
-    assert opt_float.display_value == "999.9999"
-    assert opt_float.value == 999.9999
-    assert opt_float.__get__(None, None) == 999.9999
-
+    assert_opt_float_values(opt_float, "999.9999", 999.9999)
     # Test OptFloat setting to invalid value
-    try:
+    with contextlib.suppress(OptionValidationError):
         opt_float.__set__(None, "Invalid Value")
         assert False
-    except OptionValidationError:
-        assert True
+
+
+def assert_opt_float_values(opt_float, arg1, arg2):
+    assert opt_float.display_value == arg1
+    assert opt_float.value == arg2
+    assert opt_float.__get__(None, None) == arg2
 
 
 def test_opt_string():
     # Test OptString creation
     opt_string = OptString("Test", "Test String Description")
     assert opt_string.description == "Test String Description"
-    assert opt_string.display_value == "Test"
-    assert opt_string.value == "Test"
-    assert opt_string.__get__(None, None) == "Test"
-
+    assert_opt_string_value(opt_string, "Test")
     # Test OptString setting to "AAAABBBBCCCCDDDD"
     opt_string.__set__(None, "AAAABBBBCCCCDDDD")
-    assert opt_string.display_value == "AAAABBBBCCCCDDDD"
-    assert opt_string.value == "AAAABBBBCCCCDDDD"
-    assert opt_string.__get__(None, None) == "AAAABBBBCCCCDDDD"
+    assert_opt_string_value(opt_string, "AAAABBBBCCCCDDDD")
+
+
+def assert_opt_string_value(opt_string, arg1):
+    assert opt_string.display_value == arg1
+    assert opt_string.value == arg1
+    assert opt_string.__get__(None, None) == arg1
 
 
 def test_opt_mac():
     # Test OptMAC creation
     opt_mac = OptMAC("AA:BB:CC:DD:EE:FF", "Test MAC Description")
     assert opt_mac.description == "Test MAC Description"
-    assert opt_mac.display_value == "AA:BB:CC:DD:EE:FF"
-    assert opt_mac.value == "AA:BB:CC:DD:EE:FF"
-    assert opt_mac.__get__(None, None) == "AA:BB:CC:DD:EE:FF"
-
+    assert_opt_mac_value(opt_mac, "AA:BB:CC:DD:EE:FF")
     # Test OptMAC setting to dd:ee:ff:dd:ee:ff
     opt_mac.__set__(None, "dd:ee:ff:dd:ee:ff")
-    assert opt_mac.display_value == "dd:ee:ff:dd:ee:ff"
-    assert opt_mac.value == "dd:ee:ff:dd:ee:ff"
-    assert opt_mac.__get__(None, None) == "dd:ee:ff:dd:ee:ff"
-
+    assert_opt_mac_value(opt_mac, "dd:ee:ff:dd:ee:ff")
     # Test OptMAC setting to invalid value
-    try:
+    with contextlib.suppress(OptionValidationError):
         opt_mac.__set__(None, "Invalid Value")
         assert False
-    except OptionValidationError:
-        assert True
+
+
+def assert_opt_mac_value(opt_mac, arg1):
+    assert opt_mac.display_value == arg1
+    assert opt_mac.value == arg1
+    assert opt_mac.__get__(None, None) == arg1
 
 
 def test_opt_wordlist():

@@ -28,7 +28,7 @@ class TCPCli(object):
         self.tcp_port = tcp_port
         self.verbosity = verbosity
 
-        self.peer = "{}:{}".format(self.tcp_target, self.tcp_port)
+        self.peer = f"{self.tcp_target}:{self.tcp_port}"
 
         if is_ipv4(self.tcp_target):
             self.tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -77,8 +77,7 @@ class TCPCli(object):
         """
 
         try:
-            response = self.tcp_client.recv(num)
-            return response
+            return self.tcp_client.recv(num)
         except Exception as err:
             print_error(self.peer, "TCP Error while receiving data", err, verbose=self.verbosity)
 
@@ -95,9 +94,7 @@ class TCPCli(object):
             response = b""
             received = 0
             while received < num:
-                tmp = self.tcp_client.recv(num - received)
-
-                if tmp:
+                if tmp := self.tcp_client.recv(num - received):
                     received += len(tmp)
                     response += tmp
                 else:
@@ -139,8 +136,7 @@ class TCPClient(Exploit):
         :return TCPCli: TCP client object
         """
 
-        tcp_target = target if target else self.target
-        tcp_port = port if port else self.port
+        tcp_target = target or self.target
+        tcp_port = port or self.port
 
-        tcp_client = TCPCli(tcp_target, tcp_port, verbosity=self.verbosity)
-        return tcp_client
+        return TCPCli(tcp_target, tcp_port, verbosity=self.verbosity)

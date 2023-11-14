@@ -16,4 +16,4 @@ class Encoder(BaseEncoder):
 
     def encode(self, payload):
         encoded_payload = str(b64encode(bytes(payload, "utf-8")), "utf-8")
-        return "eval(base64_decode('{}'));".format(encoded_payload)
+        return f"eval(base64_decode('{encoded_payload}'));"

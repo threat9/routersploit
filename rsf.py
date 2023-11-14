@@ -24,8 +24,7 @@ def routersploit(argv):
     else:
         rsf.start()
 
+import contextlib
 if __name__ == "__main__":
-    try:
+    with contextlib.suppress(KeyboardInterrupt, SystemExit):
         routersploit(sys.argv)
-    except (KeyboardInterrupt, SystemExit):
-        pass

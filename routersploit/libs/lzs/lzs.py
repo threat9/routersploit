@@ -41,10 +41,7 @@ class BitReader:
         return self._bits.popleft()
 
     def getBits(self, num):
-        res = 0
-        for i in range(num):
-            res += self.getBit() << num - 1 - i
-        return res
+        return sum(self.getBit() << num - 1 - i for i in range(num))
 
     def getByte(self):
         return self.getBits(8)
@@ -81,9 +78,7 @@ class RingList:
         return self.__max__
 
     def __getitem__(self, n):
-        if n >= self.size():
-            return None
-        return self.__data__[n]
+        return None if n >= self.size() else self.__data__[n]
 
 
 def LZSDecompress(data, window=RingList(2048)):
@@ -97,14 +92,8 @@ def LZSDecompress(data, window=RingList(2048)):
     result = ''
 
     while True:
-        bit = reader.getBit()
-        if not bit:
-            char = reader.getByte()
-            result += chr(char)
-            window.append(char)
-        else:
-            bit = reader.getBit()
-            if bit:
+        if bit := reader.getBit():
+            if bit := reader.getBit():
                 offset = reader.getBits(7)
                 if offset == 0:
                     # EOF
@@ -127,9 +116,13 @@ def LZSDecompress(data, window=RingList(2048)):
                         lenField = reader.getBits(4)
                         lenCounter += 1
                     length = 15 * lenCounter + 8 + lenField
-            for i in range(length):
+            for _ in range(length):
                 char = window[-offset]
                 result += chr(char)
                 window.append(char)
 
+        else:
+            char = reader.getByte()
+            result += chr(char)
+            window.append(char)
     return result, window

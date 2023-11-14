@@ -44,9 +44,9 @@ class BTLEClient(Exploit):
 
         devices = []
         try:
-            devices = [res for res in scanner.scan(self.scan_time)]
+            devices = list(scanner.scan(self.scan_time))
         except Exception as err:
-            print_error("Error: {}".format(err))
+            print_error(f"Error: {err}")
             print_error("Check if your bluetooth hardware is connected")
 
         return devices

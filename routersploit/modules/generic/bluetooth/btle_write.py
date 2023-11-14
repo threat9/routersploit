@@ -27,7 +27,6 @@ class Exploit(BTLEClient):
             print_error("Data is not in valid format")
             return
 
-        res = self.btle_scan(self.target)
-        if res:
+        if res := self.btle_scan(self.target):
             device = res[0]
             device.write(self.char, data)

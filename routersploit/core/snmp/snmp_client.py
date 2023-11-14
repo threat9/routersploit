@@ -26,7 +26,7 @@ class SNMPCli(object):
         self.snmp_port = snmp_port
         self.verbosity = verbosity
 
-        self.peer = "{}:{}".format(self.snmp_target, snmp_port)
+        self.peer = f"{self.snmp_target}:{snmp_port}"
 
     def get(self, community_string: str, oid: str, version: int = 1, retries: int = 0) -> bytes:
         """ Get OID from SNMP server
@@ -51,9 +51,17 @@ class SNMPCli(object):
             return None
 
         if errorIndication or errorStatus:
-            print_error(self.peer, "SNMP invalid community string: '{}'".format(community_string), verbose=self.verbosity)
+            print_error(
+                self.peer,
+                f"SNMP invalid community string: '{community_string}'",
+                verbose=self.verbosity,
+            )
         else:
-            print_success(self.peer, "SNMP valid community string found: '{}'".format(community_string), verbose=self.verbosity)
+            print_success(
+                self.peer,
+                f"SNMP valid community string found: '{community_string}'",
+                verbose=self.verbosity,
+            )
             return varBinds
 
         return None
@@ -74,8 +82,7 @@ class SNMPClient(Exploit):
         :return SNMPCli: SNMP client object
         """
 
-        snmp_target = target if target else self.target
-        snmp_port = port if port else self.port
+        snmp_target = target or self.target
+        snmp_port = port or self.port
 
-        snmp_client = SNMPCli(snmp_target, snmp_port, verbosity=self.verbosity)
-        return snmp_client
+        return SNMPCli(snmp_target, snmp_port, verbosity=self.verbosity)

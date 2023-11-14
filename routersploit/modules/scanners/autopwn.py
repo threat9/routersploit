@@ -68,23 +68,14 @@ class Exploit(Exploit):
             self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module, self.vendor) for module in self.modules]
 
         if self.check_exploits:
-            # vulnerabilities
-            print_info()
-            print_info("\033[94m[*]\033[0m", "{} Starting vulnerablity check...".format(self.target))
-
-            modules = []
+            modules = self._extracted_from_run_12(' Starting vulnerablity check...')
             for directory in self._exploits_directories:
-                for module in utils.iter_modules(directory):
-                    modules.append(module)
-
+                modules.extend(iter(utils.iter_modules(directory)))
             data = LockedIterator(modules)
             self.run_threads(self.threads, self.exploits_target_function, data)
 
         if self.check_creds:
-            # default creds
-            print_info()
-            print_info("\033[94m[*]\033[0m", "{} Starting default credentials check...".format(self.target))
-            modules = []
+            modules = self._extracted_from_run_12(' Starting default credentials check...')
             for directory in self._creds_directories:
                 for module in utils.iter_modules(directory):
                     modules.append(module)
@@ -95,26 +86,43 @@ class Exploit(Exploit):
         # results:
         print_info()
         if self.not_verified:
-            print_info("\033[94m[*]\033[0m", "{} Could not verify exploitability:".format(self.target))
+            print_info(
+                "\033[94m[*]\033[0m",
+                f"{self.target} Could not verify exploitability:",
+            )
             for v in self.not_verified:
                 print_info(" - {}:{} {} {}".format(*v))
             print_info()
 
         if self.vulnerabilities:
-            print_info("\033[92m[+]\033[0m", "{} Device is vulnerable:".format(self.target))
+            print_info("\033[92m[+]\033[0m", f"{self.target} Device is vulnerable:")
             headers = ("Target", "Port", "Service", "Exploit")
             print_table(headers, *self.vulnerabilities)
             print_info()
         else:
-            print_info("\033[91m[-]\033[0m", "{} Could not confirm any vulnerablity\n".format(self.target))
+            print_info(
+                "\033[91m[-]\033[0m",
+                f"{self.target} Could not confirm any vulnerablity\n",
+            )
 
         if self.creds:
-            print_info("\033[92m[+]\033[0m", "{} Found default credentials:".format(self.target))
+            print_info("\033[92m[+]\033[0m", f"{self.target} Found default credentials:")
             headers = ("Target", "Port", "Service", "Username", "Password")
             print_table(headers, *self.creds)
             print_info()
         else:
-            print_info("\033[91m[-]\033[0m", "{} Could not find default credentials".format(self.target))
+            print_info(
+                "\033[91m[-]\033[0m",
+                f"{self.target} Could not find default credentials",
+            )
+
+    # TODO Rename this here and in `run`
+    def _extracted_from_run_12(self, arg0):
+        # vulnerabilities
+        print_info()
+        print_info("\033[94m[*]\033[0m", f"{self.target}{arg0}")
+
+        return []
 
     def exploits_target_function(self, running, data):
         while running.is_set():
@@ -172,15 +180,21 @@ class Exploit(Exploit):
                 response = exploit.check()
 
                 if response is True:
-                    print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
-                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    print_info(
+                        "\033[92m[+]\033[0m",
+                        f"{exploit.target}:{exploit.port} {exploit.target_protocol} {exploit} is vulnerable",
+                    )
                     self.vulnerabilities.append((exploit.target, exploit.port, exploit.target_protocol, str(exploit)))
                 elif response is False:
-                    print_info("\033[91m[-]\033[0m", "{}:{} {} {} is not vulnerable".format(
-                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    print_info(
+                        "\033[91m[-]\033[0m",
+                        f"{exploit.target}:{exploit.port} {exploit.target_protocol} {exploit} is not vulnerable",
+                    )
                 else:
-                    print_info("\033[94m[*]\033[0m", "{}:{} {} {} Could not be verified".format(
-                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    print_info(
+                        "\033[94m[*]\033[0m",
+                        f"{exploit.target}:{exploit.port} {exploit.target_protocol} {exploit} Could not be verified",
+                    )
                     self.not_verified.append((exploit.target, exploit.port, exploit.target_protocol, str(exploit)))
 
     def creds_target_function(self, running, data):
@@ -229,13 +243,16 @@ class Exploit(Exploit):
                 else:
                     continue
 
-                response = exploit.check_default()
-                if response:
-                    print_info("\033[92m[+]\033[0m", "{}:{} {} {} is vulnerable".format(
-                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                if response := exploit.check_default():
+                    print_info(
+                        "\033[92m[+]\033[0m",
+                        f"{exploit.target}:{exploit.port} {exploit.target_protocol} {exploit} is vulnerable",
+                    )
 
                     for creds in response:
                         self.creds.append(creds)
                 else:
-                    print_info("\033[91m[-]\033[0m", "{}:{} {} {} is not vulnerable".format(
-                               exploit.target, exploit.port, exploit.target_protocol, exploit))
+                    print_info(
+                        "\033[91m[-]\033[0m",
+                        f"{exploit.target}:{exploit.port} {exploit.target_protocol} {exploit} is not vulnerable",
+                    )

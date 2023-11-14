@@ -18,8 +18,7 @@ class Exploit(BTLEClient):
     target = OptMAC("", "Target MAC address")
 
     def run(self):
-        res = self.btle_scan(self.target)
-        if res:
+        if res := self.btle_scan(self.target):
             device = res[0]
 
             device.print_info()
