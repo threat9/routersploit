@@ -15,4 +15,4 @@ class Encoder(BaseEncoder):
 
     def encode(self, payload):
         encoded_payload = bytes(payload, "utf-8").hex()
-        return "exec('{}'.decode('hex'))".format(encoded_payload)
+        return f"exec('{encoded_payload}'.decode('hex'))"

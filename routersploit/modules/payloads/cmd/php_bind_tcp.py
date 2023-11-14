@@ -15,5 +15,4 @@ class Payload(PHPBindTCP):
 
     def generate(self):
         self.fmt = self.cmd + ' -r "{}"'
-        payload = super(Payload, self).generate()
-        return payload
+        return super(Payload, self).generate()

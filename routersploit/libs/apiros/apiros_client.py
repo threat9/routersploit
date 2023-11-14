@@ -17,12 +17,13 @@ class ApiRosClient(object):
         md.update(b'\x00')
         md.update(pwd.encode('UTF-8'))
         md.update(chal)
-        output = self.talk([
-            "/login",
-            "=name=" + username,
-            "=response=00" + binascii.hexlify(md.digest()).decode('UTF-8')
-        ])
-        return output
+        return self.talk(
+            [
+                "/login",
+                f"=name={username}",
+                "=response=00" + binascii.hexlify(md.digest()).decode('UTF-8'),
+            ]
+        )
 
     def talk(self, words):
         if self.writeSentence(words) == 0:
@@ -65,8 +66,7 @@ class ApiRosClient(object):
         self.writeStr(w)
 
     def readWord(self):
-        ret = self.readStr(self.readLen())
-        return ret
+        return self.readStr(self.readLen())
 
     def writeLen(self, length):
         if length < 0x80:
@@ -77,21 +77,21 @@ class ApiRosClient(object):
             self.writeByte((length & 0xFF).to_bytes(1, sys.byteorder))
         elif length < 0x200000:
             length |= 0xC00000
-            self.writeByte(((length >> 16) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte(((length >> 8) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte((length & 0xFF).to_bytes(1, sys.byteorder))
+            self._extracted_from_writeLen_10(length)
         elif length < 0x10000000:
             length |= 0xE0000000
             self.writeByte(((length >> 24) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte(((length >> 16) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte(((length >> 8) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte((length & 0xFF).to_bytes(1, sys.byteorder))
+            self._extracted_from_writeLen_10(length)
         else:
             self.writeByte((0xF0).to_bytes(1, sys.byteorder))
             self.writeByte(((length >> 24) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte(((length >> 16) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte(((length >> 8) & 0xFF).to_bytes(1, sys.byteorder))
-            self.writeByte((length & 0xFF).to_bytes(1, sys.byteorder))
+            self._extracted_from_writeLen_10(length)
+
+    # TODO Rename this here and in `writeLen`
+    def _extracted_from_writeLen_10(self, length):
+        self.writeByte(((length >> 16) & 0xFF).to_bytes(1, sys.byteorder))
+        self.writeByte(((length >> 8) & 0xFF).to_bytes(1, sys.byteorder))
+        self.writeByte((length & 0xFF).to_bytes(1, sys.byteorder))
 
     def readLen(self):
         c = ord(self.readStr(1))
@@ -116,14 +116,19 @@ class ApiRosClient(object):
             c <<= 8
             c += ord(self.readStr(1))
         elif (c & 0xF8) == 0xF0:
-            c = ord(self.readStr(1))
-            c <<= 8
-            c += ord(self.readStr(1))
-            c <<= 8
-            c += ord(self.readStr(1))
-            c <<= 8
-            c += ord(self.readStr(1))
+            c = self._extracted_from_readLen_24()
         return c
+
+    # TODO Rename this here and in `readLen`
+    def _extracted_from_readLen_24(self):
+        result = ord(self.readStr(1))
+        result <<= 8
+        result += ord(self.readStr(1))
+        result <<= 8
+        result += ord(self.readStr(1))
+        result <<= 8
+        result += ord(self.readStr(1))
+        return result
 
     def writeStr(self, str):
         n = 0

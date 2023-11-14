@@ -105,9 +105,9 @@ class BaseInterpreter(object):
         :return: command_handler
         """
         try:
-            command_handler = getattr(self, "command_{}".format(command))
-        except AttributeError:
-            raise RoutersploitException("Unknown command: '{}'".format(command))
+            command_handler = getattr(self, f"command_{command}")
+        except AttributeError as e:
+            raise RoutersploitException(f"Unknown command: '{command}'") from e
 
         return command_handler
 
@@ -139,30 +139,33 @@ class BaseInterpreter(object):
         Otherwise try to call complete_<command> to get list of completions.
         """
         if state == 0:
-            original_line = readline.get_line_buffer()
-            line = original_line.lstrip()
-            stripped = len(original_line) - len(line)
-            start_index = readline.get_begidx() - stripped
-            end_index = readline.get_endidx() - stripped
-
-            if start_index > 0:
-                cmd, args, _ = self.parse_line(line)
-                if cmd == "":
-                    complete_function = self.default_completer
-                else:
-                    try:
-                        complete_function = getattr(self, "complete_" + cmd)
-                    except AttributeError:
-                        complete_function = self.default_completer
-            else:
-                complete_function = self.raw_command_completer
-
-            self.completion_matches = complete_function(text, line, start_index, end_index)
-
+            self.command_line_completer(text)
         try:
             return self.completion_matches[state]
         except IndexError:
             return None
+
+    # TODO Rename this here and in `complete`
+    def command_line_completer(self, text):
+        original_line = readline.get_line_buffer()
+        line = original_line.lstrip()
+        stripped = len(original_line) - len(line)
+        start_index = readline.get_begidx() - stripped
+        end_index = readline.get_endidx() - stripped
+
+        if start_index > 0:
+            cmd, args, _ = self.parse_line(line)
+            if cmd == "":
+                complete_function = self.default_completer
+            else:
+                try:
+                    complete_function = getattr(self, f"complete_{cmd}")
+                except AttributeError:
+                    complete_function = self.default_completer
+        else:
+            complete_function = self.raw_command_completer
+
+        self.completion_matches = complete_function(text, line, start_index, end_index)
 
     def commands(self, *ignored):
         """ Returns full list of interpreter commands.
@@ -225,7 +228,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         self.modules = index_modules()
         self.modules_count = Counter()
-        self.modules_count.update([module.split('.')[0] for module in self.modules])
+        self.modules_count |= [module.split('.')[0] for module in self.modules]
         self.main_modules_dirs = [module for module in os.listdir(MODULES_DIR) if not module.startswith("__")]
 
         self.__parse_prompt()
@@ -280,13 +283,13 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             opts, args = getopt.getopt(argv[1:], "hm:s:", ["help=", "module=", "set="])
         except getopt.GetoptError:
-            print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
+            print_info(f'{argv[0]} -m <module> -s \"<option> <value>\"')
             printer_queue.join()
             return
 
         for opt, arg in opts:
             if opt in ("-h", "--help"):
-                print_info("{} -m <module> -s \"<option> <value>\"".format(argv[0]))
+                print_info(f'{argv[0]} -m <module> -s \"<option> <value>\"')
                 printer_queue.join()
                 return
             elif opt in ("-m", "--module"):
@@ -313,7 +316,10 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @property
     def module_metadata(self):
-        return getattr(self.current_module, "_{}__info__".format(self.current_module.__class__.__name__))
+        return getattr(
+            self.current_module,
+            f"_{self.current_module.__class__.__name__}__info__",
+        )
 
     @property
     def prompt(self):
@@ -323,13 +329,12 @@ class RoutersploitInterpreter(BaseInterpreter):
 
         :return: prompt string with appropriate module prefix.
         """
-        if self.current_module:
-            try:
-                return self.module_prompt_template.format(host=self.prompt_hostname, module=self.module_metadata['name'])
-            except (AttributeError, KeyError):
-                return self.module_prompt_template.format(host=self.prompt_hostname, module="UnnamedModule")
-        else:
+        if not self.current_module:
             return self.raw_prompt_template.format(host=self.prompt_hostname)
+        try:
+            return self.module_prompt_template.format(host=self.prompt_hostname, module=self.module_metadata['name'])
+        except (AttributeError, KeyError):
+            return self.module_prompt_template.format(host=self.prompt_hostname, module="UnnamedModule")
 
     def available_modules_completion(self, text):
         """ Looking for tab completion hints using setup.py entry_points.
@@ -384,7 +389,7 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     @module_required
     def command_run(self, *args, **kwargs):
-        print_status("Running module {}...".format(self.current_module))
+        print_status(f"Running module {self.current_module}...")
         try:
             self.current_module.run()
         except KeyboardInterrupt:
@@ -405,10 +410,11 @@ class RoutersploitInterpreter(BaseInterpreter):
 
             if kwargs.get("glob", False):
                 GLOBAL_OPTS[key] = value
-            print_success("{} => {}".format(key, value))
+            print_success(f"{key} => {value}")
         else:
-            print_error("You can't set option '{}'.\n"
-                        "Available options: {}".format(key, self.current_module.options))
+            print_error(
+                f"You can't set option '{key}'.\nAvailable options: {self.current_module.options}"
+            )
 
     @stop_after(2)
     def complete_set(self, text, *args, **kwargs):
@@ -432,8 +438,9 @@ class RoutersploitInterpreter(BaseInterpreter):
         try:
             del GLOBAL_OPTS[key]
         except KeyError:
-            print_error("You can't unset global option '{}'.\n"
-                        "Available global options: {}".format(key, list(GLOBAL_OPTS.keys())))
+            print_error(
+                f"You can't unset global option '{key}'.\nAvailable global options: {list(GLOBAL_OPTS.keys())}"
+            )
         else:
             print_success({key: value})
 
@@ -524,13 +531,11 @@ class RoutersploitInterpreter(BaseInterpreter):
             devices = self.current_module._Exploit__info__['devices']
 
             print_info("\nTarget devices:")
-            i = 0
-            for device in devices:
+            for i, device in enumerate(devices):
                 if isinstance(device, dict):
-                    print_info("   {} - {}".format(i, device['name']))
+                    print_info(f"   {i} - {device['name']}")
                 else:
-                    print_info("   {} - {}".format(i, device))
-                i += 1
+                    print_info(f"   {i} - {device}")
             print_info()
         except KeyError:
             print_info("\nTarget devices are not defined")
@@ -538,15 +543,18 @@ class RoutersploitInterpreter(BaseInterpreter):
     @module_required
     def _show_wordlists(self, *args, **kwargs):
         headers = ("Wordlist", "Path")
-        wordlists = [(f, "file://{}/{}".format(WORDLISTS_DIR, f)) for f in os.listdir(WORDLISTS_DIR) if f.endswith(".txt")]
+        wordlists = [
+            (f, f"file://{WORDLISTS_DIR}/{f}")
+            for f in os.listdir(WORDLISTS_DIR)
+            if f.endswith(".txt")
+        ]
 
         print_table(headers, *wordlists, max_column_length=100)
 
     @module_required
     def _show_encoders(self, *args, **kwargs):
         if issubclass(self.current_module.__class__, BasePayload):
-            encoders = self.current_module.get_encoders()
-            if encoders:
+            if encoders := self.current_module.get_encoders():
                 headers = ("Encoder", "Name", "Description")
                 print_table(headers, *encoders, max_column_length=100)
                 return
@@ -572,11 +580,11 @@ class RoutersploitInterpreter(BaseInterpreter):
     def command_show(self, *args, **kwargs):
         sub_command = args[0]
         try:
-            getattr(self, "_show_{}".format(sub_command))(*args, **kwargs)
+            getattr(self, f"_show_{sub_command}")(*args, **kwargs)
         except AttributeError:
-            print_error("Unknown 'show' sub-command '{}'. "
-                        "What do you want to show?\n"
-                        "Possible choices are: {}".format(sub_command, self.show_sub_commands))
+            print_error(
+                f"Unknown 'show' sub-command '{sub_command}'. What do you want to show?\nPossible choices are: {self.show_sub_commands}"
+            )
 
     @stop_after(2)
     def complete_show(self, text, *args, **kwargs):
@@ -632,7 +640,7 @@ class RoutersploitInterpreter(BaseInterpreter):
                     print_error("Unknown module type.")
                     return
                 # print_info(' - Type  :\t{}'.format(value))
-                mod_type = "{}.".format(value)
+                mod_type = f"{value}."
             elif key in ['device', 'language', 'payload']:
                 if key == 'device' and (value not in devices):
                     print_error("Unknown exploit type.")
@@ -644,10 +652,10 @@ class RoutersploitInterpreter(BaseInterpreter):
                     print_error("Unknown payload type.")
                     return
                 # print_info(' - {}:\t{}'.format(key.capitalize(), value))
-                mod_detail = ".{}.".format(value)
+                mod_detail = f".{value}."
             elif key == 'vendor':
                 # print_info(' - Vendor:\t{}'.format(value))
-                mod_vendor = ".{}.".format(value)
+                mod_vendor = f".{value}."
 
         for module in self.modules:
             if mod_type not in str(module):
@@ -656,14 +664,14 @@ class RoutersploitInterpreter(BaseInterpreter):
                 continue
             if mod_vendor not in str(module):
                 continue
-            if not all(word in str(module) for word in keyword.split()):
+            if any(word not in str(module) for word in keyword.split()):
                 continue
 
             found = humanize_path(module)
 
             if len(keyword):
                 for word in keyword.split():
-                    found = found.replace(word, "\033[31m{}\033[0m".format(word))
+                    found = found.replace(word, f"\033[31m{word}\033[0m")
 
             print_info(found)
 

