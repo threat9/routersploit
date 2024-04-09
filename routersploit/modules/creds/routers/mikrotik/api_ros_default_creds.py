@@ -51,7 +51,7 @@ class Exploit(TCPClient):
 
                 tcp_client = self.tcp_create()
                 tcp_sock = tcp_client.connect()
-                apiros = ApiRosClient(tcp_sock)
+                apiros = ApiRosClient(tcp_client)
 
                 output = apiros.login(username, password)
 
@@ -65,6 +65,9 @@ class Exploit(TCPClient):
                     print_error("Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
                 tcp_client.close()
+            
+            except RuntimeError:
+                print_error("Connection closed by remote end")
 
             except StopIteration:
                 break
