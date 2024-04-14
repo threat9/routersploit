@@ -241,11 +241,8 @@ class RoutersploitInterpreter(BaseInterpreter):
             Embedded Devices
 
  Codename   : I Knew You Were Trouble
- Version    : 3.4.1
+ Version    : 3.4.2
  Homepage   : https://www.threat9.com - @threatnine
- Join Slack : https://www.threat9.com/slack
-
- Join Threat9 Beta Program - https://www.threat9.com
 
  Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Generic: {generic_count} Payloads: {payloads_count} Encoders: {encoders_count}
 """.format(exploits_count=self.modules_count["exploits"],
