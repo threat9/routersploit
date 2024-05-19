@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="routersploit",
-    version="3.4.2",
+    version="3.4.3",
     description="Exploitation Framework for Embedded Devices",
     long_description=long_description,
     author="Threat9",
