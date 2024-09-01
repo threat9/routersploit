@@ -1,4 +1,5 @@
 import os
+import sys
 
 from routersploit.core.exploit import *
 from routersploit.core.exploit.exploit import Protocol
@@ -55,15 +56,16 @@ class Exploit(Exploit):
         self._exploits_directories = [os.path.join(utils.MODULES_DIR, "exploits", module) for module in self.modules]
         self._creds_directories = [os.path.join(utils.MODULES_DIR, "creds", module) for module in self.modules]
 
-    def run(self, ip_list_file=None):
-        if ip_list_file:
+    def run(self):
+        ip_list_file = input("Please enter the path to the IP list text file: ").strip()
+        if os.path.exists(ip_list_file):
             with open(ip_list_file, 'r') as f:
                 ips = [line.strip() for line in f.readlines()]
             for ip in ips:
                 self.target = ip
                 self.scan_target()
         else:
-            self.scan_target()
+            print(f"File '{ip_list_file}' not found. Please check the path and try again.")
 
     def scan_target(self):
         self.vulnerabilities = []
@@ -125,4 +127,3 @@ class Exploit(Exploit):
             print_info("\033[91m[-]\033[0m", "{} Could not find default credentials".format(self.target))
 
     # The existing functions (exploits_target_function, creds_target_function) remain unchanged
-
