@@ -39,8 +39,10 @@ import readline
 
 
 def is_libedit():
-    return "libedit" in readline.__doc__
-
+    try:
+        return "libedit" in readline.__doc__
+    except TypeError:
+        return False
 
 class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
