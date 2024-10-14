@@ -39,8 +39,7 @@ import readline
 
 
 def is_libedit():
-    return "libedit" in readline.__doc__
-
+    return isinstance(readline.__doc__, str) and "libedit" in readline.__doc__
 
 class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
