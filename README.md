@@ -3,6 +3,10 @@
 [![Python 3.6](https://img.shields.io/badge/Python-3.6-yellow.svg)](http://www.python.org/download/)
 [![Build Status](https://travis-ci.org/threat9/routersploit.svg?branch=master)](https://travis-ci.org/threat9/routersploit)
 
+# Community
+Join community on [Embedded Exploitation Discord](https://discord.gg/UCXARN2vBx).
+
+# Description
 The RouterSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
 [![asciicast](https://asciinema.org/a/180370.png)](https://asciinema.org/a/180370)
