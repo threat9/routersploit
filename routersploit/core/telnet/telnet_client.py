@@ -10,7 +10,7 @@ from routersploit.core.exploit.printer import print_error
 TELNET_TIMEOUT = 30.0
 
 
-class TelnetCli(object):
+class TelnetCli:
     """ Telnet Client provides methods to handle communication with Telnet server """
 
     def __init__(self, telnet_target: str, telnet_port: int, verbosity: bool = False) -> None:
@@ -147,6 +147,7 @@ class TelnetCli(object):
         return False
 
 
+# pylint: disable=no-member
 class TelnetClient(Exploit):
     """ Telnet Client exploit """
 

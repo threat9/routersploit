@@ -17,7 +17,7 @@ from routersploit.core.exploit.utils import random_text
 SSH_TIMEOUT = 8.0
 
 
-class SSHCli(object):
+class SSHCli:
     """ SSH Client provides methods to handle communication with SSH server """
 
     def __init__(self, ssh_target: str, ssh_port: int, verbosity: bool = False) -> None:
@@ -320,6 +320,7 @@ class SSHCli(object):
         return False
 
 
+# pylint: disable=no-member
 class SSHClient(Exploit):
     """ SSH Client exploit """
 
