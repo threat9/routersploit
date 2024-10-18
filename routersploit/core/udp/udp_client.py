@@ -11,7 +11,7 @@ from routersploit.core.exploit.utils import is_ipv6
 UDP_SOCKET_TIMEOUT = 8.0
 
 
-class UDPCli(object):
+class UDPCli:
     """ UDP Client provides methods to handle communication with UDP server """
 
     def __init__(self, udp_target: str, udp_port: int, verbosity: bool = False) -> None:
@@ -84,6 +84,7 @@ class UDPCli(object):
         return False
 
 
+# pylint: disable=no-member
 class UDPClient(Exploit):
     """ UDP Client exploit """
 

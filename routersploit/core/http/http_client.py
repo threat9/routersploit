@@ -13,6 +13,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 HTTP_TIMEOUT = 30.0
 
 
+# pylint: disable=no-member
 class HTTPClient(Exploit):
     """ HTTP Client provides methods to handle communication with HTTP server """
 

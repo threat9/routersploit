@@ -12,7 +12,7 @@ from routersploit.core.exploit.utils import is_ipv6
 TCP_SOCKET_TIMEOUT = 8.0
 
 
-class TCPCli(object):
+class TCPCli:
     """ TCP Client provides methods to handle communication with TCP server """
 
     def __init__(self, tcp_target: str, tcp_port: int, verbosity: bool = False) -> None:
@@ -124,6 +124,7 @@ class TCPCli(object):
         return False
 
 
+# pylint: disable=no-member
 class TCPClient(Exploit):
     """ TCP Client exploit """
 
