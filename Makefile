@@ -19,9 +19,9 @@ tests: clean
 	python3 -m pytest -n16 tests/exploits/ tests/creds/ tests/encoders/ tests/generic/ tests/payloads/
 
 clean:
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f  {} +
+	find . -name '*.pyc' -delete
+	find . -name '*.pyo' -delete
+	find . -name '*~' -delete
 
 prune:
 	docker images -q -f dangling=true | xargs docker rmi

@@ -11,7 +11,7 @@ from routersploit.core.exploit.printer import print_success
 FTP_TIMEOUT = 8.0
 
 
-class FTPCli(object):
+class FTPCli:
     """ FTP Client provides methods to handle communication with FTP server """
 
     def __init__(self, ftp_target: str, ftp_port: int, ssl: bool = False, verbosity: bool = False) -> None:
@@ -114,6 +114,7 @@ class FTPCli(object):
         return False
 
 
+# pylint: disable=no-member
 class FTPClient(Exploit):
     """ FTP Client exploit """
 
