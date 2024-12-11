@@ -102,8 +102,14 @@ python3 rsf.py
 ```
 git clone https://www.github.com/threat9/routersploit
 cd routersploit
-docker build -t routersploit .
-docker run -it --rm routersploit
+docker compose up --build -d
+docker attach routersploit
+```
+### To run again without rebuild
+
+```
+docker start routersploit
+docker attach routersploit
 ```
 
 # Update
