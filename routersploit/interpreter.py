@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import atexit
 import itertools
 import pkgutil
@@ -8,8 +6,6 @@ import sys
 import getopt
 import traceback
 from collections import Counter
-
-from future.builtins import input
 
 from routersploit.core.exploit.exceptions import RoutersploitException
 from routersploit.core.exploit.utils import (
