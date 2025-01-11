@@ -112,9 +112,14 @@ class BaseInterpreter(object):
 
     def start(self):
         """ Routersploit main entry point. Starting interpreter loop. """
-
+        
+        if not sys.stdin.isatty():
+            print_info("stdin is not a TTY. Ensure `stdin_open` and `tty` are set")
+            sys.exit(1)
+        
         print_info(self.banner)
         printer_queue.join()
+        
         while True:
             try:
                 command, args, kwargs = self.parse_line(input(self.prompt))

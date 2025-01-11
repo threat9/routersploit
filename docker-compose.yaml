@@ -1,0 +1,11 @@
+services:
+  routersploit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: routersploit
+    environment:
+      - PYTHONUNBUFFERED=1 
+    stdin_open: true  
+    tty: true        
+    command: ["python","rsf.py"]
