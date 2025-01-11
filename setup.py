@@ -18,7 +18,6 @@ setup(
     scripts=('rsf.py',),
     entry_points={},
     install_requires=[
-        "future",
         "requests",
         "paramiko",
         "pysnmp",
