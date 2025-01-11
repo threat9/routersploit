@@ -47,9 +47,7 @@ class InterruptableThread(threading.Thread):
     def __init__(self, target):
         threading.Thread.__init__(self, target=target)
             
-    def run(self):
-        self._target()
-         
+
     def get_id(self):
         if hasattr(self, '_thread_id'):
             return self._thread_id
