@@ -43,27 +43,6 @@ import readline
 def is_libedit():
     return isinstance(readline.__doc__, str) and "libedit" in readline.__doc__
 
-class InterruptableThread(threading.Thread):
-    def __init__(self, target):
-        threading.Thread.__init__(self, target=target)
-            
-
-    def get_id(self):
-        if hasattr(self, '_thread_id'):
-            return self._thread_id
-        for id, thread in threading._active.items():
-            if thread is self:
-                return id
- 
-    def raise_exception(self):
-        thread_id = self.get_id()
-        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
-              ctypes.py_object(SystemExit))
-        if res > 1:
-            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
-            print_info()
-            print_error('Exception raise failure')
-
 class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
     history_length = 100
@@ -236,8 +215,6 @@ class RoutersploitInterpreter(BaseInterpreter):
         super(RoutersploitInterpreter, self).__init__()
         PrinterThread().start()
         
-        self.sigint_handler = signal.getsignal(signal.SIGINT)
-
         self.current_module = None
         self.raw_prompt_template = None
         self.module_prompt_template = None
@@ -412,19 +389,16 @@ class RoutersploitInterpreter(BaseInterpreter):
     @module_required
     def command_run(self, *args, **kwargs):
         print_status("Running module {}...".format(self.current_module))
-        t = InterruptableThread(self.current_module.run())
         try:
             signal.signal(signal.SIGINT, self.__command_sigint_handler)
-            t.start()
+            self.current_module.run()
         except KeyboardInterrupt:
             print_info()
             print_error("Operation cancelled by user")
-            t.raise_exception()
-            t.join()
         except Exception:
             print_error(traceback.format_exc(sys.exc_info()))
         finally:
-            signal.signal(signal.SIGINT, self.sigint_handler)
+            signal.signal(signal.SIGINT, signal.getsignal(signal.SIGINT))
 
 
     def command_exploit(self, *args, **kwargs):
