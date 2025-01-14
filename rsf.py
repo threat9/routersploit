@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
 import logging.handlers
 import sys
 if sys.version_info.major < 3:
