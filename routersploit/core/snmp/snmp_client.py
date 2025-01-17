@@ -1,4 +1,3 @@
-# from pysnmp.entity.rfc3413.oneliner import cmdgen
 import asyncio
 from pysnmp.hlapi.v3arch.asyncio import *
 
@@ -40,7 +39,6 @@ class SNMPCli(object):
         :return bytes: SNMP server response
         """
 
-
         return asyncio.run(self.get_cmd(
             community_string,
             oid,
@@ -57,8 +55,9 @@ class SNMPCli(object):
         :param int retries: number of retries
         :return bytes: SNMP server response
         """
+
         snmpEngine = SnmpEngine()
-    
+
         iterator = get_cmd(
             snmpEngine,
             CommunityData(community_string, mpModel=version),
@@ -66,17 +65,17 @@ class SNMPCli(object):
             ContextData(),
             ObjectType(ObjectIdentity(oid))
         )
-    
+
         errorIndication, errorStatus, errorIndex, varBinds = await iterator
         snmpEngine.close_dispatcher()
-    
+
         if errorIndication or errorStatus:
             print_error(self.peer, "SNMP invalid community string: '{}'".format(community_string), verbose=self.verbosity)
         else:
             print_success(self.peer, "SNMP valid community string found: '{}'".format(community_string), verbose=self.verbosity)
             return varBinds
-    
-        return None 
+
+        return None
 
 
 class SNMPClient(Exploit):
