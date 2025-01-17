@@ -1,4 +1,4 @@
-FROM python:3.7-bookworm
+FROM python:3.9-bookworm
 
 WORKDIR /routersploit
 
