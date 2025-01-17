@@ -1,4 +1,5 @@
-from pysnmp.entity.rfc3413.oneliner import cmdgen
+import asyncio
+from pysnmp.hlapi.v3arch.asyncio import *
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
@@ -31,24 +32,42 @@ class SNMPCli(object):
     def get(self, community_string: str, oid: str, version: int = 1, retries: int = 0) -> bytes:
         """ Get OID from SNMP server
 
-        :param str community_string: SNMP server communit string
+        :param str community_string: SNMP server community string
         :param str oid: SNMP server oid
         :param int version: SNMP protocol version
         :param int retries: number of retries
         :return bytes: SNMP server response
         """
 
-        cmdGen = cmdgen.CommandGenerator()
+        return asyncio.run(self.get_cmd(
+            community_string,
+            oid,
+            version,
+            retries
+        ))
 
-        try:
-            errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                cmdgen.CommunityData(community_string, mpModel=version),
-                cmdgen.UdpTransportTarget((self.snmp_target, self.snmp_port), timeout=SNMP_TIMEOUT, retries=retries),
-                oid,
-            )
-        except Exception as err:
-            print_error(self.peer, "SNMP Error while accessing server", err, verbose=self.verbosity)
-            return None
+    async def get_cmd(self, community_string: str, oid: str, version: int, retries: int):
+        """ Retrieves OID from SNMP server
+
+        :param str community_string: SNMP server community string
+        :param str oid: SNMP server oid
+        :param int version: SNMP protocol version
+        :param int retries: number of retries
+        :return bytes: SNMP server response
+        """
+
+        snmpEngine = SnmpEngine()
+
+        iterator = get_cmd(
+            snmpEngine,
+            CommunityData(community_string, mpModel=version),
+            await UdpTransportTarget.create((self.snmp_target, self.snmp_port), timeout=SNMP_TIMEOUT, retries=retries),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid))
+        )
+
+        errorIndication, errorStatus, errorIndex, varBinds = await iterator
+        snmpEngine.close_dispatcher()
 
         if errorIndication or errorStatus:
             print_error(self.peer, "SNMP invalid community string: '{}'".format(community_string), verbose=self.verbosity)
