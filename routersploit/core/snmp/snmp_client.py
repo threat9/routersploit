@@ -11,7 +11,7 @@ from routersploit.core.exploit.printer import print_error
 SNMP_TIMEOUT = 15.0
 
 
-class SNMPCli(object):
+class SNMPCli:
     """ SNMP Client provides methods to handle communication with SNMP server """
 
     def __init__(self, snmp_target: str, snmp_port: int, verbosity: bool = False) -> None:
@@ -78,6 +78,7 @@ class SNMPCli(object):
         return None
 
 
+# pylint: disable=no-member
 class SNMPClient(Exploit):
     """ SNMP Client exploit """
 

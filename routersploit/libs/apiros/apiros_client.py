@@ -2,15 +2,13 @@
 # The code is taken from https://github.com/LaiArturs/RouterOS_API/
 # All credits go to Arturs Laizans - https://github.com/LaiArtur
 
-import sys
 import binascii
 import hashlib
 import socket
 import ssl
 
- 
 TIMEOUT = 8.0
- 
+
 CONTEXT = ssl.create_default_context()
 CONTEXT.check_hostname = False
 CONTEXT.verify_mode = ssl.CERT_NONE
@@ -268,4 +266,3 @@ class ApiRosClient(object):
 
     def close(self):
         self.sock.close()
-
