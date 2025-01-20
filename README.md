@@ -3,6 +3,10 @@
 [![Python 3.6](https://img.shields.io/badge/Python-3.6-yellow.svg)](http://www.python.org/download/)
 [![Build Status](https://travis-ci.org/threat9/routersploit.svg?branch=master)](https://travis-ci.org/threat9/routersploit)
 
+# Community
+Join community on [Embedded Exploitation Discord](https://discord.gg/UCXARN2vBx).
+
+# Description
 The RouterSploit Framework is an open-source exploitation framework dedicated to embedded devices.
 
 [![asciicast](https://asciinema.org/a/180370.png)](https://asciinema.org/a/180370)
@@ -20,7 +24,6 @@ It consists of various modules that aid penetration testing operations:
 ## Requirements
 
 Required:
-* future
 * requests
 * paramiko
 * pysnmp
@@ -98,8 +101,14 @@ python3 rsf.py
 ```
 git clone https://www.github.com/threat9/routersploit
 cd routersploit
-docker build -t routersploit .
-docker run -it --rm routersploit
+docker compose up --build -d
+docker attach routersploit
+```
+### To run again without rebuild
+
+```
+docker start routersploit
+docker attach routersploit
 ```
 
 # Update

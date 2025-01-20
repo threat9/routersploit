@@ -1,15 +1,13 @@
-from __future__ import print_function
-
 import atexit
 import itertools
 import pkgutil
 import os
 import sys
 import getopt
+import signal
 import traceback
+import threading, ctypes
 from collections import Counter
-
-from future.builtins import input
 
 from routersploit.core.exploit.exceptions import RoutersploitException
 from routersploit.core.exploit.utils import (
@@ -39,8 +37,7 @@ import readline
 
 
 def is_libedit():
-    return "libedit" in readline.__doc__
-
+    return isinstance(readline.__doc__, str) and "libedit" in readline.__doc__
 
 class BaseInterpreter(object):
     history_file = os.path.expanduser("~/.history")
@@ -113,9 +110,14 @@ class BaseInterpreter(object):
 
     def start(self):
         """ Routersploit main entry point. Starting interpreter loop. """
-
+        
+        if not sys.stdin.isatty():
+            print_info("stdin is not a TTY. Ensure `stdin_open` and `tty` are set")
+            sys.exit(1)
+        
         print_info(self.banner)
         printer_queue.join()
+        
         while True:
             try:
                 command, args, kwargs = self.parse_line(input(self.prompt))
@@ -125,10 +127,13 @@ class BaseInterpreter(object):
                 command_handler(args, **kwargs)
             except RoutersploitException as err:
                 print_error(err)
-            except (EOFError, KeyboardInterrupt, SystemExit):
+            except (EOFError, SystemExit):
                 print_info()
                 print_error("RouterSploit stopped")
-                break
+                os._exit(0)
+            except KeyboardInterrupt:
+                print_info()
+                print_error("Use Ctrl+D to exit")
             finally:
                 printer_queue.join()
 
@@ -210,7 +215,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     def __init__(self):
         super(RoutersploitInterpreter, self).__init__()
         PrinterThread().start()
-
+        
         self.current_module = None
         self.raw_prompt_template = None
         self.module_prompt_template = None
@@ -241,7 +246,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             Embedded Devices
 
  Codename   : I Knew You Were Trouble
- Version    : 3.4.4
+ Version    : 3.4.6
  Homepage   : https://www.threat9.com - @threatnine
 
  Exploits: {exploits_count} Scanners: {scanners_count} Creds: {creds_count} Generic: {generic_count} Payloads: {payloads_count} Encoders: {encoders_count}
@@ -379,16 +384,23 @@ class RoutersploitInterpreter(BaseInterpreter):
         else:
             return self.main_modules_dirs
 
+    def __command_sigint_handler(self, signum, frame):
+        raise KeyboardInterrupt
+
     @module_required
     def command_run(self, *args, **kwargs):
         print_status("Running module {}...".format(self.current_module))
         try:
+            signal.signal(signal.SIGINT, self.__command_sigint_handler)
             self.current_module.run()
         except KeyboardInterrupt:
             print_info()
             print_error("Operation cancelled by user")
         except Exception:
             print_error(traceback.format_exc(sys.exc_info()))
+        finally:
+            signal.signal(signal.SIGINT, signal.getsignal(signal.SIGINT))
+
 
     def command_exploit(self, *args, **kwargs):
         self.command_run()
