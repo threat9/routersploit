@@ -24,7 +24,6 @@ It consists of various modules that aid penetration testing operations:
 ## Requirements
 
 Required:
-* future
 * requests
 * paramiko
 * pysnmp
