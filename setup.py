@@ -17,6 +17,7 @@ setup(
     include_package_data=True,
     scripts=('rsf.py',),
     entry_points={},
+    python_requires='>=3.9',
     install_requires=[
         "requests",
         "paramiko",
