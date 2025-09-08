@@ -1,4 +1,7 @@
-import telnetlib
+try:
+    import telnetlib
+except ImportError:
+    import telnetlib3 as telnetlib
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
