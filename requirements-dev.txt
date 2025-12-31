@@ -7,3 +7,4 @@ pytest-forked
 pytest-xdist
 flake8
 git+git://github.com/threat9/threat9-test-bed
+telnetlib3
