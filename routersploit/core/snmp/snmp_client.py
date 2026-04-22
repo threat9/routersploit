@@ -1,5 +1,5 @@
 import asyncio
-from pysnmp.hlapi.v3arch.asyncio import *
+from pysnmp.hlapi.v3arch.asyncio import SnmpEngine, CommunityData, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity, get_cmd
 
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
