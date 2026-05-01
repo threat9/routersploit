@@ -46,7 +46,7 @@ class FTPCli:
             try:
                 self.ftp_client.connect(self.ftp_target, self.ftp_port, timeout=FTP_TIMEOUT)
                 return True
-            except Exception as err:
+            except (ftplib.error_temp, ftplib.error_perm, OSError) as err:
                 print_error(self.peer, "FTP Error while connecting to the server", err, verbose=self.verbosity)
 
             self.ftp_client.close()
@@ -65,7 +65,7 @@ class FTPCli:
             self.ftp_client.login(username, password)
             print_success(self.peer, "FTP Authentication Successful - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
             return True
-        except Exception:
+        except (ftplib.error_perm, ftplib.error_temp):
             print_error(self.peer, "FTP Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
 
         self.ftp_client.close()
@@ -94,7 +94,7 @@ class FTPCli:
             fp_content = io.BytesIO()
             self.ftp_client.retrbinary("RETR {}".format(remote_file), fp_content.write)
             return fp_content.getvalue()
-        except Exception as err:
+        except (ftplib.error_temp, ftplib.error_perm, OSError) as err:
             print_error(self.peer, "FTP Error while retrieving content", err, verbose=self.verbosity)
 
         return None
@@ -108,7 +108,7 @@ class FTPCli:
         try:
             self.ftp_client.close()
             return True
-        except Exception as err:
+        except (ftplib.error_temp, OSError) as err:
             print_error(self.peer, "FTP Error while closing connection", err, verbose=self.verbosity)
 
         return False
