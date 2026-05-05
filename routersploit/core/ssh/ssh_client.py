@@ -1,5 +1,9 @@
 import socket
 import paramiko
+try:
+    from paramiko import DSSKey
+except ImportError:
+    DSSKey = None
 import os
 import select
 import sys
@@ -82,8 +86,8 @@ class SSHCli:
         :return bool: True if login was successful, False otherwise
         """
 
-        if "DSA PRIVATE KEY" in priv_key:
-            priv_key = paramiko.DSSKey.from_private_key(io.StringIO(priv_key))
+        if DSSKey is not None and "DSA PRIVATE KEY" in priv_key:
+            priv_key = DSSKey.from_private_key(io.StringIO(priv_key))
         elif "RSA PRIVATE KEY" in priv_key:
             priv_key = paramiko.RSAKey.from_private_key(io.StringIO(priv_key))
         else:

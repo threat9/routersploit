@@ -23,6 +23,9 @@ setup(
         "paramiko",
         "pysnmp",
         "pycryptodome",
+        "telnetlib3",
+        "bluepy",
+        "setuptools",
     ],
     extras_require={
         "tests": [
