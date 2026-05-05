@@ -2,3 +2,5 @@ requests==2.32.2
 paramiko
 pysnmp
 pycryptodome
+setuptools
+standard-telnetlib
