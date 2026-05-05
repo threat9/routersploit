@@ -2,7 +2,8 @@ import struct
 from bluepy.btle import (
     Peripheral,
     ScanEntry,
-    AssignedNumbers
+    AssignedNumbers,
+    BTLEException
 )
 from routersploit.core.exploit.printer import (
     print_table,
@@ -96,12 +97,12 @@ class Device(ScanEntry):
 
             return data
 
-        except Exception as err:
+        except BTLEException as err:
             print_error(err)
 
         try:
             dev.disconnect()
-        except Exception as err:
+        except BTLEException as err:
             print_error(err)
 
         return None
@@ -135,7 +136,7 @@ class Device(ScanEntry):
                     try:
                         char.write(data, wwrflag)
                         print_success("Data sent")
-                    except Exception as err:
+                    except BTLEException as err:
                         print_error("Error: {}".format(err))
 
                 else:
@@ -143,12 +144,12 @@ class Device(ScanEntry):
 
             dev.disconnect()
 
-        except Exception as err:
+        except BTLEException as err:
             print_error(err)
 
         try:
             dev.disconnect()
-        except Exception:
+        except BTLEException:
             pass
 
         return None
@@ -220,10 +221,10 @@ class Device(ScanEntry):
                 else:
                     try:
                         string = color_blue(repr(data.decode("utf-8")))
-                    except Exception:
+                    except UnicodeDecodeError:
                         string = repr(data)
 
-            except Exception:
+            except BTLEException:
                 pass
 
         return string
@@ -387,7 +388,7 @@ class Device(ScanEntry):
 
             if code in appearance.keys():
                 return color_green(appearance[code])
-        except Exception:
+        except (struct.error, TypeError):
             pass
 
         return repr(data)

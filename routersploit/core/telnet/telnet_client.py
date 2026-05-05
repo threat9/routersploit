@@ -3,6 +3,8 @@ try:
 except ImportError:
     import telnetlib3 as telnetlib
 
+import socket
+
 from routersploit.core.exploit.exploit import Exploit
 from routersploit.core.exploit.exploit import Protocol
 from routersploit.core.exploit.option import OptBool
@@ -42,7 +44,7 @@ class TelnetCli:
         try:
             self.telnet_client = telnetlib.Telnet(self.telnet_target, self.telnet_port, timeout=TELNET_TIMEOUT)
             return True
-        except Exception as err:
+        except (socket.error, EOFError, OSError) as err:
             print_error(self.peer, "Telnet Error while connecting to the server", err, verbose=self.verbosity)
 
         return False
@@ -75,7 +77,7 @@ class TelnetCli:
                 else:
                     print_error(self.peer, "Telnet Authentication Failed - Username: '{}' Password: '{}'".format(username, password), verbose=self.verbosity)
                     break
-            except Exception as err:
+            except (socket.error, EOFError, OSError) as err:
                 print_error(self.peer, "Telnet Error while authenticating to the server", err, verbose=self.verbosity)
 
         return False
@@ -92,7 +94,7 @@ class TelnetCli:
             self.telnet_client.close()
 
             return True
-        except Exception as err:
+        except (socket.error, EOFError, OSError) as err:
             print_error(self.peer, "Telnet Error while testing connection to the server", err, verbose=self.verbosity)
 
         return False
@@ -115,7 +117,7 @@ class TelnetCli:
         try:
             response = self.telnet_client.read_until(data, 5)
             return response
-        except Exception as err:
+        except (socket.error, EOFError, OSError) as err:
             print_error(self.peer, "Telnet Error while reading data from the server", err, verbose=self.verbosity)
 
         return None
@@ -130,7 +132,7 @@ class TelnetCli:
         try:
             self.telnet_client.write(data, 5)
             return True
-        except Exception as err:
+        except (socket.error, OSError) as err:
             print_error(self.peer, "Telnet Error while writing to the server", err, verbose=self.verbosity)
 
         return False
@@ -144,7 +146,7 @@ class TelnetCli:
         try:
             self.telnet_client.close()
             return True
-        except Exception as err:
+        except (socket.error, OSError) as err:
             print_error(self.peer, "Telnet Error while closing connection", err, verbose=self.verbosity)
 
         return False
