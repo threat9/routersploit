@@ -1,7 +1,8 @@
-import pkg_resources
+import importlib.resources as res
 
+filenames = ['defaults.txt', 'passwords.txt', 'usernames.txt', 'snmp.txt']
+pkg_files = res.files(__name__)
 
-defaults = 'file://' + pkg_resources.resource_filename(__name__, 'defaults.txt')
-passwords = 'file://' + pkg_resources.resource_filename(__name__, 'passwords.txt')
-usernames = 'file://' + pkg_resources.resource_filename(__name__, 'usernames.txt')
-snmp = 'file://' + pkg_resources.resource_filename(__name__, 'snmp.txt')
+paths = [f"file://{pkg_files.joinpath(n).resolve()}" for n in filenames]
+
+defaults, passwords, usernames, snmp = paths
