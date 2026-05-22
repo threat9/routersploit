@@ -1,6 +1,5 @@
 # RouterSploit - Exploitation Framework for Embedded Devices
-
-[![Python 3.6](https://img.shields.io/badge/Python-3.6-yellow.svg)](http://www.python.org/download/)
+ppip n 3.6](https://img.shields.io/badge/Python-3.6-yellow.svg)](http://www.python.org/download/)
 [![Build Status](https://travis-ci.org/threat9/routersploit.svg?branch=master)](https://travis-ci.org/threat9/routersploit)
 
 # Community
@@ -35,12 +34,11 @@ Optional:
 ## Installation on Kali Linux
 
 ```
-apt-get install python3-pip
-git clone https://www.github.com/threat9/routersploit
-cd routersploit
+apt-get install python3-pi
+git clone https://www.github.com/threat9/routroutersploitroutersploit
 python3 -m pip install -r requirements.txt
-python3 rsf.py
-```
+python3 rsf.Bluetooth
+python```
 
 Bluetooth Low Energy support:
 ```
