@@ -71,6 +71,7 @@ class ApiRosClient(object):
             self.connection = self.sock.connect(sa)
 
         except OSError:
+            self.sock.close()
             raise CreateSocketError('Error: API failed to connect to socket. Host: {}, port: {}.'.format(self.address,
                                                                                                          self.port))
 
@@ -265,4 +266,5 @@ class ApiRosClient(object):
         self.login()
 
     def close(self):
-        self.sock.close()
+        if self.sock:
+            self.sock.close()

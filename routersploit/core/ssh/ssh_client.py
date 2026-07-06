@@ -164,6 +164,7 @@ class SSHCli:
         try:
             sftp = self.ssh_client.open_sftp()
             sftp.get(remote_file, local_file)
+            sftp.close()
 
             return True
         except Exception as err:
