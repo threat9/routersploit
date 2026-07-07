@@ -161,14 +161,16 @@ class SSHCli:
         :return bool: True if getting file was successful, False otherwise
         """
 
+        sftp = None
         try:
             sftp = self.ssh_client.open_sftp()
             sftp.get(remote_file, local_file)
-            sftp.close()
-
             return True
         except Exception as err:
             print_error(self.peer, "SSH Error while retrieving file from the server", err, verbose=self.verbosity)
+        finally:
+            if sftp:
+                sftp.close()
 
         return False
 
@@ -179,6 +181,7 @@ class SSHCli:
         :return str: file content from SSH server
         """
 
+        sftp = None
         try:
             fp_content = io.BytesIO()
             sftp = self.ssh_client.open_sftp()
@@ -187,6 +190,9 @@ class SSHCli:
             return fp_content.getvalue()
         except Exception as err:
             print_error(self.peer, "SSH Error while retrieving file content from the server", err, verbose=self.verbosity)
+        finally:
+            if sftp:
+                sftp.close()
 
         return None
 
@@ -198,12 +204,16 @@ class SSHCli:
         :return bool: True if sending file was successful, False otherwise
         """
 
+        sftp = None
         try:
             sftp = self.ssh_client.open_sftp()
             sftp.put(local_file, dest_file)
             return True
         except Exception as err:
             print_error(self.peer, "SSH Error while sending file to the server", err, verbose=self.verbosity)
+        finally:
+            if sftp:
+                sftp.close()
 
         return False
 
@@ -215,6 +225,7 @@ class SSHCli:
         :return bool: True if sending file content was successful, False otherwise
         """
 
+        sftp = None
         try:
             fp_content = io.BytesIO(content)
             sftp = self.ssh_client.open_sftp()
@@ -222,6 +233,9 @@ class SSHCli:
             return True
         except Exception as err:
             print_error(self.peer, "SSH Error while sending content to the server", err, verbose=self.verbosity)
+        finally:
+            if sftp:
+                sftp.close()
 
         return False
 
