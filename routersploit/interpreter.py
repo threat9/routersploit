@@ -689,4 +689,4 @@ class RoutersploitInterpreter(BaseInterpreter):
         raise EOFError
 
     def command_clear(self, *args, **kwargs):
-        os.system("cls" if os.name = "nt" else "clear")
+        os.system("cls" if os.name == "nt" else "clear")
