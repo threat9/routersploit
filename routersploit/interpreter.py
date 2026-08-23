@@ -398,7 +398,7 @@ class RoutersploitInterpreter(BaseInterpreter):
             print_info()
             print_error("Operation cancelled by user")
         except Exception:
-            print_error(traceback.format_exc(sys.exc_info()))
+            print_error(traceback.format_exc())
         finally:
             signal.signal(signal.SIGINT, signal.getsignal(signal.SIGINT))
 
