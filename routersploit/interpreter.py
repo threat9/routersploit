@@ -202,6 +202,7 @@ class RoutersploitInterpreter(BaseInterpreter):
     use <module>                Select a module for usage
     exec <shell command> <args> Execute a command in a shell
     search <search term>        Search for appropriate module
+    clear                       Clear the screen
     exit                        Exit RouterSploit"""
 
     module_help = """Module commands:
@@ -224,7 +225,7 @@ class RoutersploitInterpreter(BaseInterpreter):
         self.show_sub_commands = ("info", "options", "advanced", "devices", "all", "encoders", "creds", "exploits", "scanners", "wordlists")
         self.search_sub_commands = ("type", "device", "language", "payload", "vendor")
 
-        self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search "])
+        self.global_commands = sorted(["use ", "exec ", "help", "exit", "show ", "search ", "Clear "])
         self.module_commands = ["run", "back", "set ", "setg ", "check"]
         self.module_commands.extend(self.global_commands)
         self.module_commands.sort()
@@ -686,3 +687,6 @@ class RoutersploitInterpreter(BaseInterpreter):
 
     def command_exit(self, *args, **kwargs):
         raise EOFError
+
+    def command_clear(self, *args, **kwargs):
+        os.system("cls" if os.name == "nt" else "clear")
