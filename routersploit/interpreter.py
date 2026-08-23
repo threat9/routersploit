@@ -6,7 +6,6 @@ import sys
 import getopt
 import signal
 import traceback
-import threading, ctypes
 from collections import Counter
 
 from routersploit.core.exploit.exceptions import RoutersploitException
