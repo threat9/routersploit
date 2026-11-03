@@ -32,6 +32,20 @@ Required:
 Optional:
 * bluepy - Bluetooth low energy 
 
+## Installation with uv
+
+```sh
+git clone https://github.com/threat9/routersploit
+cd routersploit
+uv venv
+uv pip install -r requirements.txt
+uv run --no-project rsf.py
+```
+
+Use `--no-project` because this repository uses `setup.py`; this also prevents
+uv from selecting a `pyproject.toml` in a parent directory. Alternatively,
+activate the environment with `source .venv/bin/activate` and run `python3 rsf.py`.
+
 ## Installation on Kali Linux
 
 ```
