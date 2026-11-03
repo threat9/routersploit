@@ -20,9 +20,10 @@ setup(
     python_requires='>=3.9',
     install_requires=[
         "requests",
-        "paramiko",
+        "paramiko>=3.5.1,<4",
         "pysnmp",
         "pycryptodome",
+        "telnetlib3; python_version >= '3.13'",
     ],
     extras_require={
         "tests": [

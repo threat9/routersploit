@@ -1,4 +1,6 @@
 requests==2.32.2
-paramiko
+# Paramiko 4 removed DSSKey, required by the bundled legacy SSH keys.
+paramiko>=3.5.1,<4
 pysnmp
 pycryptodome
+telnetlib3; python_version >= '3.13'

@@ -1,5 +1,5 @@
 requests==2.32.2
-paramiko
+paramiko>=3.5.1,<4
 pysnmp==4.4.6
 pycryptodome
 pytest==4.4.0
